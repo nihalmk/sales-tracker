@@ -5,6 +5,7 @@ import { NextPage } from 'next';
 import { Layout } from '../components/Layout/Layout';
 import ErrorMessage from '../components/Errors/ErrorMessage';
 import Navigation from '../components/Navigation/Navigation';
+import AddStock from '../components/Stock/AddStock';
 
 interface Props {}
 
@@ -13,13 +14,23 @@ const Home: NextPage<Props> = () => {
 
   const [selectedMenu, setSelectedMenu] = useState<string>();
 
+  const component = () => {
+    switch (selectedMenu) {
+      case 'stock':
+        return <AddStock />;
+      default:
+        return <div className="text-center">Not Available</div>;
+    }
+  };
   return (
     <Layout hideHeader={false}>
       <div className="container">
         {user?.shop ? (
           <React.Fragment>
             <Navigation selected={setSelectedMenu} />
-            {selectedMenu}
+            <div className="mt-5">
+            {component()}
+            </div>
           </React.Fragment>
         ) : (
           <ErrorMessage

@@ -23,6 +23,13 @@ export const omitTypenameKey = (arr: any) => {
   });
 };
 
+export const removeUnderscoreKeys = (obj: Object) => {
+  return JSON.parse(JSON.stringify(obj), (key, value) => {
+    if (key.startsWith('__')) return undefined;
+    return value;
+  });
+};
+
 export const labelMaps: { [key: string]: string } = {
   Mobile: 'Mobile and Accessories',
 };

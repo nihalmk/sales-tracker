@@ -44,6 +44,14 @@ type Commission {
   rate: Float!
 }
 
+input CreateItemsInput {
+  name: String!
+  category: String
+  price: PriceInput
+  stock: Float!
+  shop: ID
+}
+
 input CreateShopInput {
   name: String!
   type: ShopType!
@@ -89,6 +97,17 @@ type Item {
   quantity: Float!
 }
 
+"""The Items model"""
+type Items {
+  _id: ID!
+  shortId: String!
+  name: String!
+  category: String
+  price: Price
+  stock: Float!
+  shop: Shop
+}
+
 type Location {
   id: String!
   label: String!
@@ -104,6 +123,8 @@ type Location {
 }
 
 type Mutation {
+  createItem(item: CreateItemsInput!): Items
+  updateItem(item: UpdateItemsInput!): Items
   createShop(shop: CreateShopInput!): Shop
   createNewUser(user: CreateUserInput!): ID!
   sendResetPasswordEmail(email: String!): Boolean!
@@ -159,6 +180,18 @@ type Payment {
   service_fee: Float!
 }
 
+type Price {
+  sale: Float!
+  cost: Float!
+  list: Float!
+}
+
+input PriceInput {
+  sale: Float!
+  cost: Float!
+  list: Float!
+}
+
 type Profile {
   id: String!
   guest: Boolean!
@@ -171,6 +204,7 @@ type Profile {
 }
 
 type Query {
+  getItemsForUser: [Items!]!
   getShopForUser: Shop
   me: User
   getUserById(id: ID!): User
@@ -182,9 +216,7 @@ enum Roles {
   Admin
 }
 
-"""
-The Shop model
-"""
+"""The Shop model"""
 type Shop {
   _id: ID!
   name: String!
@@ -204,9 +236,15 @@ type Tax {
   amount: Float!
 }
 
-"""
-The User model
-"""
+input UpdateItemsInput {
+  _id: ID!
+  name: String!
+  category: String
+  price: PriceInput
+  stock: Float!
+}
+
+"""The User model"""
 type User {
   _id: ID!
   firstName: String!

@@ -42,6 +42,11 @@ export const Layout: React.FC<Props> = ({ children, hideHeader }) => {
         .body {
           background: #f7c5c7;
         }
+        @media (max-width: 768px) {
+          .hide-small-screen {
+            display: none
+          }
+        }
       `}</style>
     </Site>
   );

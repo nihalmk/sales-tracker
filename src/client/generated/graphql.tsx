@@ -11,7 +11,7 @@ export type Scalars = {
 };
 
 export type Address = {
-  __typename?: 'Address';
+   __typename?: 'Address';
   street: Scalars['String'];
   pincode: Scalars['String'];
   lat?: Maybe<Scalars['String']>;
@@ -35,7 +35,7 @@ export type AuthenticateParamsInput = {
 };
 
 export type Branches = {
-  __typename?: 'Branches';
+   __typename?: 'Branches';
   name: Scalars['String'];
 };
 
@@ -45,13 +45,13 @@ export type BranchesInput = {
 };
 
 export type Channel = {
-  __typename?: 'Channel';
+   __typename?: 'Channel';
   type: Scalars['String'];
   version: Scalars['String'];
 };
 
 export type Charges = {
-  __typename?: 'Charges';
+   __typename?: 'Charges';
   joker_fee: Scalars['Float'];
   service_fee: Scalars['Float'];
   discount_fee: Scalars['Float'];
@@ -59,17 +59,26 @@ export type Charges = {
 };
 
 export type Commission = {
-  __typename?: 'Commission';
+   __typename?: 'Commission';
   commissionable_value: Scalars['Float'];
   amount: Scalars['Float'];
   rate: Scalars['Float'];
 };
 
+export type CreateItemsInput = {
+  name: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+  price?: Maybe<PriceInput>;
+  stock: Scalars['Float'];
+  shop?: Maybe<Scalars['ID']>;
+};
+
 export type CreateShopInput = {
   name: Scalars['String'];
+  type: ShopType;
   address: AddressInput;
-  timezone: Scalars['String'];
-  branches: Array<BranchesInput>;
+  timezone?: Maybe<Scalars['String']>;
+  branches?: Maybe<Array<BranchesInput>>;
 };
 
 export type CreateUserInput = {
@@ -83,21 +92,22 @@ export type CreateUserInput = {
 };
 
 export type CreateUserResult = {
-  __typename?: 'CreateUserResult';
+   __typename?: 'CreateUserResult';
   userId?: Maybe<Scalars['ID']>;
   loginResult?: Maybe<LoginResult>;
 };
 
 export type Customer = {
-  __typename?: 'Customer';
+   __typename?: 'Customer';
   customer_id: Scalars['String'];
   profile: Profile;
   channel: Channel;
   payment: Payment;
 };
 
+
 export type Delivery = {
-  __typename?: 'Delivery';
+   __typename?: 'Delivery';
   tip: Scalars['Float'];
   delivery_fee: Scalars['Float'];
   tax: Tax;
@@ -106,20 +116,20 @@ export type Delivery = {
 };
 
 export type EmailRecord = {
-  __typename?: 'EmailRecord';
+   __typename?: 'EmailRecord';
   address?: Maybe<Scalars['String']>;
   verified?: Maybe<Scalars['Boolean']>;
 };
 
 export type ImpersonateReturn = {
-  __typename?: 'ImpersonateReturn';
+   __typename?: 'ImpersonateReturn';
   authorized?: Maybe<Scalars['Boolean']>;
   tokens?: Maybe<Tokens>;
   user?: Maybe<User>;
 };
 
 export type Item = {
-  __typename?: 'Item';
+   __typename?: 'Item';
   id: Scalars['String'];
   name: Scalars['String'];
   customer_notes: Scalars['String'];
@@ -127,8 +137,20 @@ export type Item = {
   quantity: Scalars['Float'];
 };
 
+/** The Items model */
+export type Items = {
+   __typename?: 'Items';
+  _id: Scalars['ID'];
+  shortId: Scalars['String'];
+  name: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+  price?: Maybe<Price>;
+  stock: Scalars['Float'];
+  shop?: Maybe<Shop>;
+};
+
 export type Location = {
-  __typename?: 'Location';
+   __typename?: 'Location';
   id: Scalars['String'];
   label: Scalars['String'];
   address_text: Scalars['String'];
@@ -143,14 +165,14 @@ export type Location = {
 };
 
 export type LoginResult = {
-  __typename?: 'LoginResult';
+   __typename?: 'LoginResult';
   sessionId?: Maybe<Scalars['String']>;
   tokens?: Maybe<Tokens>;
   user?: Maybe<User>;
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
+   __typename?: 'Mutation';
   createUser?: Maybe<CreateUserResult>;
   verifyEmail?: Maybe<Scalars['Boolean']>;
   resetPassword?: Maybe<LoginResult>;
@@ -165,79 +187,100 @@ export type Mutation = {
   logout?: Maybe<Scalars['Boolean']>;
   authenticate?: Maybe<LoginResult>;
   verifyAuthentication?: Maybe<Scalars['Boolean']>;
+  createItems?: Maybe<Items>;
   createShop?: Maybe<Shop>;
   createNewUser: Scalars['ID'];
 };
+
 
 export type MutationCreateUserArgs = {
   user: CreateUserInput;
 };
 
+
 export type MutationVerifyEmailArgs = {
   token: Scalars['String'];
 };
+
 
 export type MutationResetPasswordArgs = {
   token: Scalars['String'];
   newPassword: Scalars['String'];
 };
 
+
 export type MutationSendVerificationEmailArgs = {
   email: Scalars['String'];
 };
+
 
 export type MutationSendResetPasswordEmailArgs = {
   email: Scalars['String'];
 };
 
+
 export type MutationAddEmailArgs = {
   newEmail: Scalars['String'];
 };
+
 
 export type MutationChangePasswordArgs = {
   oldPassword: Scalars['String'];
   newPassword: Scalars['String'];
 };
 
+
 export type MutationTwoFactorSetArgs = {
   secret: TwoFactorSecretKeyInput;
   code: Scalars['String'];
 };
 
+
 export type MutationTwoFactorUnsetArgs = {
   code: Scalars['String'];
 };
+
 
 export type MutationImpersonateArgs = {
   accessToken: Scalars['String'];
   username: Scalars['String'];
 };
 
+
 export type MutationRefreshTokensArgs = {
   accessToken: Scalars['String'];
   refreshToken: Scalars['String'];
 };
+
 
 export type MutationAuthenticateArgs = {
   serviceName: Scalars['String'];
   params: AuthenticateParamsInput;
 };
 
+
 export type MutationVerifyAuthenticationArgs = {
   serviceName: Scalars['String'];
   params: AuthenticateParamsInput;
 };
 
+
+export type MutationCreateItemsArgs = {
+  items: CreateItemsInput;
+};
+
+
 export type MutationCreateShopArgs = {
   shop: CreateShopInput;
 };
+
 
 export type MutationCreateNewUserArgs = {
   user: CreateUserInput;
 };
 
 export type Option = {
-  __typename?: 'Option';
+   __typename?: 'Option';
   id: Scalars['String'];
   name: Scalars['String'];
   type: Scalars['String'];
@@ -246,7 +289,7 @@ export type Option = {
 };
 
 export type OrderContent = {
-  __typename?: 'OrderContent';
+   __typename?: 'OrderContent';
   order_id: Scalars['String'];
   brand_name: Scalars['String'];
   country_code: Scalars['String'];
@@ -267,7 +310,7 @@ export type OrderContent = {
 };
 
 export type OrderInfo = {
-  __typename?: 'OrderInfo';
+   __typename?: 'OrderInfo';
   minimum_order_value: Scalars['Float'];
   deposit: Scalars['Float'];
   order_value: Scalars['Float'];
@@ -276,7 +319,7 @@ export type OrderInfo = {
 };
 
 export type Payment = {
-  __typename?: 'Payment';
+   __typename?: 'Payment';
   payment_method: Scalars['String'];
   paid: Scalars['Boolean'];
   transaction_number: Scalars['String'];
@@ -290,8 +333,21 @@ export type Payment = {
   service_fee: Scalars['Float'];
 };
 
+export type Price = {
+   __typename?: 'Price';
+  sale: Scalars['Float'];
+  cost: Scalars['Float'];
+  list: Scalars['Float'];
+};
+
+export type PriceInput = {
+  sale: Scalars['Float'];
+  cost: Scalars['Float'];
+  list: Scalars['Float'];
+};
+
 export type Profile = {
-  __typename?: 'Profile';
+   __typename?: 'Profile';
   id: Scalars['String'];
   guest: Scalars['Boolean'];
   locale: Scalars['String'];
@@ -303,13 +359,15 @@ export type Profile = {
 };
 
 export type Query = {
-  __typename?: 'Query';
+   __typename?: 'Query';
   twoFactorSecret?: Maybe<TwoFactorSecretKey>;
   getUser?: Maybe<User>;
+  getItemsForUser: Array<Items>;
   getShopForUser?: Maybe<Shop>;
   me?: Maybe<User>;
   getUserById?: Maybe<User>;
 };
+
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['ID'];
@@ -318,12 +376,12 @@ export type QueryGetUserByIdArgs = {
 export enum Roles {
   Sales = 'Sales',
   Manager = 'Manager',
-  Admin = 'Admin',
+  Admin = 'Admin'
 }
 
 /** The Shop model */
 export type Shop = {
-  __typename?: 'Shop';
+   __typename?: 'Shop';
   _id: Scalars['ID'];
   name: Scalars['String'];
   type: ShopType;
@@ -333,24 +391,24 @@ export type Shop = {
 };
 
 export enum ShopType {
-  Mobile = 'Mobile',
+  Mobile = 'Mobile'
 }
 
 export type Tax = {
-  __typename?: 'Tax';
+   __typename?: 'Tax';
   tax_rate_percent: Scalars['Float'];
   net_amount: Scalars['Float'];
   amount: Scalars['Float'];
 };
 
 export type Tokens = {
-  __typename?: 'Tokens';
+   __typename?: 'Tokens';
   refreshToken?: Maybe<Scalars['String']>;
   accessToken?: Maybe<Scalars['String']>;
 };
 
 export type TwoFactorSecretKey = {
-  __typename?: 'TwoFactorSecretKey';
+   __typename?: 'TwoFactorSecretKey';
   ascii?: Maybe<Scalars['String']>;
   base32?: Maybe<Scalars['String']>;
   hex?: Maybe<Scalars['String']>;
@@ -372,9 +430,16 @@ export type TwoFactorSecretKeyInput = {
   otpauth_url?: Maybe<Scalars['String']>;
 };
 
+export type UpdateItemsInput = {
+  _id: Scalars['ID'];
+  category?: Maybe<Scalars['String']>;
+  price?: Maybe<PriceInput>;
+  stock: Scalars['Float'];
+};
+
 /** The User model */
 export type User = {
-  __typename?: 'User';
+   __typename?: 'User';
   id: Scalars['ID'];
   emails?: Maybe<Array<EmailRecord>>;
   username?: Maybe<Scalars['String']>;
@@ -396,8 +461,9 @@ export type UserInput = {
 };
 
 export type VendorInfo = {
-  __typename?: 'VendorInfo';
+   __typename?: 'VendorInfo';
   id: Scalars['String'];
   name: Scalars['String'];
   charges?: Maybe<Charges>;
 };
+

@@ -30,7 +30,8 @@ const AddShop: NextPage<Props> = function () {
 
   const router = useRouter();
 
-  const onSubmit = async () => {
+  const onSubmit = async (e: React.SyntheticEvent) => {
+    e && e.preventDefault();
     const { name, address, type } = shopState;
     setSubmitted(true);
     if (!name || !address?.street || !address?.pincode || !type) {
