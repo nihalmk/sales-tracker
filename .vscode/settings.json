@@ -1,0 +1,14 @@
+{
+  "cSpell.words": [
+    "Datafridge",
+    "bodyparser",
+    "esnext",
+    "honestfoodcompany",
+    "kcors",
+    "pino",
+    "pubsub",
+    "tabler",
+    "typegoose"
+  ],
+  "javascript.implicitProjectConfig.experimentalDecorators": true
+}

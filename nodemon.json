@@ -1,0 +1,17 @@
+{
+  "verbose": true,
+  "ignore": [
+    "node_modules",
+    "src/client/.next",
+    "static",
+    ".vscode",
+    "src/server/**/*.test.ts"
+  ],
+  "watch": [
+    "src/server/**/*",
+    "src/accounts/**/*",
+    "src/client/apollo/**/*",
+    "src/client/next.config.js"
+  ],
+  "ext": "js jsx json ts tsx"
+}

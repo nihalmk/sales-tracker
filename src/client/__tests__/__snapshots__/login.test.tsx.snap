@@ -1,0 +1,112 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Login Page Login page snapshot 1`] = `
+<div
+  className="jsx-2085888330 container"
+>
+  <Head>
+    <title
+      className="jsx-2085888330"
+    >
+      Login
+    </title>
+    <link
+      className="jsx-2085888330"
+      href="/favicon.ico"
+      rel="icon"
+    />
+  </Head>
+  <div
+    className="jsx-2085888330 row"
+  >
+    <div
+      className="jsx-2085888330 col col-login mx-auto"
+    >
+      <div
+        className="jsx-2085888330 text-center mb-6"
+      >
+        <Logo
+          setColor={true}
+        />
+      </div>
+      <form
+        action=""
+        className="jsx-2085888330 card"
+        method="post"
+      >
+        <div
+          className="jsx-2085888330 card-body p-6"
+        >
+          <div
+            className="jsx-2085888330 card-title text-center"
+          >
+            Sign in to your Kitchen
+          </div>
+        </div>
+        <div
+          className="jsx-2085888330 card-body p-6"
+        >
+          <ErrorMessage
+            error=""
+          />
+          <div
+            className="jsx-2085888330 form-group"
+          >
+            <label
+              className="jsx-2085888330 form-label"
+            >
+              Email address
+            </label>
+            <input
+              className="jsx-2085888330 form-control"
+              id="email"
+              name="email"
+              onChange={[Function]}
+              placeholder="Enter email"
+              type="email"
+            />
+          </div>
+          <div
+            className="jsx-2085888330 form-group"
+          >
+            <label
+              className="jsx-2085888330 form-label"
+            >
+              Password
+            </label>
+            <input
+              className="jsx-2085888330 form-control"
+              id="userPassword"
+              name="password"
+              onChange={[Function]}
+              placeholder="Password"
+              type="password"
+            />
+          </div>
+          <Link
+            href="/forgot"
+          >
+            Forgot Password?
+          </Link>
+          <div
+            className="jsx-2085888330 form-footer"
+          >
+            <button
+              className="jsx-2085888330 btn btn-primary btn-block false"
+              onClick={[Function]}
+              type="button"
+            >
+              Sign in
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <JSXStyle
+    id="2085888330"
+  />
+</div>
+`;
+
+exports[`Login Page with user already logged in Login page snapshot 1`] = `<Loader />`;

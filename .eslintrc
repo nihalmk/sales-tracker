@@ -1,0 +1,22 @@
+{
+  "env": {
+    "mocha": true,
+    "node": true
+  },
+  "extends": [
+    "@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "globals": {
+    "browser": true,
+    "API_URL": true
+  },
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error"
+  }
+}

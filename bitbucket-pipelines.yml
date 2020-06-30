@@ -1,0 +1,55 @@
+# This is a sample build configuration for JavaScript.
+# Check our guides at https://confluence.atlassian.com/x/14UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: node:10.15.3
+
+options:
+  max-time: 30
+pipelines:
+  pull-requests:
+    '**':
+      - parallel:
+          - step:
+              name: Unit tests
+              caches:
+                - npm
+              script:
+                - npm install
+                - npm run test -- --max-workers=1 --forceExit
+                - npm run build
+  custom:
+    staging:
+      - parallel:
+          - step:
+              name: Unit tests
+              caches:
+                - npm
+              script:
+                - npm install
+                - npm run test -- --max-workers=1 --forceExit
+  branches:
+    develop:
+      - parallel:
+          - step:
+              name: Unit tests
+              caches:
+                - npm
+              script:
+                - npm install
+                - npm run test -- --max-workers=1 --forceExit
+    master:
+      - parallel:
+          - step:
+              name: Unit tests
+              caches:
+                - npm
+              script:
+                - npm install
+                - npm run test -- --max-workers=1 --forceExit
+
+definitions:
+  caches:
+    npm: $HOME/.npm
+    next: dist

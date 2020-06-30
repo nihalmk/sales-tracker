@@ -1,0 +1,148 @@
+steps:
+  # Get SSH key from secret manager
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Get SSH key from secret manager'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud secrets versions access latest --secret=bitbucket_ssh > /root/.ssh/id_rsa
+        cp /root/.ssh/id_rsa id_rsa
+        touch known_hosts
+    volumes:
+      - name: 'ssh'
+        path: /root/.ssh
+
+  # Place trigger values in ENV files
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Place trigger values in ENV files'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Place container image tag
+        sed -i -e 's,IMAGE_TAG_PLACEHOLDER,$REVISION_ID,g' var_env_kitchen_screens.auto.tfvars
+        # Place env variables
+        sed -i -e 's#GRAPHQL_SERVER_PLACEHOLDER#$_GRAPHQL_SERVER#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#GRAPHQL_WEBSOCKET_SERVER_PLACEHOLDER#$_GRAPHQL_WEBSOCKET_SERVER#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#MONGO_URI_SECRET_PLACEHOLDER#$_MONGO_URI_SECRET#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#NODE_ENV_PLACEHOLDER#$_NODE_ENV#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#PORT_PLACEHOLDER#$_PORT#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#PUBSUB_ROOT_DIR_PLACEHOLDER#$_PUBSUB_ROOT_DIR#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#REDIS_HOST_PLACEHOLDER#$_REDIS_HOST#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#CLOUD_TASK_PROJECT_ID_PLACEHOLDER#$_CLOUD_TASK_PROJECT_ID#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#CLOUD_TASK_LOCATION_PLACEHOLDER#$_CLOUD_TASK_LOCATION#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#CLOUD_TASK_WORKER_URL_PLACEHOLDER#$_CLOUD_TASK_WORKER_URL#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#CLOUD_TASK_RETRY_CONFIG_PLACEHOLDER#$_CLOUD_TASK_RETRY_CONFIG#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#MAILGUN_API_KEY_PLACEHOLDER#$_MAILGUN_API_KEY#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#MAILGUN_DOMAIN_PLACEHOLDER#$_MAILGUN_DOMAIN#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#HURRIER_ORDER_DETAILS_URL_PLACEHOLDER#$_HURRIER_ORDER_DETAILS_URL#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#HURRIER_ORDER_AUTH_KEY_PLACEHOLDER#$_HURRIER_ORDER_AUTH_KEY#g' var_env_kitchen_screens.auto.tfvars
+        sed -i -e 's#CLOUD_SCHEDULER_AUDIENCE_PLACEHOLDER#$_CLOUD_SCHEDULER_AUDIENCE#g' var_env_kitchen_screens.auto.tfvars
+
+  # Set up bitbucket with key and domain
+  - name: 'gcr.io/hfc-experiments/node:alpine3.11'
+    id: 'Set up bitbucket with key and domain'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        chmod 600 /root/.ssh/id_rsa
+        cat <<EOF >/root/.ssh/config
+        Hostname bitbucket.org
+        IdentityFile /root/.ssh/id_rsa
+        EOF
+        echo "bitbucket.org ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAubiN81eDcafrgMeLzaFPsw2kNvEcqTKl/VqLat/MaB33pZy0y3rJZtnqwR2qOOvbwKZYKiEO1O6VqNEBxKvJJelCq0dTXWT5pbO2gDXC6h6QDXCaHo6pOHGPUy+YBaGQRGuSusMEASYiWunYN0vCAI8QaXnWMXNMdFP3jHAJH0eDsoiGnLPBlBp4TNm6rYI74nMzgz3B9IikW4WVK+dc8KZJZWYjAuORU3jc1c/NPskD2ASinf8v3xnfXeukU0sJ5N6m5E8VLjObPEO+mN2t/FZTMZLiFqPWc/ALSqnMnnhwrNi2rbfg/rd/IpL8Le3pSBne8+seeFVBoGqzHM9yXw==" > known_hosts
+        cp known_hosts /root/.ssh/known_hosts
+    volumes:
+      - name: 'ssh'
+        path: /root/.ssh
+
+  # Install dependencies to run the tests
+  - name: 'gcr.io/cloud-builders/npm:current'
+    id: 'Install dependencies to run the tests'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        npm install
+    volumes:
+      - name: 'ssh'
+        path: /root/.ssh
+
+  # Run tests
+  # - name: "gcr.io/cloud-builders/npm:current"
+  #   id: "Run tests"
+  #   entrypoint: "sh"
+  #   args:
+  #   - '-c'
+  #   - |
+  #     npm run test
+  #   volumes:
+  #   - name: "ssh"
+  #     path: /root/.ssh
+
+  #  Build and push docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build and push docker image'
+    args:
+      [
+        'build',
+        '-t',
+        'gcr.io/$PROJECT_ID/$_HFC_PROJECT:$REVISION_ID',
+        '--build-arg',
+        'GRAPHQL_SERVER=$_GRAPHQL_SERVER',
+        '--build-arg',
+        'GRAPHQL_WEBSOCKET_SERVER=$_GRAPHQL_WEBSOCKET_SERVER',
+        '.',
+      ]
+
+  #  Tag the image with latest and commit hash tags
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Tag the image with latest and REVISION_ID tag'
+    args:
+      [
+        'tag',
+        'gcr.io/$PROJECT_ID/$_HFC_PROJECT:$REVISION_ID',
+        'gcr.io/$PROJECT_ID/$_HFC_PROJECT:latest',
+      ]
+
+  # Update hfc-gcp-common-infra repository
+  - name: 'gcr.io/cloud-builders/git'
+    id: 'Update hfc-gcp-common-infra repository'
+    entrypoint: /bin/sh
+    args:
+      - '-c'
+      - |
+        set -x
+          # Set environment name
+          echo "staging" > /_ENV
+          echo "staging" > /_INFRA_BRANCH
+          if [ $BRANCH_NAME -eq "master" ]; then
+            echo "production" > /_ENV
+            echo "production" > /_INFRA_BRANCH
+          fi
+          echo "The value of \"_ENV\" is $(cat /_ENV)."
+          echo "The value of \"_INFRA_BRANCH\" is $(cat /_INFRA_BRANCH)."
+        # Configure Git to create commits with Cloud Build's service account
+        git config  --global user.email $(gcloud auth list --filter=status:ACTIVE --format='value(account)')
+        git config  --global user.name "Cloud Build"
+        # Clone infra repo and checkout branch
+        git clone git@bitbucket.org:honestfoodcompany/hfc-gcp-common-infra.git
+        cd hfc-gcp-common-infra
+        git checkout "$(cat /_INFRA_BRANCH)"
+        # Replace env files with updated versions
+        mv /workspace/var_env_kitchen_screens.auto.tfvars "environment/env/$(cat /_ENV)/var_env_kitchen_screens.auto.tfvars"
+        # Commit and push to infra repo (only if there were changes)
+        git add "environment/env/$(cat /_ENV)/var_env_kitchen_screens.auto.tfvars"
+        git diff-index --quiet HEAD || git commit -m "Update image gcr.io/${PROJECT_ID}/${_HFC_PROJECT}:${SHORT_SHA} Built from commit ${COMMIT_SHA} of repository ${_HFC_PROJECT}."
+        git push origin "$(cat /_INFRA_BRANCH)"
+    volumes:
+      - name: 'ssh'
+        path: /root/.ssh
+
+images:
+  [
+    'gcr.io/$PROJECT_ID/$_HFC_PROJECT:$REVISION_ID',
+    'gcr.io/$PROJECT_ID/$_HFC_PROJECT:latest',
+  ]

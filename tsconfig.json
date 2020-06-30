@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "outDir": "./dist/src/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "esnext",
+    "target": "es2017",
+    "jsx": "preserve",
+    "lib": ["dom", "es2015", "es2017"],
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "emitDecoratorMetadata": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": ["./src/client/**/*"],
+  "exclude": [
+    "node_modules",
+    "src/client/build",
+    "src/client/pages/__tests__/**/*",
+    "src/client/pages/__stubs__/**/*",
+    "**/*.test.ts",
+    "dist"
+  ]
+}

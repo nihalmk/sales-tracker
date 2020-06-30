@@ -1,0 +1,25 @@
+{
+  "env": {
+    "development": {
+      "presets": ["next/babel"],
+      "ignore": ["node_modules", "build"]
+    },
+    "production": {
+      "presets": ["next/babel"],
+      "ignore": ["node_modules", "build"]
+    },
+    "test": {
+      "presets": [
+        [
+          "next/babel",
+          {
+            "preset-env": {
+              "modules": "commonjs"
+            }
+          }
+        ],
+      ],
+      "ignore": ["node_modules", "build"]
+    }
+  }
+}

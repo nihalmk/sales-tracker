@@ -1,0 +1,16 @@
+version: '3'
+services:
+  gfs-kitchen-screens:
+    build: .
+    image: gfs-kitchen-screens
+    environment:
+      GRAPHQL_SERVER: http://localhost:3000/graphql
+      MONGO_URI: mongodb://mongo:27017/gfs_kitchen_screens_dev
+      PORT: 3000
+    ports:
+      - '80:3000'
+    depends_on: [mongo]
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'

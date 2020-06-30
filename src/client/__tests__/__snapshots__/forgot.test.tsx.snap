@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Forgot password page renders as expected 1`] = `
+<div
+  className="col col-login mx-auto"
+>
+  <div
+    className="text-center mb-6"
+  >
+    <Logo
+      setColor={true}
+    />
+  </div>
+  <div
+    className="card"
+  >
+    <div
+      className="card-body"
+    >
+      <div
+        className="card-title text-center"
+      >
+        Forgot Password
+      </div>
+    </div>
+    <div
+      className="card-body p-6"
+    >
+      <p>
+        Enter your email address to receive an email with password reset instructions.
+      </p>
+      <div
+        className="form-group"
+      >
+        <label
+          className="form-label"
+        >
+          Email
+        </label>
+        <input
+          className="form-control"
+          id="email"
+          name="email"
+          onChange={[Function]}
+          placeholder="Enter email"
+          type="email"
+        />
+      </div>
+      <div
+        className="form-footer"
+      >
+        <button
+          className="btn btn-primary btn-block false"
+          onClick={[Function]}
+          type="button"
+        >
+          Send reset email
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
