@@ -15,7 +15,7 @@ import { buildSchema } from 'type-graphql';
 import { addRoutes } from './routes';
 import compression from 'compression';
 import { authChecker } from './common/authChecker';
-import { graphqlPubsub as pubSub } from './modules/graphqlPubsub/pubsub.service';
+// import { graphqlPubsub as pubSub } from './modules/graphqlPubsub/pubsub.service';
 
 const koaConnect = require('koa-connect');
 
@@ -64,7 +64,7 @@ const startUp = async () => {
       emitSchemaFile: path.resolve(__dirname, '../schema.gql'),
       validate: false,
       authChecker,
-      pubSub,
+      // pubSub,
     });
 
     const schema = makeExecutableSchema({
