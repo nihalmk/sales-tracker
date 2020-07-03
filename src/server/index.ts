@@ -99,29 +99,29 @@ const startUp = async () => {
         endpoint: isProduction ? undefined : '/graphql',
       },
       introspection: !isProduction,
-      subscriptions: {
-        keepAlive: 5000,
-        onConnect: async (connectionParams: any) => {
-          const { accountsServer } = getAccounts();
-          if (connectionParams.token) {
-            try {
-              const session = await accountsServer.findSessionByAccessToken(
-                connectionParams.token,
-              );
-              const user = await accountsServer.findUserById(session.userId);
-              return {
-                user: user,
-              };
-            } catch (e) {
-              logger.error(
-                'Error authentication subscription connection',
-                e.message,
-              );
-            }
-          }
-          throw new Error('Missing auth token!');
-        },
-      },
+      // subscriptions: {
+      //   keepAlive: 5000,
+      //   onConnect: async (connectionParams: any) => {
+      //     const { accountsServer } = getAccounts();
+      //     if (connectionParams.token) {
+      //       try {
+      //         const session = await accountsServer.findSessionByAccessToken(
+      //           connectionParams.token,
+      //         );
+      //         const user = await accountsServer.findUserById(session.userId);
+      //         return {
+      //           user: user,
+      //         };
+      //       } catch (e) {
+      //         logger.error(
+      //           'Error authentication subscription connection',
+      //           e.message,
+      //         );
+      //       }
+      //     }
+      //     throw new Error('Missing auth token!');
+      //   },
+      // },
     });
 
     graphQLServer.applyMiddleware({ app });
