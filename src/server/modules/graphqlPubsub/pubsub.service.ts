@@ -1,5 +1,5 @@
 import IORedis from 'ioredis';
-import { RedisPubSub } from 'graphql-redis-subscriptions';
+// import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { logger } from '../../../common/logger';
 
 const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
