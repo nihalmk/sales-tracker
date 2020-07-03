@@ -33,7 +33,7 @@ class MyApp extends App {
     return (
       <React.Fragment>
         <Head>
-          <title>Order Management System</title>
+          <title>Shop Tracker</title>
           <link rel="icon" href="/static/favicon.ico" />
         </Head>
         {this.state.loaded &&

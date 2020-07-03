@@ -8,6 +8,7 @@ export const sale = `{
           name
         }
         quantity
+        cost
         discount
         total
       }
