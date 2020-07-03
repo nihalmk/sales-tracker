@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 interface Props {
   inputLabel?: string;
@@ -30,10 +30,10 @@ const Input: React.FunctionComponent<Props> = (props) => (
       {props.prependIcon && (
         <span className="input-group-prepend">
           <span className="input-group-text">
-            <FontAwesomeIcon
+            {/* <FontAwesomeIcon
               icon={props.prependIcon}
               style={{ color: '#9aa0ac' }}
-            ></FontAwesomeIcon>
+            ></FontAwesomeIcon> */}
           </span>
         </span>
       )}

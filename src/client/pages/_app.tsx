@@ -4,12 +4,12 @@ import App from 'next/app';
 import { withApollo } from '../apollo/client';
 import 'tabler-react/dist/Tabler.css';
 import UserWrapper from '../components/UserWrapper/UserWrapper';
-import { config } from '@fortawesome/fontawesome-svg-core';
-import '@fortawesome/fontawesome-svg-core/styles.css';
+// import { config } from '@fortawesome/fontawesome-svg-core';
+// import '@fortawesome/fontawesome-svg-core/styles.css';
 import Router from 'next/router';
 import { AuthenticatedPages } from '../utils/pages';
 
-config.autoAddCss = false;
+// config.autoAddCss = false;
 
 class MyApp extends App {
   state = {

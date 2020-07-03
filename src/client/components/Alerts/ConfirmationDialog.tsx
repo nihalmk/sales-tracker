@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Alert } from 'tabler-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
 
 interface Props {
   message: string;
@@ -22,7 +22,7 @@ const ConfirmationDialog: React.FC<Props> = ({
         <Card.Body>
           {message && (
             <Alert className={`${className} alert-align`} type="warning">
-              <FontAwesomeIcon icon={faExclamationTriangle}></FontAwesomeIcon>
+              {/* <FontAwesomeIcon icon={faExclamationTriangle}></FontAwesomeIcon> */}
               {message}
             </Alert>
           )}
