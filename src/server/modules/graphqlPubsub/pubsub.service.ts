@@ -9,7 +9,7 @@ const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
 
 logger.info(`Setting up redis for Graphql subscriptions...`);
 
-const options: IORedis.RedisOptions = {
+export const options: IORedis.RedisOptions = {
   path: REDIS_URL,
   host: REDIS_HOST,
   port: REDIS_PORT,
@@ -19,7 +19,7 @@ const options: IORedis.RedisOptions = {
 };
 
 // create Redis-based pub-sub
-export const graphqlPubsub = new RedisPubSub({
-  publisher: new IORedis(options),
-  subscriber: new IORedis(options),
-});
+// export const graphqlPubsub = new RedisPubSub({
+//   publisher: new IORedis(options),
+//   subscriber: new IORedis(options),
+// });
