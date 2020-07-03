@@ -8,7 +8,7 @@ import helmet from 'koa-helmet';
 import { logger } from '../common/logger';
 import { ApolloServer, makeExecutableSchema } from 'apollo-server-koa';
 import * as path from 'path';
-import { setUpAccounts, getAccounts } from '../accounts/setup';
+import { setUpAccounts } from '../accounts/setup';
 import { connect } from 'mongoose';
 import { mergeResolvers, mergeTypeDefs, mergeSchemas } from 'graphql-toolkit';
 import { buildSchema } from 'type-graphql';
