@@ -73,6 +73,18 @@ export type CreateItemsInput = {
   shop?: Maybe<Scalars['ID']>;
 };
 
+export type CreateSaleInput = {
+  items: Array<SaleItemInput>;
+  customer: Scalars['String'];
+  contact?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  total: Scalars['Float'];
+  discount?: Maybe<Scalars['Float']>;
+  profit: Scalars['Float'];
+  loss: Scalars['Float'];
+  shop?: Maybe<Scalars['ID']>;
+};
+
 export type CreateShopInput = {
   name: Scalars['String'];
   type: ShopType;
@@ -103,6 +115,11 @@ export type Customer = {
   profile: Profile;
   channel: Channel;
   payment: Payment;
+};
+
+export type DateRange = {
+  from: Scalars['DateTime'];
+  to: Scalars['DateTime'];
 };
 
 
@@ -187,7 +204,10 @@ export type Mutation = {
   logout?: Maybe<Scalars['Boolean']>;
   authenticate?: Maybe<LoginResult>;
   verifyAuthentication?: Maybe<Scalars['Boolean']>;
-  createItems?: Maybe<Items>;
+  createItem?: Maybe<Items>;
+  updateItem?: Maybe<Items>;
+  createSale?: Maybe<Sale>;
+  updateSale?: Maybe<Sale>;
   createShop?: Maybe<Shop>;
   createNewUser: Scalars['ID'];
 };
@@ -265,8 +285,23 @@ export type MutationVerifyAuthenticationArgs = {
 };
 
 
-export type MutationCreateItemsArgs = {
-  items: CreateItemsInput;
+export type MutationCreateItemArgs = {
+  item: CreateItemsInput;
+};
+
+
+export type MutationUpdateItemArgs = {
+  item: UpdateItemsInput;
+};
+
+
+export type MutationCreateSaleArgs = {
+  sale: CreateSaleInput;
+};
+
+
+export type MutationUpdateSaleArgs = {
+  sale: UpdateSaleInput;
 };
 
 
@@ -363,9 +398,33 @@ export type Query = {
   twoFactorSecret?: Maybe<TwoFactorSecretKey>;
   getUser?: Maybe<User>;
   getItemsForUser: Array<Items>;
+  getSalesForUser: Array<Sale>;
+  getSaleByBillNumber: Array<Sale>;
+  getSaleByCustomerName: Array<Sale>;
+  getSaleByCustomerPhone: Array<Sale>;
   getShopForUser?: Maybe<Shop>;
   me?: Maybe<User>;
   getUserById?: Maybe<User>;
+};
+
+
+export type QueryGetSalesForUserArgs = {
+  date: DateRange;
+};
+
+
+export type QueryGetSaleByBillNumberArgs = {
+  billNumber: Scalars['String'];
+};
+
+
+export type QueryGetSaleByCustomerNameArgs = {
+  customer: Scalars['String'];
+};
+
+
+export type QueryGetSaleByCustomerPhoneArgs = {
+  contact: Scalars['String'];
 };
 
 
@@ -378,6 +437,40 @@ export enum Roles {
   Manager = 'Manager',
   Admin = 'Admin'
 }
+
+/** The Sales model */
+export type Sale = {
+   __typename?: 'Sale';
+  _id: Scalars['ID'];
+  billNumber: Scalars['String'];
+  items: Array<SaleItem>;
+  customer: Scalars['String'];
+  contact?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  total: Scalars['Float'];
+  discount?: Maybe<Scalars['Float']>;
+  profit: Scalars['Float'];
+  loss: Scalars['Float'];
+  active: Scalars['Boolean'];
+  shop?: Maybe<Shop>;
+};
+
+export type SaleItem = {
+   __typename?: 'SaleItem';
+  item: Items;
+  quantity: Scalars['Float'];
+  cost: Scalars['Float'];
+  discount: Scalars['Float'];
+  total: Scalars['Float'];
+};
+
+export type SaleItemInput = {
+  item: Scalars['ID'];
+  quantity: Scalars['Float'];
+  cost: Scalars['Float'];
+  discount: Scalars['Float'];
+  total: Scalars['Float'];
+};
 
 /** The Shop model */
 export type Shop = {
@@ -432,9 +525,23 @@ export type TwoFactorSecretKeyInput = {
 
 export type UpdateItemsInput = {
   _id: Scalars['ID'];
+  name: Scalars['String'];
   category?: Maybe<Scalars['String']>;
   price?: Maybe<PriceInput>;
   stock: Scalars['Float'];
+};
+
+export type UpdateSaleInput = {
+  items: Array<SaleItemInput>;
+  customer: Scalars['String'];
+  contact?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  total: Scalars['Float'];
+  discount?: Maybe<Scalars['Float']>;
+  profit: Scalars['Float'];
+  loss: Scalars['Float'];
+  shop?: Maybe<Scalars['ID']>;
+  _id: Scalars['ID'];
 };
 
 /** The User model */

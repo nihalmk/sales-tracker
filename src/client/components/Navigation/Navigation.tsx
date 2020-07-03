@@ -12,16 +12,23 @@ const Navigation: React.FC<Props> = ({ selected }) => {
           <button
             type="button"
             className={'btn btn-primary'}
-            onClick={() => selected('history')}
+            onClick={() => selected('sales')}
           >
             Sales
+          </button>
+          <button
+            type="button"
+            className={'btn btn-primary ml-auto'}
+            onClick={() => selected('purchases')}
+          >
+            Purchases
           </button>
           <button
             type="button"
             className={'btn btn-primary ml-auto hide-small-screen'}
             onClick={() => selected('stock')}
           >
-            Add Stock
+            Stock
           </button>
           <button
             type="button"
@@ -33,9 +40,9 @@ const Navigation: React.FC<Props> = ({ selected }) => {
           <button
             type="button"
             className={'btn btn-primary ml-auto'}
-            onClick={() => selected('orders')}
+            onClick={() => selected('purchase')}
           >
-            Orders
+            Purchase
           </button>
           <button
             type="button"
@@ -47,9 +54,9 @@ const Navigation: React.FC<Props> = ({ selected }) => {
           <button
             type="button"
             className={'btn btn-primary ml-auto'}
-            onClick={() => selected('search')}
+            onClick={() => selected('report')}
           >
-            Search
+            Report
           </button>
         </Card.Header>
       </Card>

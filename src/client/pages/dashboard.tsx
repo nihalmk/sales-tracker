@@ -6,18 +6,21 @@ import { Layout } from '../components/Layout/Layout';
 import ErrorMessage from '../components/Errors/ErrorMessage';
 import Navigation from '../components/Navigation/Navigation';
 import AddStock from '../components/Stock/AddStock';
+import AddSale from '../components/Sale/AddSale';
 
 interface Props {}
 
 const Home: NextPage<Props> = () => {
   const { user } = useContext(UserContext);
 
-  const [selectedMenu, setSelectedMenu] = useState<string>();
+  const [selectedMenu, setSelectedMenu] = useState<string>('sale');
 
   const component = () => {
     switch (selectedMenu) {
       case 'stock':
         return <AddStock />;
+      case 'sale':
+          return <AddSale />;
       default:
         return <div className="text-center">Not Available</div>;
     }

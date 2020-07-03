@@ -18,6 +18,7 @@ interface Props {
   step?: number;
   className?: string;
   prependIcon?: IconProp;
+  autoFocus?: boolean;
 }
 
 const Input: React.FunctionComponent<Props> = (props) => (
@@ -59,6 +60,7 @@ const Input: React.FunctionComponent<Props> = (props) => (
         minLength={props.min}
         maxLength={props.max}
         step={props.step}
+        autoFocus={props.autoFocus}
       />
     </div>
     <style jsx>{`

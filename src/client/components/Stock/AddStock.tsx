@@ -274,7 +274,7 @@ const AddStock: NextPage<Props> = function () {
               inputName="Search"
               inputType="text"
               max={20}
-              placeholderValue="Search Product by name or id"
+              placeholderValue="Search Product by Name or ID"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const search = e.target.value;
                 setSearchTerm(search);
