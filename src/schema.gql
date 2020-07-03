@@ -123,6 +123,8 @@ type Items {
   price: Price
   stock: Float!
   shop: Shop
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Location {
@@ -253,6 +255,8 @@ type Sale {
   loss: Float!
   active: Boolean!
   shop: Shop
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type SaleItem {

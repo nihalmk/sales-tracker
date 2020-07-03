@@ -1,7 +1,7 @@
 import { getModelForClass, prop, Ref, pre } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
-import { StringField, NumberField } from '../../common/fields';
+import { StringField, NumberField, DateField } from '../../common/fields';
 import { Shop } from '../shop/shop.model';
 
 @ObjectType()
@@ -57,6 +57,12 @@ export class Items {
   @prop({ ref: 'Shop', required: false, index: true })
   @Field((_type) => Shop, { nullable: true })
   shop: Ref<Shop>;
+
+  @Field(DateField)
+  public createdAt: Date;
+
+  @Field(DateField)
+  public updatedAt: Date;
 }
 
 export const ItemsModel = getModelForClass(Items, {

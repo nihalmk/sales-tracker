@@ -39,7 +39,7 @@ const Navigation: React.FC<Props> = ({ selected }) => {
           </button>
           <button
             type="button"
-            className={'btn btn-primary ml-auto'}
+            className={'btn btn-primary ml-auto hide-small-screen'}
             onClick={() => selected('purchase')}
           >
             Purchase
@@ -53,7 +53,7 @@ const Navigation: React.FC<Props> = ({ selected }) => {
           </button>
           <button
             type="button"
-            className={'btn btn-primary ml-auto'}
+            className={'btn btn-primary ml-auto hide-small-screen'}
             onClick={() => selected('report')}
           >
             Report

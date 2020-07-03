@@ -4,12 +4,14 @@ export const sale = `{
       _id
       items {
         item {
+          shortId
           name
         }
         quantity
         discount
         total
       }
+      billNumber
       customer
       contact
       email
@@ -17,6 +19,7 @@ export const sale = `{
       discount
       profit
       loss
+      createdAt
     }`;
 
 export const GET_SALES = gql`

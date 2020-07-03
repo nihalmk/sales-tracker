@@ -7,6 +7,7 @@ import ErrorMessage from '../components/Errors/ErrorMessage';
 import Navigation from '../components/Navigation/Navigation';
 import AddStock from '../components/Stock/AddStock';
 import AddSale from '../components/Sale/AddSale';
+import Sales from '../components/Sale/Sales';
 
 interface Props {}
 
@@ -21,6 +22,8 @@ const Home: NextPage<Props> = () => {
         return <AddStock />;
       case 'sale':
           return <AddSale />;
+      case 'sales':
+          return <Sales />;
       default:
         return <div className="text-center">Not Available</div>;
     }

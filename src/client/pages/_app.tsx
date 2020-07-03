@@ -3,6 +3,7 @@ import Head from 'next/head';
 import App from 'next/app';
 import { withApollo } from '../apollo/client';
 import 'tabler-react/dist/Tabler.css';
+import "react-datepicker/dist/react-datepicker.css";
 import UserWrapper from '../components/UserWrapper/UserWrapper';
 // import { config } from '@fortawesome/fontawesome-svg-core';
 // import '@fortawesome/fontawesome-svg-core/styles.css';

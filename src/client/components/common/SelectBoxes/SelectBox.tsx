@@ -26,7 +26,6 @@ interface Props {
   name?: string;
   customOption?: (val: LabelValueObj) => React.ReactElement | null;
   className?: string;
-  ref?: any;
 }
 
 const SelectBox: React.FunctionComponent<Props> = (props) => {
@@ -52,7 +51,6 @@ const SelectBox: React.FunctionComponent<Props> = (props) => {
           options={props.selectData}
           onChange={props.onSelectChange}
           formatOptionLabel={props.customOption}
-          ref={props.ref}
         />
       </div>
       <style jsx global>{`

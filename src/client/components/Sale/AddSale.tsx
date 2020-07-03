@@ -13,7 +13,6 @@ import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
-import { useFocus } from '../hooks/useFocus';
 
 interface Props {
   billNumber?: string;
@@ -80,7 +79,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const [newSaleItem, setNewSaleItem] = useState<SaleItem>();
   const [newItem, setNewItem] = useState<Items>();
 
-  const [focusProduct, setFocusProduct] = useFocus();
 
   useEffect(() => {
     setSaleItems(saleData?.getSaleByBillNumber?.[0].items || []);
@@ -91,15 +89,12 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   }, [sale]);
 
   useEffect(() => {
-    console.log(_.sum(saleItems.map((i) => i.total)));
     setNewSale((currentState) => ({
       ...currentState,
       items: saleItems,
       total: _.sum(saleItems.map((i) => i.total)),
     }));
   }, [saleItems]);
-
-  console.log(newSale);
 
   const onNewSaleCreate = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
@@ -308,7 +303,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         </div>
         <form
           onSubmit={(e) => {
-            setFocusProduct();
             e.preventDefault();
             setNewItemSubmitted(true);
             if (!newSaleItem) {
@@ -360,7 +354,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     (i) =>
                       i.value === ((newSaleItem?.item as unknown) as string),
                   )}
-                  ref={focusProduct}
                   isInvalid={!!(newItemSubmitted && !newItem)}
                 ></SelectBox>
               </div>
