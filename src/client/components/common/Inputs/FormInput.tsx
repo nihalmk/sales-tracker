@@ -17,7 +17,7 @@ interface Props {
   max?: number;
   step?: number;
   className?: string;
-  prependIcon?: IconProp;
+  prependIcon?: any;
   autoFocus?: boolean;
 }
 
