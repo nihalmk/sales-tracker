@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { CREATE_SALE, UPDATE_SALE } from '../../graphql/mutation/sale';
@@ -19,6 +19,8 @@ interface Props {
 }
 
 const AddSale: NextPage<Props> = function ({ billNumber }) {
+  const productSelectRef = useRef<any>(null);
+
   const [submitCreateSale, { loading: createLoading }] = useMutation(
     CREATE_SALE,
   );
@@ -251,7 +253,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     const profit =
       total -
       _.sum(
-        items.map(
+        items?.map(
           (i) => (i.item?.price?.cost || i.item?.price?.list) * i.quantity,
         ),
       );
@@ -350,6 +352,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             ]);
             setNewSaleItem(undefined);
             setNewItem(undefined);
+            productSelectRef?.current?.focus()
           }}
         >
           <div className="card-body pt-0">
@@ -381,6 +384,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   )}
                   isInvalid={!!(newItemSubmitted && !newItem)}
                   noOptionsMessage={'Not in Stock'}
+                  innerRef={productSelectRef}
                 ></SelectBox>
               </div>
               <div className="col-md-2">
