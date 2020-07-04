@@ -163,6 +163,12 @@ const AddStock: NextPage<Props> = function () {
         </div>
         <form onSubmit={onNewItemCreate}>
           <div className="card-body">
+            <div className="p1 mb-2 text-muted">
+              <i>
+                * For Service Charges, add -1 stock with 0 cost, 0 list and
+                Service charges as sale price
+              </i>
+            </div>
             <div className="row">
               <div className="col-md-2">
                 <Input
