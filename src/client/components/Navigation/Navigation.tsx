@@ -7,7 +7,7 @@ interface Props {
 const Navigation: React.FC<Props> = ({ selected }) => {
   return (
     <React.Fragment>
-      <Card className="mb-0 bg-nav">
+      <Card className="mb-0 mt-0 bg-nav">
         <Card.Header>
           <button
             type="button"

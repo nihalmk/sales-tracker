@@ -54,7 +54,7 @@ input CreateItemsInput {
 
 input CreateSaleInput {
   items: [SaleItemInput!]!
-  customer: String!
+  customer: String
   contact: String
   email: String
   total: Float!
@@ -246,7 +246,7 @@ type Sale {
   _id: ID!
   billNumber: String!
   items: [SaleItem!]!
-  customer: String!
+  customer: String
   contact: String
   email: String
   total: Float!
@@ -305,7 +305,7 @@ input UpdateItemsInput {
 
 input UpdateSaleInput {
   items: [SaleItemInput!]!
-  customer: String!
+  customer: String
   contact: String
   email: String
   total: Float!

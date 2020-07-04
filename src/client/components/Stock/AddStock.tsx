@@ -217,10 +217,10 @@ const AddStock: NextPage<Props> = function () {
                 <Input
                   tabIndex={3}
                   inputName="list"
-                  inputLabel="List"
+                  inputLabel="MRP"
                   inputType="number"
                   max={20}
-                  placeholderValue="List Price"
+                  placeholderValue="MRP"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const list = Number(e.target.value);
                     setNewItem((currentState) => ({
@@ -276,7 +276,7 @@ const AddStock: NextPage<Props> = function () {
                   }}
                   disabled={createLoading}
                   isInvalid={!!(submitted && !newItem?.stock)}
-                  value={newItem?.stock || -1}
+                  value={newItem?.stock}
                 />
               </div>
               <div className="col-md-2">

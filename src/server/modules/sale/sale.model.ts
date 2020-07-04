@@ -51,9 +51,9 @@ export class Sale {
   @Field((_type) => [SaleItem])
   items: SaleItem[];
 
-  @prop({ required: true })
-  @Field(StringField)
-  customer: string;
+  @prop()
+  @Field(StringField, { nullable: true})
+  customer?: string;
 
   @prop()
   @Field(StringField, { nullable: true})

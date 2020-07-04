@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 export const CREATE_SALE = gql`
   mutation createSale(
     $items: [SaleItemInput!]!
-    $customer: String!
+    $customer: String
     $contact: String
     $email: String
     $total: Float!
@@ -32,7 +32,7 @@ export const UPDATE_SALE = gql`
   mutation updateSale(
     $_id: ID!
     $items: [SaleItemInput!]!
-    $customer: String!
+    $customer: String
     $contact: String
     $email: String
     $total: Float!

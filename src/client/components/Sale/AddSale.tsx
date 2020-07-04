@@ -43,7 +43,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const [submitted, setSubmitted] = useState(false);
   const [newItemSubmitted, setNewItemSubmitted] = useState(false);
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
-  // const [searchTerm, setSearchTerm] = useState('');
+  const [showProfit, setShowProfit] = useState(false);
   const [sale, setSale] = useState<Sale[]>();
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         sortedItems.map((i) => {
           if (i.stock > 0 || i.stock === -1) {
             return {
-              label: i.name,
+              label: `${i.name} ${i.stock > 0 ? `(${i.price.cost}₹)` : ''}`,
               value: i._id,
             };
           }
@@ -89,6 +89,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
 
   useEffect(() => {
     console.log(sale);
+    console.log(submitted);
   }, [sale]);
 
   useEffect(() => {
@@ -103,12 +104,17 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     e && e.preventDefault();
     const { customer, contact, email, items, total } = newSale || {};
     const profit =
-      total - _.sum(items.map((i) => i.item?.price?.cost * i.quantity));
+      total -
+      _.sum(
+        items.map(
+          (i) => (i.item?.price?.cost || i.item?.price?.list) * i.quantity,
+        ),
+      );
     const loss = profit < 0 ? Math.abs(profit) : 0;
     const discount =
       _.sum(items.map((i) => i.discount)) + (newSale.discount || 0);
     setSubmitted(true);
-    if (!customer || _.isEmpty(items) || !contact) {
+    if (_.isEmpty(items)) {
       setError('Please enter values for all fields');
       setTimeout(() => {
         setError('');
@@ -151,12 +157,18 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const onSaleEdit = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
     const { customer, contact, email, items, _id, total } = newSale || {};
-    const profit = total - _.sum(items.map((i) => i.item?.price?.cost));
+    const profit =
+      total -
+      _.sum(
+        items.map(
+          (i) => (i.item?.price?.cost || i.item?.price?.list) * i.quantity,
+        ),
+      );
     const loss = profit < 0 ? Math.abs(profit) : 0;
     const discount =
       _.sum(items.map((i) => i.discount)) + (newSale.discount || 0);
     setUpdateSubmitted(true);
-    if (!customer || !_.isEmpty(items) || !contact) {
+    if (!_.isEmpty(items)) {
       setError('Please enter values for all fields');
       setTimeout(() => {
         setError('');
@@ -233,6 +245,19 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       setUpdateSubmitted(true);
     }
   };
+
+  const getProfitOrLoss = () => {
+    const { items, total } = newSale || {};
+    const profit =
+      total -
+      _.sum(
+        items.map(
+          (i) => (i.item?.price?.cost || i.item?.price?.list) * i.quantity,
+        ),
+      );
+    const loss = profit < 0 ? Math.abs(profit) : 0;
+    return [profit, loss];
+  };
   return (
     <React.Fragment>
       <div className="card">
@@ -260,7 +285,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   }));
                 }}
                 autoFocus={true}
-                isInvalid={!!(submitted && !newSale?.customer)}
                 value={newSale?.customer || ''}
               />
             </div>
@@ -279,7 +303,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     contact,
                   }));
                 }}
-                isInvalid={!!(submitted && !newSale?.contact)}
                 value={newSale?.contact || ''}
               />
             </div>
@@ -298,7 +321,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     email,
                   }));
                 }}
-                isInvalid={!!(submitted && !newSale?.email)}
                 value={newSale?.email || ''}
               />
             </div>
@@ -349,8 +371,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                       item: item,
                       quantity: 1,
                       discount: 0,
-                      cost: item.price?.sale,
-                      total: item.price?.sale,
+                      cost: item.price?.sale || item.price?.list,
+                      total: item.price?.sale || item.price?.list,
                     });
                   }}
                   selectDefault={itemsSelection?.find(
@@ -497,6 +519,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                 <React.Fragment>
                   {saleItems?.map((sale: SaleItem, i: number) => {
                     const isEdit = editSale?.item._id === sale.item._id;
+                    const profit = sale.cost - sale.item?.price?.cost;
+                    const isProfit = profit > 0;
                     const item = sale.item;
                     return (
                       <tr key={i}>
@@ -566,7 +590,17 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                             sale.quantity
                           )}
                         </td>
-                        <td>{sale.total}</td>
+                        <td>
+                          {sale.total}
+                          {showProfit ? (
+                            <div className={isProfit ? 'profit' : 'loss'}>
+                              {isProfit && '+'}
+                              {profit}
+                            </div>
+                          ) : (
+                            ''
+                          )}
+                        </td>
                         <td className="w-14">
                           <button
                             onClick={() => onEdit(sale, isEdit)}
@@ -600,7 +634,21 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     <td className="w-10">
                       <strong>{newSale?.total}</strong>
                     </td>
-                    <td className="w-14"></td>
+                    <td className="w-14">
+                      {showProfit && (
+                        <React.Fragment>
+                          <div
+                            className={
+                              getProfitOrLoss()[0] < 0 ? 'loss' : 'profit'
+                            }
+                          >
+                            {getProfitOrLoss()[0] > 0 ? '+' : ''}
+                            {getProfitOrLoss()[0]}
+                          </div>
+                          {/* <div className="loss">-{getProfitOrLoss()[1]}</div> */}
+                        </React.Fragment>
+                      )}
+                    </td>
                   </tr>
                 </React.Fragment>
               )}
@@ -616,9 +664,19 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             </Link>
             <button
               id="shop-submit"
+              type="button"
+              className={
+                'btn btn-secondary ml-auto ' + (createLoading && 'btn-loading')
+              }
+              onClick={() => setShowProfit(!showProfit)}
+            >
+              {showProfit ? 'Hide P/L' : 'P/L'}
+            </button>
+            <button
+              id="shop-submit"
               type="submit"
               className={
-                'btn btn-primary ml-auto ' + (createLoading && 'btn-loading')
+                'btn btn-primary ml-2 ' + (createLoading && 'btn-loading')
               }
               onClick={onNewSaleCreate}
             >

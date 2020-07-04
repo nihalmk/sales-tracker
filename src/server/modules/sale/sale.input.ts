@@ -26,8 +26,8 @@ export class CreateSaleInput implements Partial<Sale> {
   @Field((_type) => [SaleItemInput])
   items: SaleItemInput[];
 
-  @Field(StringField)
-  customer: string;
+  @Field(StringField, { nullable: true})
+  customer?: string;
 
   @Field(StringField, { nullable: true })
   contact?: string;

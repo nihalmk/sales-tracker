@@ -28,13 +28,36 @@ const Sales: NextPage<Props> = function () {
   const [sales, setSales] = useState<Sale[]>();
 
   useEffect(() => {
-    setSales(saleData?.getSalesForUser);
+    setSales(
+      saleData?.getSalesForUser.sort(
+        (a: Sale, b: Sale) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
+    );
   }, [saleData]);
 
+  const getTotalProfit = () => {
+    const profit =
+      _.sum(sales?.map((s) => s.total)) -
+      _.sum(
+        _.flatten(sales?.map((s) => s.items)).map(
+          (i) => (i.item?.price?.cost || i.item?.price?.list) * i.quantity,
+        ),
+      );
+    return profit;
+  };
   return (
     <React.Fragment>
       <div className="">
         <div className="row">
+          <div className="col-md-2">
+            <label className="form-label">{'P/L'}</label>{' '}
+            <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
+              {getTotalProfit() > 0 && '+'}
+              {getTotalProfit()}₹
+            </div>
+            {}
+          </div>
           <div className="col-md-4  ml-auto">
             <DatePicker
               inputLabel="Select Date"

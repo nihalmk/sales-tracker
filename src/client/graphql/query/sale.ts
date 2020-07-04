@@ -6,6 +6,10 @@ export const sale = `{
         item {
           shortId
           name
+          price {
+            cost
+            list
+          }
         }
         quantity
         cost

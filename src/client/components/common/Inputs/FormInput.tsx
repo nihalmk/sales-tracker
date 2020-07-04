@@ -19,6 +19,7 @@ interface Props {
   className?: string;
   prependIcon?: any;
   autoFocus?: boolean;
+  append?: string;
 }
 
 const Input: React.FunctionComponent<Props> = (props) => (
@@ -62,6 +63,11 @@ const Input: React.FunctionComponent<Props> = (props) => (
         step={props.step}
         autoFocus={props.autoFocus}
       />
+      {props.append && (
+        <span className="input-group-append">
+          <span className="input-group-text">{props.append}</span>
+        </span>
+      )}
     </div>
     <style jsx>{`
       .form-control {
