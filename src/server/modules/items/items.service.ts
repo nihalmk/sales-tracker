@@ -60,13 +60,16 @@ export class ItemsService {
   async updateStock(items: SaleItemInput[]): Promise<void> {
     for (const item of items) {
       const inStockItem = await this.model.findById(item.item);
-      await this.model.updateOne({
-        _id: item.item
-      }, {
-        $set: {
-          stock: inStockItem.stock - item.quantity
-        }
-      })
+      if (inStockItem.stock !== -1) {
+        await this.model.updateOne({
+          _id: item.item
+        }, {
+          $set: {
+            stock: inStockItem.stock - item.quantity
+          }
+        })
+      }
+
     }
   }
 }

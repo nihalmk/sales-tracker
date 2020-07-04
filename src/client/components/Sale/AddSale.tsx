@@ -65,12 +65,16 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   useEffect(() => {
     const sortedItems = _.sortBy(itemsData?.getItemsForUser, 'name') as Items[];
     setItemsSelection(
-      sortedItems.map((i) => {
-        return {
-          label: i.name,
-          value: i._id,
-        };
-      }),
+      _.compact(
+        sortedItems.map((i) => {
+          if (i.stock > 0 || i.stock === -1) {
+            return {
+              label: i.name,
+              value: i._id,
+            };
+          }
+        }),
+      ),
     );
     setItems(sortedItems);
   }, [itemsData]);
@@ -78,7 +82,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const [saleItems, setSaleItems] = useState<SaleItem[]>([]);
   const [newSaleItem, setNewSaleItem] = useState<SaleItem>();
   const [newItem, setNewItem] = useState<Items>();
-
 
   useEffect(() => {
     setSaleItems(saleData?.getSaleByBillNumber?.[0].items || []);
@@ -311,12 +314,12 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
               }
             }
             if (!newSaleItem.quantity) {
-              newSaleItem.quantity = 1
-              newSaleItem.total = newSaleItem.cost * 1
+              newSaleItem.quantity = 1;
+              newSaleItem.total = newSaleItem.cost * 1;
             }
             if (!newSaleItem.cost) {
               newSaleItem.cost = newItem.price?.sale;
-              newSaleItem.total = newItem.price?.sale * newSaleItem.quantity
+              newSaleItem.total = newItem.price?.sale * newSaleItem.quantity;
             }
             setNewItemSubmitted(false);
             setSaleItems((currentState) => [
@@ -324,7 +327,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
               newSaleItem,
             ]);
             setNewSaleItem(undefined);
-            setNewItem(undefined)
+            setNewItem(undefined);
           }}
         >
           <div className="card-body pt-0">
@@ -355,6 +358,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                       i.value === ((newSaleItem?.item as unknown) as string),
                   )}
                   isInvalid={!!(newItemSubmitted && !newItem)}
+                  noOptionsMessage={'Not in Stock'}
                 ></SelectBox>
               </div>
               <div className="col-md-2">
@@ -394,7 +398,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                         quantity: newItem.stock,
                         total: newSaleItem?.cost * newItem.stock,
                       }));
-                      return
+                      return;
                     }
                     setNewSaleItem((currentState) => ({
                       ...currentState,
@@ -538,7 +542,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                               placeholderValue="Quantity"
                               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                 const quantity = Number(e.target.value);
-                                if (quantity > item.stock) {
+                                if (item.stock > -1 && quantity > item.stock) {
                                   setEditSale((currentState) => ({
                                     ...currentState,
                                     quantity: item.stock,

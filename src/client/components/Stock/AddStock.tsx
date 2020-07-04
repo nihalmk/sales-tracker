@@ -58,11 +58,31 @@ const AddStock: NextPage<Props> = function () {
 
   const [editItem, setEditItem] = useState<Items>();
 
+  useEffect(() => {
+    if (!newItem) {
+      setNewItem({
+        name: '',
+        price: {
+          cost: 0,
+          sale: 0,
+          list: 0,
+        },
+        stock: -1,
+      } as Items);
+    }
+  });
+
   const onNewItemCreate = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
     const { name, category, price, stock } = newItem || {};
     setSubmitted(true);
-    if (!name || !price?.cost || !price?.list || !price?.sale || !stock) {
+    if (
+      !name ||
+      price?.cost < 0 ||
+      price?.list < 0 ||
+      price?.sale < 0 ||
+      stock < -1
+    ) {
       setError('Please enter values for all fields');
       setTimeout(() => {
         setError('');
@@ -97,7 +117,13 @@ const AddStock: NextPage<Props> = function () {
     e && e.preventDefault();
     const { name, category, price, stock, _id } = editItem || {};
     setUpdateSubmitted(true);
-    if (!name || !price?.cost || !price?.list || !price?.sale || !stock) {
+    if (
+      !name ||
+      price?.cost < 0 ||
+      price?.list < 0 ||
+      price?.sale < 0 ||
+      stock < -1
+    ) {
       setError('Please enter values for all fields');
       setTimeout(() => {
         setError('');
@@ -163,7 +189,7 @@ const AddStock: NextPage<Props> = function () {
                   tabIndex={2}
                   inputName="cost"
                   inputLabel="Cost"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Cost Price"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -177,8 +203,8 @@ const AddStock: NextPage<Props> = function () {
                     }));
                   }}
                   disabled={createLoading}
-                  isInvalid={!!(submitted && !newItem?.price?.cost)}
-                  value={newItem?.price?.cost || ''}
+                  isInvalid={!!(submitted && newItem?.price?.cost < 0)}
+                  value={newItem?.price?.cost || 0}
                 />
               </div>
               <div className="col-md-2">
@@ -186,7 +212,7 @@ const AddStock: NextPage<Props> = function () {
                   tabIndex={3}
                   inputName="list"
                   inputLabel="List"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="List Price"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -200,8 +226,8 @@ const AddStock: NextPage<Props> = function () {
                     }));
                   }}
                   disabled={createLoading}
-                  isInvalid={!!(submitted && !newItem?.price?.list)}
-                  value={newItem?.price?.list || ''}
+                  isInvalid={!!(submitted && newItem?.price?.list < 0)}
+                  value={newItem?.price?.list || 0}
                 />
               </div>
               <div className="col-md-2">
@@ -209,7 +235,7 @@ const AddStock: NextPage<Props> = function () {
                   tabIndex={4}
                   inputName="sale"
                   inputLabel="Sale"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Sale Price"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -223,8 +249,8 @@ const AddStock: NextPage<Props> = function () {
                     }));
                   }}
                   disabled={createLoading}
-                  isInvalid={!!(submitted && !newItem?.price?.sale)}
-                  value={newItem?.price?.sale || ''}
+                  isInvalid={!!(submitted && newItem?.price?.sale < 0)}
+                  value={newItem?.price?.sale || 0}
                 />
               </div>
               <div className="col-md-2">
@@ -232,7 +258,7 @@ const AddStock: NextPage<Props> = function () {
                   tabIndex={5}
                   inputName="stock"
                   inputLabel="Stock"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Stock Count"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -244,7 +270,7 @@ const AddStock: NextPage<Props> = function () {
                   }}
                   disabled={createLoading}
                   isInvalid={!!(submitted && !newItem?.stock)}
-                  value={newItem?.stock || ''}
+                  value={newItem?.stock || -1}
                 />
               </div>
               <div className="col-md-2">
@@ -466,15 +492,14 @@ const AddStock: NextPage<Props> = function () {
                             (isEdit && updateLoading ? 'btn-loading' : '')
                           }
                         >
-                          {isEdit ? "Done" : 'Edit'}
+                          {isEdit ? 'Done' : 'Edit'}
                         </button>
                         {isEdit && (
                           <a
-                          className="link"
+                            className="link"
                             onClick={() => {
                               setEditItem(undefined);
                             }}
-                            
                           >
                             X
                           </a>
@@ -493,9 +518,9 @@ const AddStock: NextPage<Props> = function () {
         }
         .link {
           color: blue !important;
-          cursor: pointer
+          cursor: pointer;
         }
-        .link:hover{
+        .link:hover {
           border-bottom: 1px solid blue;
         }
       `}</style>
