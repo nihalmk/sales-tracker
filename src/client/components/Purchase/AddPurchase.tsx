@@ -76,12 +76,10 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
     setItemsSelection(
       _.compact(
         sortedItems.map((i) => {
-          if (i.stock > 0 || i.stock === -1) {
-            return {
-              label: `${i.name} ${i.stock > 0 ? `(${i.price.cost}₹)` : ''}`,
-              value: i._id,
-            };
-          }
+          return {
+            label: `${i.name} ${i.stock > 0 ? `(${i.price.cost}₹)` : ''}`,
+            value: i._id,
+          };
         }),
       ),
     );
@@ -385,19 +383,11 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   tabIndex={6}
                   inputName="quantity"
                   inputLabel="Quantity"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Quantity"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const quantity = Number(e.target.value);
-                    if (quantity > newItem.stock) {
-                      setNewPurchaseItem((currentState) => ({
-                        ...currentState,
-                        quantity: newItem.stock,
-                        total: newPurchaseItem?.cost * newItem.stock,
-                      }));
-                      return;
-                    }
                     setNewPurchaseItem((currentState) => ({
                       ...currentState,
                       quantity,
@@ -444,7 +434,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
             </div>
             <div className="p1 mb-2 text-muted">
               <i>
-                * For any change in cost price of item, add new a item from Stock menu with new cost
+                * For any change in cost price of item, add new a item from
+                Stock menu with new cost
               </i>
             </div>
           </div>
@@ -498,32 +489,32 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                             }}
                           >
                             {
-                            // isEdit ? (
-                            //   <Input
-                            //     tabIndex={11}
-                            //     inputName="Purchase"
-                            //     inputType="number"
-                            //     max={10}
-                            //     placeholderValue="Purchase Price"
-                            //     onChange={(
-                            //       e: ChangeEvent<HTMLInputElement>,
-                            //     ) => {
-                            //       const cost = Number(e.target.value);
-                            //       setEditPurchase((currentState) => ({
-                            //         ...currentState,
-                            //         cost,
-                            //         total: currentState.quantity * cost,
-                            //       }));
-                            //     }}
-                            //     disabled={true || updateLoading}
-                            //     isInvalid={
-                            //       !!(updateSubmitted && !editPurchase?.cost)
-                            //     }
-                            //     value={editPurchase?.cost || ''}
-                            //   />
-                            // ) : (
+                              // isEdit ? (
+                              //   <Input
+                              //     tabIndex={11}
+                              //     inputName="Purchase"
+                              //     inputType="number"
+                              //     max={10}
+                              //     placeholderValue="Purchase Price"
+                              //     onChange={(
+                              //       e: ChangeEvent<HTMLInputElement>,
+                              //     ) => {
+                              //       const cost = Number(e.target.value);
+                              //       setEditPurchase((currentState) => ({
+                              //         ...currentState,
+                              //         cost,
+                              //         total: currentState.quantity * cost,
+                              //       }));
+                              //     }}
+                              //     disabled={true || updateLoading}
+                              //     isInvalid={
+                              //       !!(updateSubmitted && !editPurchase?.cost)
+                              //     }
+                              //     value={editPurchase?.cost || ''}
+                              //   />
+                              // ) : (
                               purchase.cost
-                            // )
+                              // )
                             }
                           </td>
                           <td className="w-14">
@@ -538,17 +529,6 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                                   e: ChangeEvent<HTMLInputElement>,
                                 ) => {
                                   const quantity = Number(e.target.value);
-                                  if (
-                                    item.stock > -1 &&
-                                    quantity > item.stock
-                                  ) {
-                                    setEditPurchase((currentState) => ({
-                                      ...currentState,
-                                      quantity: item.stock,
-                                      total: item.stock * currentState.cost,
-                                    }));
-                                    return;
-                                  }
                                   setEditPurchase((currentState) => ({
                                     ...currentState,
                                     quantity,

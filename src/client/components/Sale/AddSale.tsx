@@ -392,7 +392,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   tabIndex={5}
                   inputName="Sale"
                   inputLabel="Sale Price"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Sale Price"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -413,7 +413,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   tabIndex={6}
                   inputName="quantity"
                   inputLabel="Quantity"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Quantity"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -442,7 +442,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   tabIndex={7}
                   inputName="total"
                   inputLabel="Total"
-                  inputType="tel"
+                  inputType="number"
                   max={20}
                   placeholderValue="Total"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
