@@ -2,7 +2,8 @@ import { Resolver, Query, Authorized, Ctx, Arg, Mutation } from 'type-graphql';
 import { CTX } from '../../interfaces/common';
 import { SaleService } from './sale.service';
 import { Sale } from './sale.model';
-import { CreateSaleInput, UpdateSaleInput, DateRange } from './sale.input';
+import { CreateSaleInput, UpdateSaleInput } from './sale.input';
+import { DateRange } from '../common/Types/InputTypes';
 
 /**
  * Mutations and Queries for getting sale / updating sale data

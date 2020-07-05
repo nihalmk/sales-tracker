@@ -73,9 +73,19 @@ export type CreateItemsInput = {
   shop?: Maybe<Scalars['ID']>;
 };
 
+export type CreatePurchaseInput = {
+  items: Array<PurchaseItemInput>;
+  vendor?: Maybe<Scalars['String']>;
+  contact?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  total: Scalars['Float'];
+  discount?: Maybe<Scalars['Float']>;
+  shop?: Maybe<Scalars['ID']>;
+};
+
 export type CreateSaleInput = {
   items: Array<SaleItemInput>;
-  customer: Scalars['String'];
+  customer?: Maybe<Scalars['String']>;
   contact?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   total: Scalars['Float'];
@@ -208,6 +218,8 @@ export type Mutation = {
   verifyAuthentication?: Maybe<Scalars['Boolean']>;
   createItem?: Maybe<Items>;
   updateItem?: Maybe<Items>;
+  createPurchase?: Maybe<Purchase>;
+  updatePurchase?: Maybe<Purchase>;
   createSale?: Maybe<Sale>;
   updateSale?: Maybe<Sale>;
   createShop?: Maybe<Shop>;
@@ -294,6 +306,16 @@ export type MutationCreateItemArgs = {
 
 export type MutationUpdateItemArgs = {
   item: UpdateItemsInput;
+};
+
+
+export type MutationCreatePurchaseArgs = {
+  purchase: CreatePurchaseInput;
+};
+
+
+export type MutationUpdatePurchaseArgs = {
+  purchase: UpdatePurchaseInput;
 };
 
 
@@ -395,11 +417,47 @@ export type Profile = {
   phone: Scalars['String'];
 };
 
+/** The Purchase model */
+export type Purchase = {
+   __typename?: 'Purchase';
+  _id: Scalars['ID'];
+  billNumber: Scalars['String'];
+  items: Array<PurchaseItem>;
+  vendor?: Maybe<Scalars['String']>;
+  contact?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  total: Scalars['Float'];
+  discount?: Maybe<Scalars['Float']>;
+  active: Scalars['Boolean'];
+  shop?: Maybe<Shop>;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type PurchaseItem = {
+   __typename?: 'PurchaseItem';
+  item: Items;
+  quantity: Scalars['Float'];
+  cost: Scalars['Float'];
+  total: Scalars['Float'];
+};
+
+export type PurchaseItemInput = {
+  item: Scalars['ID'];
+  quantity: Scalars['Float'];
+  cost: Scalars['Float'];
+  total: Scalars['Float'];
+};
+
 export type Query = {
    __typename?: 'Query';
   twoFactorSecret?: Maybe<TwoFactorSecretKey>;
   getUser?: Maybe<User>;
   getItemsForUser: Array<Items>;
+  getPurchasesForUser: Array<Purchase>;
+  getPurchaseByBillNumber: Array<Purchase>;
+  getPurchaseByVendorName: Array<Purchase>;
+  getPurchaseByVendorPhone: Array<Purchase>;
   getSalesForUser: Array<Sale>;
   getSaleByBillNumber: Array<Sale>;
   getSaleByCustomerName: Array<Sale>;
@@ -407,6 +465,26 @@ export type Query = {
   getShopForUser?: Maybe<Shop>;
   me?: Maybe<User>;
   getUserById?: Maybe<User>;
+};
+
+
+export type QueryGetPurchasesForUserArgs = {
+  date: DateRange;
+};
+
+
+export type QueryGetPurchaseByBillNumberArgs = {
+  billNumber: Scalars['String'];
+};
+
+
+export type QueryGetPurchaseByVendorNameArgs = {
+  vendor: Scalars['String'];
+};
+
+
+export type QueryGetPurchaseByVendorPhoneArgs = {
+  contact: Scalars['String'];
 };
 
 
@@ -446,7 +524,7 @@ export type Sale = {
   _id: Scalars['ID'];
   billNumber: Scalars['String'];
   items: Array<SaleItem>;
-  customer: Scalars['String'];
+  customer?: Maybe<Scalars['String']>;
   contact?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   total: Scalars['Float'];
@@ -535,9 +613,20 @@ export type UpdateItemsInput = {
   stock: Scalars['Float'];
 };
 
+export type UpdatePurchaseInput = {
+  items: Array<PurchaseItemInput>;
+  vendor?: Maybe<Scalars['String']>;
+  contact?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
+  total: Scalars['Float'];
+  discount?: Maybe<Scalars['Float']>;
+  shop?: Maybe<Scalars['ID']>;
+  _id: Scalars['ID'];
+};
+
 export type UpdateSaleInput = {
   items: Array<SaleItemInput>;
-  customer: Scalars['String'];
+  customer?: Maybe<Scalars['String']>;
   contact?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   total: Scalars['Float'];

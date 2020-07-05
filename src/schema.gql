@@ -52,6 +52,16 @@ input CreateItemsInput {
   shop: ID
 }
 
+input CreatePurchaseInput {
+  items: [PurchaseItemInput!]!
+  vendor: String
+  contact: String
+  email: String
+  total: Float!
+  discount: Float
+  shop: ID
+}
+
 input CreateSaleInput {
   items: [SaleItemInput!]!
   customer: String
@@ -144,6 +154,8 @@ type Location {
 type Mutation {
   createItem(item: CreateItemsInput!): Items
   updateItem(item: UpdateItemsInput!): Items
+  createPurchase(purchase: CreatePurchaseInput!): Purchase
+  updatePurchase(purchase: UpdatePurchaseInput!): Purchase
   createSale(sale: CreateSaleInput!): Sale
   updateSale(sale: UpdateSaleInput!): Sale
   createShop(shop: CreateShopInput!): Shop
@@ -224,8 +236,42 @@ type Profile {
   phone: String!
 }
 
+"""The Purchase model"""
+type Purchase {
+  _id: ID!
+  billNumber: String!
+  items: [PurchaseItem!]!
+  vendor: String
+  contact: String
+  email: String
+  total: Float!
+  discount: Float
+  active: Boolean!
+  shop: Shop
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PurchaseItem {
+  item: Items!
+  quantity: Float!
+  cost: Float!
+  total: Float!
+}
+
+input PurchaseItemInput {
+  item: ID!
+  quantity: Float!
+  cost: Float!
+  total: Float!
+}
+
 type Query {
   getItemsForUser: [Items!]!
+  getPurchasesForUser(date: DateRange!): [Purchase!]!
+  getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
+  getPurchaseByVendorName(vendor: String!): [Purchase!]!
+  getPurchaseByVendorPhone(contact: String!): [Purchase!]!
   getSalesForUser(date: DateRange!): [Sale!]!
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
@@ -301,6 +347,17 @@ input UpdateItemsInput {
   category: String
   price: PriceInput
   stock: Float!
+}
+
+input UpdatePurchaseInput {
+  items: [PurchaseItemInput!]!
+  vendor: String
+  contact: String
+  email: String
+  total: Float!
+  discount: Float
+  shop: ID
+  _id: ID!
 }
 
 input UpdateSaleInput {

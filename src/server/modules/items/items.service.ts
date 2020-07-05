@@ -4,6 +4,7 @@ import { CTX } from '../../interfaces/common';
 import { UserService } from '../user/user.service';
 import _ from 'lodash';
 import { SaleItemInput } from '../sale/sale.input';
+import { PurchaseItemInput } from '../purchase/purchase.input';
 
 // Queries on models to to get/create/update items data
 
@@ -66,6 +67,22 @@ export class ItemsService {
         }, {
           $set: {
             stock: inStockItem.stock - item.quantity
+          }
+        })
+      }
+
+    }
+  }
+
+  async updateStockWithPurchase(items: PurchaseItemInput[]): Promise<void> {
+    for (const item of items) {
+      const inStockItem = await this.model.findById(item.item);
+      if (inStockItem.stock !== -1) {
+        await this.model.updateOne({
+          _id: item.item
+        }, {
+          $set: {
+            stock: inStockItem.stock + item.quantity
           }
         })
       }

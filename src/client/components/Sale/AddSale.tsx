@@ -123,7 +123,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       }, 5000);
       return;
     }
-    const saleItems = items.map((i) => {
+    const saleItems = _.cloneDeep(items).map((i) => {
       const saleItem = (i as unknown) as SaleItemInput;
       saleItem.item = i.item._id;
       return saleItem;
@@ -177,7 +177,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       }, 5000);
       return;
     }
-    const saleItems = items.map((i) => {
+    const saleItems = _.cloneDeep(items).map((i) => {
       const saleItem = (i as unknown) as SaleItemInput;
       saleItem.item = i.item._id;
       return saleItem;

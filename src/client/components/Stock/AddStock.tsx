@@ -154,12 +154,19 @@ const AddStock: NextPage<Props> = function () {
     }
   };
 
+  const getTotalStockAmount = () => {
+    return _.sum(items?.map((i) => i.price?.cost * i.stock));
+  };
+
   return (
     <React.Fragment>
       <div className="card">
         <div className="card-header">
           <div className="card-title">{'Stock'}</div>
-          <div className="card-options"></div>
+          <div className="ml-auto">
+            <strong>Total</strong>
+            <div className="profit">{getTotalStockAmount()}₹</div>
+          </div>
         </div>
         <form onSubmit={onNewItemCreate}>
           <div className="card-body">
@@ -324,7 +331,7 @@ const AddStock: NextPage<Props> = function () {
                 <th className="w-10">#ID</th>
                 <th className="w-25">Product</th>
                 <th>Cost Price</th>
-                <th>List Price</th>
+                <th>MRP</th>
                 <th>Sale Price</th>
                 <th>Stock</th>
                 <th className="w-10">Action</th>

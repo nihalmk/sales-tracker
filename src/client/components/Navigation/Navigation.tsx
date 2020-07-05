@@ -42,7 +42,7 @@ const Navigation: React.FC<Props> = ({ selected }) => {
             className={'btn btn-primary ml-auto hide-small-screen'}
             onClick={() => selected('purchase')}
           >
-            Purchase
+            New Purchase
           </button>
           <button
             type="button"

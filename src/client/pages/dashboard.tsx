@@ -8,6 +8,8 @@ import Navigation from '../components/Navigation/Navigation';
 import AddStock from '../components/Stock/AddStock';
 import AddSale from '../components/Sale/AddSale';
 import Sales from '../components/Sale/Sales';
+import Purchases from '../components/Purchase/Purchases';
+import AddPurchase from '../components/Purchase/AddPurchase';
 
 interface Props {}
 
@@ -21,9 +23,13 @@ const Home: NextPage<Props> = () => {
       case 'stock':
         return <AddStock />;
       case 'sale':
-          return <AddSale />;
+        return <AddSale />;
       case 'sales':
-          return <Sales />;
+        return <Sales />;
+      case 'purchase':
+        return <AddPurchase />;
+      case 'purchases':
+        return <Purchases />;
       default:
         return <div className="text-center">Not Available</div>;
     }
@@ -34,9 +40,7 @@ const Home: NextPage<Props> = () => {
         {user?.shop ? (
           <React.Fragment>
             <Navigation selected={setSelectedMenu} />
-            <div className="mt-5">
-            {component()}
-            </div>
+            <div className="mt-5">{component()}</div>
           </React.Fragment>
         ) : (
           <ErrorMessage
