@@ -38,10 +38,35 @@ type Charges {
   payment_fee: Float!
 }
 
+"""The Closings model"""
+type Closing {
+  _id: ID!
+  closingId: String!
+  sales: [Sale!]!
+  spentItems: [SpentItems!]!
+  receivedItems: [ReceivedItems!]!
+  inHandTotal: Float!
+  spentTotal: Float!
+  active: Boolean!
+  shop: Shop
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Commission {
   commissionable_value: Float!
   amount: Float!
   rate: Float!
+}
+
+input CreateClosingInput {
+  salesIds: [ID!]!
+  spentItems: [SpentItemsInput!]!
+  receivedItems: [ReceivedItemsInput!]!
+  inHandTotal: Float!
+  spentTotal: Float!
+  active: Boolean!
+  shop: ID
 }
 
 input CreateItemsInput {
@@ -152,6 +177,8 @@ type Location {
 }
 
 type Mutation {
+  createClosing(closing: CreateClosingInput!): Closing
+  updateClosing(closing: UpdateClosingInput!): Closing
   createItem(item: CreateItemsInput!): Items
   updateItem(item: UpdateItemsInput!): Items
   createPurchase(purchase: CreatePurchaseInput!): Purchase
@@ -267,6 +294,8 @@ input PurchaseItemInput {
 }
 
 type Query {
+  getClosingForUser(date: DateRange!): [Closing!]!
+  getClosingByBillNumber(closingId: String!): [Closing!]!
   getItemsForUser: [Items!]!
   getPurchasesForUser(date: DateRange!): [Purchase!]!
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
@@ -279,6 +308,16 @@ type Query {
   getShopForUser: Shop
   me: User
   getUserById(id: ID!): User
+}
+
+type ReceivedItems {
+  receivedFor: String!
+  amount: Float!
+}
+
+input ReceivedItemsInput {
+  receivedFor: String!
+  amount: Float!
 }
 
 enum Roles {
@@ -335,10 +374,31 @@ enum ShopType {
   Mobile
 }
 
+type SpentItems {
+  spentOn: String!
+  amount: Float!
+}
+
+input SpentItemsInput {
+  spentOn: String!
+  amount: Float!
+}
+
 type Tax {
   tax_rate_percent: Float!
   net_amount: Float!
   amount: Float!
+}
+
+input UpdateClosingInput {
+  salesIds: [ID!]!
+  spentItems: [SpentItemsInput!]!
+  receivedItems: [ReceivedItemsInput!]!
+  inHandTotal: Float!
+  spentTotal: Float!
+  active: Boolean!
+  shop: ID
+  _id: ID!
 }
 
 input UpdateItemsInput {

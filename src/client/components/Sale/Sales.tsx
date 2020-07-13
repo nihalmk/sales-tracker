@@ -11,10 +11,11 @@ import DatePicker from '../common/DatePicker/DatePicker';
 
 interface Props {
   billNumber?: string;
+  saleDate?: Date;
 }
 
-const Sales: NextPage<Props> = function () {
-  const [date, setDate] = useState(moment());
+const Sales: NextPage<Props> = function ({ saleDate }) {
+  const [date, setDate] = useState(saleDate ? moment(saleDate) : moment());
   const { loading: saleLoading, data: saleData } = useQuery(GET_SALES, {
     variables: {
       date: {
@@ -58,16 +59,18 @@ const Sales: NextPage<Props> = function () {
             </div>
             {}
           </div>
-          <div className="col-md-4  ml-auto">
-            <DatePicker
-              inputLabel="Select Date"
-              maxDate={new Date()}
-              selected={date.toDate()}
-              onChange={(selectedDate: Date) => {
-                setDate(moment(selectedDate));
-              }}
-            ></DatePicker>
-          </div>
+          {!saleDate && (
+            <div className="col-md-4  ml-auto">
+              <DatePicker
+                inputLabel="Select Date"
+                maxDate={new Date()}
+                selected={date.toDate()}
+                onChange={(selectedDate: Date) => {
+                  setDate(moment(selectedDate));
+                }}
+              ></DatePicker>
+            </div>
+          )}
         </div>
         {saleLoading ? (
           <Loader />

@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import _ from 'lodash';
 import { Items } from '../items/items.model';
 import { ItemsService } from '../items/items.service';
+import { ObjectId } from 'mongodb';
 
 // Queries on models to to get/create/update sale data
 
@@ -73,6 +74,15 @@ export class SaleService {
       .populate({
         path: 'items.item',
         model: Items,
+      });
+  }
+
+  async getSalesByIds(ids: ObjectId[]): Promise<Sale[]> {
+    return this.model
+      .find({
+        _id: {
+          $in: ids
+        },
       });
   }
 

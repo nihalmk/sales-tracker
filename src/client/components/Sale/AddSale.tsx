@@ -13,6 +13,8 @@ import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
+import Sales from './Sales';
+import moment from 'moment-timezone';
 
 interface Props {
   billNumber?: string;
@@ -145,6 +147,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       setNewSale(undefined);
       setSaleItems([]);
       setSubmitted(false);
+      setNewItemSubmitted(false);
       setTimeout(() => {
         setMessage('');
       }, 5000);
@@ -352,7 +355,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             ]);
             setNewSaleItem(undefined);
             setNewItem(undefined);
-            productSelectRef?.current?.focus()
+            productSelectRef?.current?.focus();
           }}
         >
           <div className="card-body pt-0">
@@ -689,6 +692,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
           </div>
         </div>
       </div>
+      <h3>Today's Sales</h3>
+      {createLoading ? <Loader /> : <Sales saleDate={moment().toDate()} />}
       <style jsx>{`
         .w-10 {
           width: 10%;
