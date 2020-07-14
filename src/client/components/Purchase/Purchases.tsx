@@ -11,10 +11,17 @@ import DatePicker from '../common/DatePicker/DatePicker';
 
 interface Props {
   billNumber?: string;
+  hideExtraFields?: boolean;
+  purchaseDate?: Date;
 }
 
-const Purchases: NextPage<Props> = function () {
-  const [date, setDate] = useState(moment());
+const Purchases: NextPage<Props> = function ({
+  hideExtraFields,
+  purchaseDate,
+}) {
+  const [date, setDate] = useState(
+    purchaseDate ? moment(purchaseDate) : moment(),
+  );
   const { loading: purchaseLoading, data: purchaseData } = useQuery(
     GET_PURCHASES,
     {
@@ -46,22 +53,24 @@ const Purchases: NextPage<Props> = function () {
   return (
     <React.Fragment>
       <div className="">
-        <div className="row">
-          <div className="col-md-2">
-            <label className="form-label">{'Total'}</label>{' '}
-            <div className={'loss'}>-{getTotal()}₹</div>
+        {!hideExtraFields && (
+          <div className="row">
+            <div className="col-md-2">
+              <label className="form-label">{'Total'}</label>{' '}
+              <div className={'loss'}>-{getTotal()}₹</div>
+            </div>
+            <div className="col-md-4  ml-auto">
+              <DatePicker
+                inputLabel="Select Date"
+                maxDate={new Date()}
+                selected={date.toDate()}
+                onChange={(selectedDate: Date) => {
+                  setDate(moment(selectedDate));
+                }}
+              ></DatePicker>
+            </div>
           </div>
-          <div className="col-md-4  ml-auto">
-            <DatePicker
-              inputLabel="Select Date"
-              maxDate={new Date()}
-              selected={date.toDate()}
-              onChange={(selectedDate: Date) => {
-                setDate(moment(selectedDate));
-              }}
-            ></DatePicker>
-          </div>
-        </div>
+        )}
         {purchaseLoading ? (
           <Loader />
         ) : (
@@ -69,7 +78,10 @@ const Purchases: NextPage<Props> = function () {
             purchases.map((purchase: Purchase, i) => {
               return (
                 <React.Fragment key={i}>
-                  <PurchaseCard purchaseDetails={purchase} />
+                  <PurchaseCard
+                    purchaseDetails={purchase}
+                    showContent={!hideExtraFields}
+                  />
                 </React.Fragment>
               );
             })) || (

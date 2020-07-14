@@ -10,7 +10,7 @@ export const CREATE_PURCHASE = gql`
     $discount: Float
   ) {
     createPurchase(
-      sale: {
+      purchase: {
         items: $items
         vendor: $vendor
         contact: $contact

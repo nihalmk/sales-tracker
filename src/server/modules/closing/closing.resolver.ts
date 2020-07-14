@@ -28,12 +28,12 @@ export default class ClosingResolver {
 
   @Query((_returns) => [Closing])
   @Authorized()
-  async getClosingByBillNumber(
+  async getClosingByClosingId(
     @Ctx() ctx: CTX,
     @Arg('closingId', (_returns) => String) closingId: string,
   ): Promise<Closing[]> {
     const closingService = new ClosingService(ctx);
-    return await closingService.getClosingByBillNumber(closingId);
+    return await closingService.getClosingByClosingId(closingId);
   }
 
   // Mutations

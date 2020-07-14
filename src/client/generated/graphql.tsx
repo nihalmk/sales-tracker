@@ -58,11 +58,37 @@ export type Charges = {
   payment_fee: Scalars['Float'];
 };
 
+/** The Closings model */
+export type Closing = {
+   __typename?: 'Closing';
+  _id: Scalars['ID'];
+  closingId: Scalars['String'];
+  sales: Array<Sale>;
+  spentItems: Array<SpentItems>;
+  receivedItems: Array<ReceivedItems>;
+  inHandTotal: Scalars['Float'];
+  spentTotal: Scalars['Float'];
+  active: Scalars['Boolean'];
+  shop?: Maybe<Shop>;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type Commission = {
    __typename?: 'Commission';
   commissionable_value: Scalars['Float'];
   amount: Scalars['Float'];
   rate: Scalars['Float'];
+};
+
+export type CreateClosingInput = {
+  salesIds: Array<Scalars['ID']>;
+  spentItems: Array<SpentItemsInput>;
+  receivedItems: Array<ReceivedItemsInput>;
+  inHandTotal: Scalars['Float'];
+  spentTotal: Scalars['Float'];
+  active: Scalars['Boolean'];
+  shop?: Maybe<Scalars['ID']>;
 };
 
 export type CreateItemsInput = {
@@ -216,6 +242,8 @@ export type Mutation = {
   logout?: Maybe<Scalars['Boolean']>;
   authenticate?: Maybe<LoginResult>;
   verifyAuthentication?: Maybe<Scalars['Boolean']>;
+  createClosing?: Maybe<Closing>;
+  updateClosing?: Maybe<Closing>;
   createItem?: Maybe<Items>;
   updateItem?: Maybe<Items>;
   createPurchase?: Maybe<Purchase>;
@@ -296,6 +324,16 @@ export type MutationAuthenticateArgs = {
 export type MutationVerifyAuthenticationArgs = {
   serviceName: Scalars['String'];
   params: AuthenticateParamsInput;
+};
+
+
+export type MutationCreateClosingArgs = {
+  closing: CreateClosingInput;
+};
+
+
+export type MutationUpdateClosingArgs = {
+  closing: UpdateClosingInput;
 };
 
 
@@ -453,6 +491,8 @@ export type Query = {
    __typename?: 'Query';
   twoFactorSecret?: Maybe<TwoFactorSecretKey>;
   getUser?: Maybe<User>;
+  getClosingForUser: Array<Closing>;
+  getClosingByClosingId: Array<Closing>;
   getItemsForUser: Array<Items>;
   getPurchasesForUser: Array<Purchase>;
   getPurchaseByBillNumber: Array<Purchase>;
@@ -465,6 +505,16 @@ export type Query = {
   getShopForUser?: Maybe<Shop>;
   me?: Maybe<User>;
   getUserById?: Maybe<User>;
+};
+
+
+export type QueryGetClosingForUserArgs = {
+  date: DateRange;
+};
+
+
+export type QueryGetClosingByClosingIdArgs = {
+  closingId: Scalars['String'];
 };
 
 
@@ -510,6 +560,17 @@ export type QueryGetSaleByCustomerPhoneArgs = {
 
 export type QueryGetUserByIdArgs = {
   id: Scalars['ID'];
+};
+
+export type ReceivedItems = {
+   __typename?: 'ReceivedItems';
+  receivedFor: Scalars['String'];
+  amount: Scalars['Float'];
+};
+
+export type ReceivedItemsInput = {
+  receivedFor: Scalars['String'];
+  amount: Scalars['Float'];
 };
 
 export enum Roles {
@@ -569,6 +630,17 @@ export enum ShopType {
   Mobile = 'Mobile'
 }
 
+export type SpentItems = {
+   __typename?: 'SpentItems';
+  spentOn: Scalars['String'];
+  amount: Scalars['Float'];
+};
+
+export type SpentItemsInput = {
+  spentOn: Scalars['String'];
+  amount: Scalars['Float'];
+};
+
 export type Tax = {
    __typename?: 'Tax';
   tax_rate_percent: Scalars['Float'];
@@ -603,6 +675,17 @@ export type TwoFactorSecretKeyInput = {
   qr_code_base32?: Maybe<Scalars['String']>;
   google_auth_qr?: Maybe<Scalars['String']>;
   otpauth_url?: Maybe<Scalars['String']>;
+};
+
+export type UpdateClosingInput = {
+  salesIds: Array<Scalars['ID']>;
+  spentItems: Array<SpentItemsInput>;
+  receivedItems: Array<ReceivedItemsInput>;
+  inHandTotal: Scalars['Float'];
+  spentTotal: Scalars['Float'];
+  active: Scalars['Boolean'];
+  shop?: Maybe<Scalars['ID']>;
+  _id: Scalars['ID'];
 };
 
 export type UpdateItemsInput = {

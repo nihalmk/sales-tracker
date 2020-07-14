@@ -26,7 +26,7 @@ export class ClosingService {
     this.saleService = new SaleService(ctx);
   }
 
-  async getClosingByBillNumber(closingId: string): Promise<Closing[]> {
+  async getClosingByClosingId(closingId: string): Promise<Closing[]> {
     return this.model
       .find({
         shop: this.ctx.user.shop,

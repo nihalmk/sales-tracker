@@ -12,9 +12,10 @@ import DatePicker from '../common/DatePicker/DatePicker';
 interface Props {
   billNumber?: string;
   saleDate?: Date;
+  hideExtraFields?: boolean;
 }
 
-const Sales: NextPage<Props> = function ({ saleDate }) {
+const Sales: NextPage<Props> = function ({ saleDate, hideExtraFields }) {
   const [date, setDate] = useState(saleDate ? moment(saleDate) : moment());
   const { loading: saleLoading, data: saleData } = useQuery(GET_SALES, {
     variables: {
@@ -51,14 +52,15 @@ const Sales: NextPage<Props> = function ({ saleDate }) {
     <React.Fragment>
       <div className="">
         <div className="row">
-          <div className="col-md-2">
-            <label className="form-label">{'P/L'}</label>{' '}
-            <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
-              {getTotalProfit() > 0 && '+'}
-              {getTotalProfit()}₹
+          {!hideExtraFields && (
+            <div className="col-md-2">
+              <label className="form-label">{'P/L'}</label>{' '}
+              <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
+                {getTotalProfit() > 0 && '+'}
+                {getTotalProfit()}₹
+              </div>
             </div>
-            {}
-          </div>
+          )}
           {!saleDate && (
             <div className="col-md-4  ml-auto">
               <DatePicker
@@ -79,7 +81,7 @@ const Sales: NextPage<Props> = function ({ saleDate }) {
             sales.map((sale: Sale, i) => {
               return (
                 <React.Fragment key={i}>
-                  <SaleCard saleDetails={sale} />
+                  <SaleCard saleDetails={sale} showContent={!hideExtraFields}/>
                 </React.Fragment>
               );
             })) || (

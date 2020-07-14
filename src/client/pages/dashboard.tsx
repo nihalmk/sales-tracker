@@ -10,6 +10,7 @@ import AddSale from '../components/Sale/AddSale';
 import Sales from '../components/Sale/Sales';
 import Purchases from '../components/Purchase/Purchases';
 import AddPurchase from '../components/Purchase/AddPurchase';
+import NewClosing from '../components/Closing/NewClosing';
 
 interface Props {}
 
@@ -30,6 +31,8 @@ const Home: NextPage<Props> = () => {
         return <AddPurchase />;
       case 'purchases':
         return <Purchases />;
+      case 'closing':
+        return <NewClosing />
       default:
         return <div className="text-center">Not Available</div>;
     }

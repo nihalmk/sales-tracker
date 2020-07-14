@@ -44,3 +44,5 @@ export const getLabelValueFromEnum = (obj: any) => {
   }
   return converted;
 };
+
+export const currency = "₹";

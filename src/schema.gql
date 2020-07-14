@@ -295,7 +295,7 @@ input PurchaseItemInput {
 
 type Query {
   getClosingForUser(date: DateRange!): [Closing!]!
-  getClosingByBillNumber(closingId: String!): [Closing!]!
+  getClosingByClosingId(closingId: String!): [Closing!]!
   getItemsForUser: [Items!]!
   getPurchasesForUser(date: DateRange!): [Purchase!]!
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
