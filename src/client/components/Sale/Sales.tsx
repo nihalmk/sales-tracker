@@ -13,9 +13,14 @@ interface Props {
   billNumber?: string;
   saleDate?: Date;
   hideExtraFields?: boolean;
+  callback?: (salesIds: string[], total: number) => void;
 }
 
-const Sales: NextPage<Props> = function ({ saleDate, hideExtraFields }) {
+const Sales: NextPage<Props> = function ({
+  saleDate,
+  hideExtraFields,
+  callback,
+}) {
   const [date, setDate] = useState(saleDate ? moment(saleDate) : moment());
   const { loading: saleLoading, data: saleData } = useQuery(GET_SALES, {
     variables: {
@@ -37,6 +42,12 @@ const Sales: NextPage<Props> = function ({ saleDate, hideExtraFields }) {
       ),
     );
   }, [saleData]);
+
+  useEffect(() => {
+    if (sales && callback) {
+      callback(sales.map((s) => s._id), _.sum(sales.map((s) => s.total)));
+    }
+  }, [sales]);
 
   const getTotalProfit = () => {
     const profit =
@@ -81,7 +92,7 @@ const Sales: NextPage<Props> = function ({ saleDate, hideExtraFields }) {
             sales.map((sale: Sale, i) => {
               return (
                 <React.Fragment key={i}>
-                  <SaleCard saleDetails={sale} showContent={!hideExtraFields}/>
+                  <SaleCard saleDetails={sale} showContent={!hideExtraFields} />
                 </React.Fragment>
               );
             })) || (

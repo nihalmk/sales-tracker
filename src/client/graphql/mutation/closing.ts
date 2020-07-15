@@ -2,12 +2,13 @@ import gql from 'graphql-tag';
 
 export const CREATE_CLOSING = gql`
   mutation createClosing(
-    $salesIds: [ObjectId!]!
-    $spentItems: [SpentItemsInput!]!
-    $receivedItems: [ReceivedItemsInput!]!
-    $inHandTotal: Float!
-    $spentTotal: Float!
+    $salesIds: [ID!]
+    $spentItems: [SpentItemsInput!]
+    $receivedItems: [ReceivedItemsInput!]
+    $inHandTotal: Float
+    $spentTotal: Float
     $active: Boolean!
+    $date: DateTime!
   ) {
     createClosing(
       closing: {
@@ -17,6 +18,7 @@ export const CREATE_CLOSING = gql`
         inHandTotal: $inHandTotal
         spentTotal: $spentTotal
         active: $active
+        date: $date
       }
     ) {
       _id

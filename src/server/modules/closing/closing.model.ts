@@ -71,6 +71,10 @@ export class Closing {
   @Field(BooleanField)
   active: boolean;
 
+  @prop()
+  @Field(() => Date)
+  date: Date;
+
   @prop({ ref: 'Shop', required: false, index: true })
   @Field((_type) => Shop, { nullable: true })
   shop: Ref<Shop>;

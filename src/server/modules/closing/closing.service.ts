@@ -24,6 +24,7 @@ export class ClosingService {
     this.userService = new UserService();
     this.itemsService = new ItemsService(ctx);
     this.saleService = new SaleService(ctx);
+    this.purchaseService = new PurchaseService(ctx);
   }
 
   async getClosingByClosingId(closingId: string): Promise<Closing[]> {
@@ -58,19 +59,20 @@ export class ClosingService {
         sales: [],
         spentItems: [],
         receivedItems: [],
-        inHandTotal: previousClosing ? previousClosing.inHandTotal : 0,
-        spentTotal: previousClosing ? previousClosing.spentTotal : 0,
+        inHandTotal: previousClosing ? previousClosing.inHandTotal : closing.inHandTotal ||0,
+        spentTotal: previousClosing ? previousClosing.spentTotal : closing.spentTotal || 0,
+        date: closing.date,
         active: false
       }
     } else {
       const sales = await this.saleService.getSalesByIds(closing.salesIds);
       const purchases = await this.purchaseService.getPurchasesByIds(closing.salesIds);
 
-      const receivedItemsTotal = _.sum(closing.receivedItems.map(s => s.amount))
-      const salesTotal = _.sum(sales.map(s => s.total))
-      const purchaseTotal = _.sum(purchases.map(s => s.total))
+      const receivedItemsTotal = _.sum(closing.receivedItems?.map(s => s.amount))
+      const salesTotal = _.sum(sales?.map(s => s.total))
+      const purchaseTotal = _.sum(purchases?.map(s => s.total))
 
-      const spentTotal = _.sum(closing.spentItems.map(s => s.amount));
+      const spentTotal = _.sum(closing.spentItems?.map(s => s.amount));
 
       const inHandTotal = (salesTotal + receivedItemsTotal) - (purchaseTotal + spentTotal);
 
@@ -80,6 +82,7 @@ export class ClosingService {
         receivedItems: closing.receivedItems,
         inHandTotal: inHandTotal,
         spentTotal: spentTotal,
+        date: closing.date,
         active: true
       }
     }

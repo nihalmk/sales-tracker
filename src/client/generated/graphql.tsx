@@ -82,11 +82,11 @@ export type Commission = {
 };
 
 export type CreateClosingInput = {
-  salesIds: Array<Scalars['ID']>;
+  salesIds?: Maybe<Array<Scalars['ID']>>;
   spentItems: Array<SpentItemsInput>;
   receivedItems: Array<ReceivedItemsInput>;
-  inHandTotal: Scalars['Float'];
-  spentTotal: Scalars['Float'];
+  inHandTotal?: Maybe<Scalars['Float']>;
+  spentTotal?: Maybe<Scalars['Float']>;
   active: Scalars['Boolean'];
   shop?: Maybe<Scalars['ID']>;
 };
@@ -678,11 +678,11 @@ export type TwoFactorSecretKeyInput = {
 };
 
 export type UpdateClosingInput = {
-  salesIds: Array<Scalars['ID']>;
+  salesIds?: Maybe<Array<Scalars['ID']>>;
   spentItems: Array<SpentItemsInput>;
   receivedItems: Array<ReceivedItemsInput>;
-  inHandTotal: Scalars['Float'];
-  spentTotal: Scalars['Float'];
+  inHandTotal?: Maybe<Scalars['Float']>;
+  spentTotal?: Maybe<Scalars['Float']>;
   active: Scalars['Boolean'];
   shop?: Maybe<Scalars['ID']>;
   _id: Scalars['ID'];

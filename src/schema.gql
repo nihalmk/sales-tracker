@@ -48,6 +48,7 @@ type Closing {
   inHandTotal: Float!
   spentTotal: Float!
   active: Boolean!
+  date: DateTime!
   shop: Shop
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -60,12 +61,13 @@ type Commission {
 }
 
 input CreateClosingInput {
-  salesIds: [ID!]!
-  spentItems: [SpentItemsInput!]!
-  receivedItems: [ReceivedItemsInput!]!
-  inHandTotal: Float!
-  spentTotal: Float!
+  salesIds: [ID!]
+  spentItems: [SpentItemsInput!]
+  receivedItems: [ReceivedItemsInput!]
+  inHandTotal: Float
+  spentTotal: Float
   active: Boolean!
+  date: DateTime!
   shop: ID
 }
 
@@ -391,12 +393,13 @@ type Tax {
 }
 
 input UpdateClosingInput {
-  salesIds: [ID!]!
-  spentItems: [SpentItemsInput!]!
-  receivedItems: [ReceivedItemsInput!]!
-  inHandTotal: Float!
-  spentTotal: Float!
+  salesIds: [ID!]
+  spentItems: [SpentItemsInput!]
+  receivedItems: [ReceivedItemsInput!]
+  inHandTotal: Float
+  spentTotal: Float
   active: Boolean!
+  date: DateTime!
   shop: ID
   _id: ID!
 }

@@ -13,11 +13,13 @@ interface Props {
   billNumber?: string;
   hideExtraFields?: boolean;
   purchaseDate?: Date;
+  callback?: (purchaseIds: string[], total: number) => void;
 }
 
 const Purchases: NextPage<Props> = function ({
   hideExtraFields,
   purchaseDate,
+  callback,
 }) {
   const [date, setDate] = useState(
     purchaseDate ? moment(purchaseDate) : moment(),
@@ -45,6 +47,12 @@ const Purchases: NextPage<Props> = function ({
       ),
     );
   }, [purchaseData]);
+
+  useEffect(() => {
+    if (purchases && callback) {
+      callback(purchases.map((s) => s._id), _.sum(purchases.map((s) => s.total)));
+    }
+  }, [purchases]);
 
   const getTotal = () => {
     const total = _.sum(purchases?.map((s) => s.total));
