@@ -1,3 +1,4 @@
+import gql from 'graphql-tag';
 export type Maybe<T> = T | null;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -69,6 +70,7 @@ export type Closing = {
   inHandTotal: Scalars['Float'];
   spentTotal: Scalars['Float'];
   active: Scalars['Boolean'];
+  date: Scalars['DateTime'];
   shop?: Maybe<Shop>;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
@@ -83,11 +85,12 @@ export type Commission = {
 
 export type CreateClosingInput = {
   salesIds?: Maybe<Array<Scalars['ID']>>;
-  spentItems: Array<SpentItemsInput>;
-  receivedItems: Array<ReceivedItemsInput>;
+  spentItems?: Maybe<Array<SpentItemsInput>>;
+  receivedItems?: Maybe<Array<ReceivedItemsInput>>;
   inHandTotal?: Maybe<Scalars['Float']>;
   spentTotal?: Maybe<Scalars['Float']>;
   active: Scalars['Boolean'];
+  date: Scalars['DateTime'];
   shop?: Maybe<Scalars['ID']>;
 };
 
@@ -492,13 +495,16 @@ export type Query = {
   twoFactorSecret?: Maybe<TwoFactorSecretKey>;
   getUser?: Maybe<User>;
   getClosingForUser: Array<Closing>;
+  getPreviousClosing?: Maybe<Closing>;
   getClosingByClosingId: Array<Closing>;
   getItemsForUser: Array<Items>;
   getPurchasesForUser: Array<Purchase>;
+  getLastPurchase?: Maybe<Purchase>;
   getPurchaseByBillNumber: Array<Purchase>;
   getPurchaseByVendorName: Array<Purchase>;
   getPurchaseByVendorPhone: Array<Purchase>;
   getSalesForUser: Array<Sale>;
+  getLastSale?: Maybe<Sale>;
   getSaleByBillNumber: Array<Sale>;
   getSaleByCustomerName: Array<Sale>;
   getSaleByCustomerPhone: Array<Sale>;
@@ -679,11 +685,12 @@ export type TwoFactorSecretKeyInput = {
 
 export type UpdateClosingInput = {
   salesIds?: Maybe<Array<Scalars['ID']>>;
-  spentItems: Array<SpentItemsInput>;
-  receivedItems: Array<ReceivedItemsInput>;
+  spentItems?: Maybe<Array<SpentItemsInput>>;
+  receivedItems?: Maybe<Array<ReceivedItemsInput>>;
   inHandTotal?: Maybe<Scalars['Float']>;
   spentTotal?: Maybe<Scalars['Float']>;
   active: Scalars['Boolean'];
+  date: Scalars['DateTime'];
   shop?: Maybe<Scalars['ID']>;
   _id: Scalars['ID'];
 };

@@ -66,7 +66,7 @@ const NewClosing: NextPage<Props> = function ({ date }) {
           spentTotal,
           inHandTotal,
           active: true,
-          date: today.toDate(),
+          date: today.startOf('day').toDate(),
         },
       });
       setMessage('New closing added successfully');
@@ -116,11 +116,14 @@ const NewClosing: NextPage<Props> = function ({ date }) {
             <span className="mr-2">
               Previous (
               {moment(
-                prevClosing?.createdAt || moment(today).subtract(1, 'days'),
+                prevClosing?.date || moment(today).subtract(1, 'days'),
               ).format('DD/MM/YYYY')}
               ):
             </span>
-              <span className="profit">{prevClosing?.inHandTotal || 0}{currency}</span>
+            <span className="profit">
+              {prevClosing?.inHandTotal || 0}
+              {currency}
+            </span>
           </div>
         </div>
         <SuccessMessage message={message} />
@@ -187,7 +190,8 @@ const NewClosing: NextPage<Props> = function ({ date }) {
             <div className="row bigger">
               <strong className="col-md-9">Closing Balance</strong>
               <strong className="col-md-3 profit">
-                {getTotal()[0].toFixed(2)}{currency}
+                {getTotal()[0].toFixed(2)}
+                {currency}
               </strong>
             </div>
           </div>

@@ -13,6 +13,7 @@ export const closing = `{
       inHandTotal
       spentTotal
       active
+      date
       createdAt
     }`;
 
