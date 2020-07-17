@@ -27,6 +27,11 @@ export const sale = `{
       createdAt
     }`;
 
+export const saleMinimal = `{
+      _id
+      createdAt
+    }`;
+
 export const GET_SALES = gql`
   query getSalesForUser($date: DateRange!) {
     getSalesForUser(date: $date) ${sale}
@@ -48,5 +53,11 @@ export const GET_SALE_BY_CUSTOMER = gql`
 export const GET_SALE_BY_CONTACT = gql`
   query getSaleByCustomerPhone($contact: String!) {
     getSaleByCustomerPhone(contact: $contact) ${sale}
+  }
+`;
+
+export const GET_LAST_SALE = gql`
+  query getLastSale {
+    getLastSale ${saleMinimal}
   }
 `;

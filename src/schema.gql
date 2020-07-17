@@ -297,13 +297,16 @@ input PurchaseItemInput {
 
 type Query {
   getClosingForUser(date: DateRange!): [Closing!]!
+  getPreviousClosing: Closing
   getClosingByClosingId(closingId: String!): [Closing!]!
   getItemsForUser: [Items!]!
   getPurchasesForUser(date: DateRange!): [Purchase!]!
+  getLastPurchase: Purchase
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
   getPurchaseByVendorName(vendor: String!): [Purchase!]!
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
   getSalesForUser(date: DateRange!): [Sale!]!
+  getLastSale: Sale
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!

@@ -115,4 +115,9 @@ export class PurchaseService {
     );
     return updatePurchase;
   }
+
+  async getLastPurchase(): Promise<Purchase> {
+    const purchase = await this.model.find().sort({createdAt: -1}).limit(1)
+    return purchase[0];
+  }
 }

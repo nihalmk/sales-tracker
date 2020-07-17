@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
 import _ from 'lodash';
-import { CreateClosingInput } from '../../generated/graphql';
+import { CreateClosingInput, Closing } from '../../generated/graphql';
 import Link from 'next/link';
 import { CREATE_CLOSING } from '../../graphql/mutation/closing';
 import moment from 'moment-timezone';
@@ -12,23 +12,45 @@ import Sales from '../Sale/Sales';
 import Purchases from '../Purchase/Purchases';
 import { Spent } from './Spent';
 import { Received } from './Received';
+import { GET_PREVIOUS_CLOSING } from '../../graphql/query/closing';
+import Loader from '../Loaders/Loader';
+import { currency } from '../../utils/helpers';
 
 interface Props {
   closingId?: string;
+  date?: Date;
 }
 
-const NewClosing: NextPage<Props> = function ({}) {
+const NewClosing: NextPage<Props> = function ({ date }) {
   const [submitCreateClosing, { loading: createLoading }] = useMutation(
     CREATE_CLOSING,
   );
-  const today = moment();
+
+  const { data: previousClosing, loading: previousClosingLoading } = useQuery(
+    GET_PREVIOUS_CLOSING,
+    {
+      fetchPolicy: 'no-cache',
+    },
+  );
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [, setSubmitted] = useState(false);
   const [salesTotal, setSalesTotal] = useState(0);
   const [purchaseTotal, setPurchaseTotal] = useState(0);
-
+  const [today, setToday] = useState(date ? moment(date) : moment());
   const [newClosing, setNewClosing] = useState<CreateClosingInput>();
+  const [prevClosing, setPrevClosing] = useState<Closing>();
+
+  useEffect(() => {
+    setToday(moment(date));
+  }, [date]);
+
+  useEffect(() => {
+    if (previousClosing?.getPreviousClosing) {
+      setPrevClosing(previousClosing.getPreviousClosing);
+    }
+  }, [previousClosing]);
 
   const onNewClosingCreate = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
@@ -60,23 +82,28 @@ const NewClosing: NextPage<Props> = function ({}) {
       }, 5000);
     }
   };
-  console.log(newClosing);
+
   const getTotal = () => {
     const receivedItemsTotal = _.sum(
       newClosing?.receivedItems?.map((s) => s.amount),
     );
     const spentTotal = _.sum(newClosing?.spentItems?.map((s) => s.amount));
     const inHandTotal =
-      salesTotal + receivedItemsTotal - (purchaseTotal + spentTotal);
-    console.log({
-      receivedItemsTotal,
-      spentTotal,
-      salesTotal,
-      purchaseTotal,
-    });
+      (prevClosing?.inHandTotal || 0) +
+      salesTotal +
+      receivedItemsTotal -
+      (purchaseTotal + spentTotal);
+
     return [inHandTotal, spentTotal];
   };
-
+  if (previousClosingLoading) {
+    return (
+      <React.Fragment>
+        <div>Getting previous closing data...</div>
+        <Loader />
+      </React.Fragment>
+    );
+  }
   return (
     <React.Fragment>
       <div className="card">
@@ -85,11 +112,28 @@ const NewClosing: NextPage<Props> = function ({}) {
             {'New Closing | '}
             {today.format('DD/MM/YYYY')}
           </div>
-          <div className="card-options"></div>
+          <div className="card-options">
+            <span className="mr-2">
+              Previous (
+              {moment(
+                prevClosing?.createdAt || moment(today).subtract(1, 'days'),
+              ).format('DD/MM/YYYY')}
+              ):
+            </span>
+              <span className="profit">{prevClosing?.inHandTotal || 0}{currency}</span>
+          </div>
         </div>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
         <div className="card-body pb-0">
+          <div className="mb-3">
+            {!prevClosing?.inHandTotal && (
+              <small className="btn btn-outline-danger w-100">
+                * Add Total in hand on <strong>Received</strong> section for
+                first time closing
+              </small>
+            )}
+          </div>
           <h4>Sales</h4>
           <div className="card-body pb-0">
             <Sales
@@ -143,7 +187,7 @@ const NewClosing: NextPage<Props> = function ({}) {
             <div className="row bigger">
               <strong className="col-md-9">Closing Balance</strong>
               <strong className="col-md-3 profit">
-                {getTotal()[0].toFixed(2)}
+                {getTotal()[0].toFixed(2)}{currency}
               </strong>
             </div>
           </div>

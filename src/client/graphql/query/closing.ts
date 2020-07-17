@@ -2,9 +2,6 @@ import gql from 'graphql-tag';
 
 export const closing = `{
       _id
-      sales {
-        _id
-      }
       spentItems {
         spentOn
         amount
@@ -22,6 +19,12 @@ export const closing = `{
 export const GET_CLOSINGS = gql`
   query getClosings($date: DateRange!) {
     getClosings(date: $date) ${closing}
+  }
+`;
+
+export const GET_PREVIOUS_CLOSING = gql`
+  query getPreviousClosing {
+    getPreviousClosing ${closing}
   }
 `;
 

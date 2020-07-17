@@ -115,4 +115,9 @@ export class SaleService {
     );
     return updateSale;
   }
+
+  async getLastSale(): Promise<Sale> {
+    const sale = await this.model.find().sort({createdAt: -1}).limit(1)
+    return sale[0];
+  }
 }

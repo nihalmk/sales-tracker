@@ -111,4 +111,9 @@ export class ClosingService {
     );
     return updateClosing;
   }
+
+  async getPreviousClosing(): Promise<Closing> {
+    const closing = await this.model.find().sort({createdAt: -1}).limit(1)
+    return closing[0];
+  }
 }
