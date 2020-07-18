@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { ItemsService } from '../items/items.service';
 import { SaleService } from '../sale/sale.service';
 import { PurchaseService } from '../purchase/purchase.service';
+import moment from 'moment-timezone';
 
 // Queries on models to to get/create/update closing data
 
@@ -97,6 +98,13 @@ export class ClosingService {
       ...closingObj,
       shop: closing.shop || this.ctx.user.shop,
     });
+    // TODO: use shop timezone
+    const dateRange = {
+      from: moment(closing.date).startOf('day').toDate(),
+      to: moment(closing.date).endOf('day').toDate(),
+    }
+    this.saleService.updateClosing(dateRange, createdClosing._id);
+    this.purchaseService.updateClosing(dateRange, createdClosing._id)
     return createdClosing;
   }
 

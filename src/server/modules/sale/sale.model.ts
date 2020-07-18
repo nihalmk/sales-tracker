@@ -5,6 +5,7 @@ import { StringField, NumberField, BooleanField, DateField } from '../../common/
 import { Shop } from '../shop/shop.model';
 import { Items } from '../items/items.model';
 import moment from 'moment-timezone';
+import { Closing } from '../closing/closing.model';
 
 @ObjectType()
 export class SaleItem {
@@ -86,6 +87,10 @@ export class Sale {
   @prop({ ref: 'Shop', required: false, index: true })
   @Field((_type) => Shop, { nullable: true })
   shop: Ref<Shop>;
+
+  @prop({ ref: 'Closing', index: true })
+  @Field((_type) => Closing, { nullable: true })
+  closing?: Ref<Closing>;
 
   @Field(DateField)
   public createdAt: Date;

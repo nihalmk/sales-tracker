@@ -277,6 +277,7 @@ type Purchase {
   discount: Float
   active: Boolean!
   shop: Shop
+  closing: Closing
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -302,11 +303,13 @@ type Query {
   getItemsForUser: [Items!]!
   getPurchasesForUser(date: DateRange!): [Purchase!]!
   getLastPurchase: Purchase
+  getPurchaseWithoutClosing: [Purchase!]
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
   getPurchaseByVendorName(vendor: String!): [Purchase!]!
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
   getSalesForUser(date: DateRange!): [Sale!]!
   getLastSale: Sale
+  getSaleWithoutClosing: [Sale!]
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!
@@ -345,6 +348,7 @@ type Sale {
   loss: Float!
   active: Boolean!
   shop: Shop
+  closing: Closing
   createdAt: DateTime!
   updatedAt: DateTime!
 }

@@ -34,6 +34,15 @@ export default class SaleResolver {
     return await saleService.getLastSale();
   }
 
+  @Query((_returns) => [Sale], { nullable: true })
+  @Authorized()
+  async getSaleWithoutClosing(
+    @Ctx() ctx: CTX,
+  ): Promise<Sale[]> {
+    const saleService = new SaleService(ctx);
+    return await saleService.getSaleWithoutClosing();
+  }
+
 
   @Query((_returns) => [Sale])
   @Authorized()

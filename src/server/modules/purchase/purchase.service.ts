@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { Items } from '../items/items.model';
 import { ItemsService } from '../items/items.service';
 import { ObjectId } from 'mongodb';
+import { DateRange } from '../common/Types/InputTypes';
 
 // Queries on models to to get/create/update purchase data
 
@@ -121,5 +122,30 @@ export class PurchaseService {
       shop: this.ctx.user.shop,
     }).sort({createdAt: -1}).limit(1)
     return purchase[0];
+  }
+
+  async getPurchaseWithoutClosing(): Promise<Purchase[]> {
+    return await this.model.find({
+      shop: this.ctx.user.shop,
+      closing: {
+        $exists: false
+      }
+    })
+  }
+
+  async updateClosing(date: DateRange, closingId: ObjectId): Promise<void> {
+    await this.model.updateMany(
+      {
+        createdAt: {
+          $gte: date.from,
+          $lte: date.to,
+        },
+      },
+      {
+        $set: {
+          closing: closingId,
+        },
+      },
+    );
   }
 }

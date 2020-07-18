@@ -198,11 +198,11 @@ const Home: NextPage<Props> = () => {
                   'day',
                 ) && (
                   <small className="btn btn-outline-danger w-100 mt-3">
-                    * You are closed for the day and closing details available
+                    * You are closed for the day and the closing details are available
                     on date:{' '}
                     {moment(previousClosing?.getPreviousClosing?.date).format(
                       'DD/MM/YYYY',
-                    )}
+                    )}{' '} on Report
                   </small>
                 )}
               {needsClosing && (

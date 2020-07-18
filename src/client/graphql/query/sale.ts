@@ -61,3 +61,9 @@ export const GET_LAST_SALE = gql`
     getLastSale ${saleMinimal}
   }
 `;
+
+export const GET_SALE_WT_CLOSING = gql`
+  query getSaleWithoutClosing {
+    getSaleWithoutClosing ${saleMinimal}
+  }
+`;

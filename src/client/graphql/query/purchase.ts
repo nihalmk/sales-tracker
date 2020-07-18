@@ -57,3 +57,9 @@ export const GET_LAST_PURCHASE = gql`
     getLastPurchase ${purchaseMinimal}
   }
 `;
+
+export const GET_PURCHASE_WT_CLOSING = gql`
+  query getPurchaseWithoutClosing {
+    getPurchaseWithoutClosing ${purchaseMinimal}
+  }
+`;

@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { Items } from '../items/items.model';
 import { ItemsService } from '../items/items.service';
 import { ObjectId } from 'mongodb';
+import { DateRange } from '../common/Types/InputTypes';
 
 // Queries on models to to get/create/update sale data
 
@@ -78,12 +79,11 @@ export class SaleService {
   }
 
   async getSalesByIds(ids: ObjectId[]): Promise<Sale[]> {
-    return this.model
-      .find({
-        _id: {
-          $in: ids
-        },
-      });
+    return this.model.find({
+      _id: {
+        $in: ids,
+      },
+    });
   }
 
   // Create a new sale
@@ -117,9 +117,37 @@ export class SaleService {
   }
 
   async getLastSale(): Promise<Sale> {
-    const sale = await this.model.find({
-      shop: this.ctx.user.shop,
-    }).sort({createdAt: -1}).limit(1)
+    const sale = await this.model
+      .find({
+        shop: this.ctx.user.shop,
+      })
+      .sort({ createdAt: -1 })
+      .limit(1);
     return sale[0];
+  }
+
+  async getSaleWithoutClosing(): Promise<Sale[]> {
+    return await this.model.find({
+      shop: this.ctx.user.shop,
+      closing: {
+        $exists: false
+      }
+    })
+  }
+
+  async updateClosing(date: DateRange, closingId: ObjectId): Promise<void> {
+    await this.model.updateMany(
+      {
+        createdAt: {
+          $gte: date.from,
+          $lte: date.to,
+        },
+      },
+      {
+        $set: {
+          closing: closingId,
+        },
+      },
+    );
   }
 }
