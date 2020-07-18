@@ -34,10 +34,6 @@ export class ClosingService {
   }
 
   async getClosings(date: { from: Date; to: Date }): Promise<Closing[]> {
-    console.log({
-      $gte: date.from,
-      $lte: date.to,
-    });
     return this.model.find({
       shop: this.ctx.user.shop,
       date: {
@@ -52,7 +48,6 @@ export class ClosingService {
   async createClosing(closing: CreateClosingInput): Promise<Closing> {
     // TODO: use shop timezone
     const previousClosing = await this.getPreviousClosing();
-    console.log(previousClosing);
     let closingObj: Partial<Closing> = {};
     if (!closing.active) {
       closingObj = {
@@ -83,7 +78,9 @@ export class ClosingService {
       const spentTotal = _.sum(closing.spentItems?.map((s) => s.amount));
 
       const inHandTotal =
-        (previousClosing.inHandTotal || 0 + salesTotal + receivedItemsTotal) -
+        (previousClosing?.inHandTotal || 0) +
+        salesTotal +
+        receivedItemsTotal -
         (purchaseTotal + spentTotal);
 
       closingObj = {

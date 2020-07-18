@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
 import _ from 'lodash';
 import { ReceivedItemsInput } from '../../generated/graphql';
@@ -18,6 +18,7 @@ export const Received: NextPage<Props> = function ({
   const [receivedItems, setReceivedItems] = useState(receivedItemsList || []);
   const [newReceivedItem, setNewReceivedItem] = useState<ReceivedItemsInput>();
   const [submitted, setIsSubmitted] = useState(false);
+  const formFocus = useRef<any>(null);
 
   useEffect(() => {
     callback(receivedItems);
@@ -89,6 +90,7 @@ export const Received: NextPage<Props> = function ({
             ]);
             setIsSubmitted(false);
             setNewReceivedItem(undefined);
+            formFocus?.current?.focus();
           }}
         >
           <div className="row pl-2 pr-2">
@@ -109,6 +111,7 @@ export const Received: NextPage<Props> = function ({
                 }}
                 isInvalid={submitted && !newReceivedItem?.receivedFor}
                 value={newReceivedItem?.receivedFor || ''}
+                innerRef={formFocus}
               />
             </div>
             <div className="col-md-3">

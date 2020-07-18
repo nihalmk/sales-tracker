@@ -20,6 +20,7 @@ interface Props {
   prependIcon?: any;
   autoFocus?: boolean;
   append?: string;
+  innerRef?: any
 }
 
 const Input: React.FunctionComponent<Props> = (props) => (
@@ -62,6 +63,7 @@ const Input: React.FunctionComponent<Props> = (props) => (
         maxLength={props.max}
         step={props.step}
         autoFocus={props.autoFocus}
+        ref={props.innerRef}
       />
       {props.append && (
         <span className="input-group-append">

@@ -26,15 +26,36 @@ const Home: NextPage<Props> = () => {
     UserContext,
   );
 
-  const { data: previousClosing, loading: previousClosingLoading } = useQuery(
-    GET_PREVIOUS_CLOSING,
-  );
+  const {
+    data: previousClosing,
+    loading: previousClosingLoading,
+    refetch: refetchPrevClosing,
+  } = useQuery(GET_PREVIOUS_CLOSING, {
+    fetchPolicy: 'no-cache',
+  });
 
-  const { data: lastSale, loading: lastSaleLoading } = useQuery(GET_LAST_SALE);
+  const {
+    data: lastSale,
+    loading: lastSaleLoading,
+    refetch: refetchLastSale,
+  } = useQuery(GET_LAST_SALE, {
+    fetchPolicy: 'no-cache',
+  });
 
-  const { data: lastPurchase, loading: lastPurchaseLoading } = useQuery(
-    GET_LAST_PURCHASE,
-  );
+  const {
+    data: lastPurchase,
+    loading: lastPurchaseLoading,
+    refetch: refetchLastPurchase,
+  } = useQuery(GET_LAST_PURCHASE, {
+    fetchPolicy: 'no-cache',
+  });
+
+  // refetch on changes in menu selected. hack to refetch on closing submit.
+  useEffect(() => {
+    refetchPrevClosing();
+    refetchLastPurchase();
+    refetchLastSale();
+  }, [selectedMenu]);
 
   const [needsClosing, setNeedsClosing] = useState(false);
 
@@ -95,6 +116,8 @@ const Home: NextPage<Props> = () => {
         });
         setSelectedMenu(NavItems.CLOSING);
         setNeedsClosing(true);
+      } else {
+        setNeedsClosing(false);
       }
     }
   }, [previousClosing, lastSale, lastPurchase]);
@@ -131,6 +154,7 @@ const Home: NextPage<Props> = () => {
   };
   const isLoading =
     previousClosingLoading || lastSaleLoading || lastPurchaseLoading;
+    console.log(previousClosing?.getPreviousClosing)
   return (
     <Layout hideHeader={false}>
       <div className="container">
@@ -145,18 +169,19 @@ const Home: NextPage<Props> = () => {
           ) : (
             <React.Fragment>
               <Navigation />
-              {moment(previousClosing?.getPreviousClosing?.date).isSame(
-                moment(),
-                'day',
-              ) && (
-                <small className="btn btn-outline-danger w-100 mt-3">
-                  * You are closed for the day and closing details available on
-                  date:{' '}
-                  {moment(previousClosing?.getPreviousClosing?.date).format(
-                    'DD/MM/YYYY',
-                  )}
-                </small>
-              )}
+              {previousClosing?.getPreviousClosing !== null &&
+                moment(previousClosing?.getPreviousClosing?.date).isSame(
+                  moment(),
+                  'day',
+                ) && (
+                  <small className="btn btn-outline-danger w-100 mt-3">
+                    * You are closed for the day and closing details available
+                    on date:{' '}
+                    {moment(previousClosing?.getPreviousClosing?.date).format(
+                      'DD/MM/YYYY',
+                    )}
+                  </small>
+                )}
               {needsClosing && (
                 <small className="btn btn-outline-danger w-100 mt-3">
                   * You need to close your Sales/Purchase for date{' '}

@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
 import _ from 'lodash';
 import { SpentItemsInput } from '../../generated/graphql';
@@ -18,6 +18,7 @@ export const Spent: NextPage<Props> = function ({
   const [spentItems, setSpentItems] = useState(spentItemsList || []);
   const [newSpentItem, setNewSpentItem] = useState<SpentItemsInput>();
   const [submitted, setIsSubmitted] = useState(false);
+  const formFocus = useRef<any>(null);
 
   useEffect(() => {
     callback(spentItems);
@@ -84,6 +85,7 @@ export const Spent: NextPage<Props> = function ({
             setSpentItems((currentState) => [...currentState, newSpentItem]);
             setIsSubmitted(false);
             setNewSpentItem(undefined);
+            formFocus?.current?.focus();
           }}
         >
           <div className="row pl-2 pr-2">
@@ -104,6 +106,7 @@ export const Spent: NextPage<Props> = function ({
                 }}
                 isInvalid={submitted && !newSpentItem?.spentOn}
                 value={newSpentItem?.spentOn || ''}
+                innerRef={formFocus}
               />
             </div>
             <div className="col-md-3">

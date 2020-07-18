@@ -117,7 +117,9 @@ export class SaleService {
   }
 
   async getLastSale(): Promise<Sale> {
-    const sale = await this.model.find().sort({createdAt: -1}).limit(1)
+    const sale = await this.model.find({
+      shop: this.ctx.user.shop,
+    }).sort({createdAt: -1}).limit(1)
     return sale[0];
   }
 }
