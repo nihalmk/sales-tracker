@@ -170,8 +170,8 @@ const Home: NextPage<Props> = () => {
   };
   const isLoading =
     previousClosingLoading || lastSaleLoading || lastPurchaseLoading;
-  console.log(previousClosing?.getPreviousClosing);
-  return (
+
+    return (
     <Layout hideHeader={false}>
       <div className="container">
         {user?.shop ? (

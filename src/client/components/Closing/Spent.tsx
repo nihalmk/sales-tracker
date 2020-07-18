@@ -27,7 +27,7 @@ export const Spent: NextPage<Props> = function ({
   }, [spentItems]);
 
   useEffect(() => {
-    setSpentItems(spentItemsList);
+    setSpentItems(spentItemsList || []);
   }, [spentItemsList]);
 
   return (

@@ -27,7 +27,7 @@ export const Received: NextPage<Props> = function ({
   }, [receivedItems]);
 
   useEffect(() => {
-    setReceivedItems(receivedItemsList);
+    setReceivedItems(receivedItemsList || []);
   }, [receivedItemsList]);
   return (
     <React.Fragment>
