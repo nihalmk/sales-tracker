@@ -112,13 +112,13 @@ const Home: NextPage<Props> = () => {
     };
 
     const checkForClosing = () => {
-      if (lastSale?.getLastSale && saleLastDate.isBefore(closingLastDate, 'day')) {
+      if (lastSale?.getLastSale && closingLastDate.isBefore(saleLastDate, 'day')) {
         needClosing();
         return;
       }
       if (
         lastPurchase?.getLastPurchase &&
-        purchaseLastDate.isBefore(closingLastDate, 'day')
+        closingLastDate.isBefore(purchaseLastDate, 'day')
       ) {
         needClosing();
         return;
