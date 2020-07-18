@@ -8,6 +8,9 @@ import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import { currency } from '../../utils/helpers';
 
+let html2canvas: any;
+let jsPDF: any;
+
 interface Props {
   billNumber?: string;
   saleDetails?: Sale;
@@ -20,6 +23,7 @@ const SaleCard: NextPage<Props> = function ({
   showContent = true,
 }) {
   const [view, setView] = useState(showContent);
+  const [isPrinting, setIsPrinting] = useState(false);
   const { loading: saleLoading, data: saleData } = useQuery(
     GET_SALE_BY_BILL_NUMBER,
     {
@@ -42,9 +46,34 @@ const SaleCard: NextPage<Props> = function ({
     setSale(saleDetails);
   }, [sale]);
 
+  useEffect(() => {
+    html2canvas = require('html2canvas');
+    jsPDF = require('jspdf');
+  });
+
+  // TODO: improve printing
+  const print = (selectedId: string) => {
+    if (html2canvas) {
+      setIsPrinting(true);
+      html2canvas(document.querySelector(`#sale-${selectedId}`)).then(
+        async (canvas: any) => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'landscape',
+          });
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          await pdf.save(`${selectedId}.pdf`);
+          setIsPrinting(false);
+        },
+      );
+    }
+  };
   return (
     <React.Fragment>
-      <div className="card">
+      <div className="card" id={`sale-${billNumber || sale?.billNumber}`}>
         <div className="card-header">
           <div className="card-title">
             #{billNumber || sale?.billNumber} |{' '}
@@ -140,6 +169,17 @@ const SaleCard: NextPage<Props> = function ({
           </div>
           <div className="card-footer">
             <div className="d-flex">
+              {(billNumber || sale?.billNumber) && (
+                <button
+                  type="button"
+                  className={
+                    'btn btn-primary ' + (isPrinting ? 'btn-loading' : '')
+                  }
+                  onClick={() => print(billNumber || sale?.billNumber)}
+                >
+                  Download
+                </button>
+              )}
               <button
                 id="shop-submit"
                 type="submit"
