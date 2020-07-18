@@ -21,7 +21,13 @@ import Loader from '../components/Loaders/Loader';
 interface Props {}
 
 const Home: NextPage<Props> = () => {
-  const { user } = useContext(UserContext);
+  const {
+    user,
+    enabledNavItems,
+    setNavItems,
+    setSelectedMenu,
+    selectedMenu,
+  } = useContext(UserContext);
 
   const { data: previousClosing, loading: previousClosingLoading } = useQuery(
     GET_PREVIOUS_CLOSING,
@@ -33,19 +39,37 @@ const Home: NextPage<Props> = () => {
     GET_LAST_PURCHASE,
   );
 
-  const [selectedMenu, setSelectedMenu] = useState<string>(NavItems.SALE);
   const [needsClosing, setNeedsClosing] = useState(false);
-  const [enabledNavItems, setNavItems] = useState({
-    sale: true,
-    stock: true,
-    purchase: true,
-    purchases: true,
-    sales: true,
-    closing: true,
-    report: true,
-  });
 
   useEffect(() => {
+    if (
+      moment(previousClosing?.getPreviousClosing?.date).isSame(
+        moment(),
+        'day',
+      )
+    ) {
+      setNavItems({
+        sale: false,
+        stock: true,
+        purchase: false,
+        purchases: true,
+        sales: true,
+        closing: false,
+        // report: true,
+      });
+      setSelectedMenu(NavItems.SALES);
+    } else {
+      setNavItems({
+        sale: true,
+        stock: true,
+        purchase: true,
+        purchases: true,
+        sales: true,
+        closing: true,
+        // report: true,
+      });
+      setSelectedMenu(NavItems.SALE);
+    }
     if (
       (previousClosing?.getPreviousClosing ||
         previousClosing?.getPreviousClosing === null) &&
@@ -53,7 +77,7 @@ const Home: NextPage<Props> = () => {
       lastPurchase?.getLastPurchase
     ) {
       const closingLastDate = moment(
-        previousClosing?.getPreviousClosing?.createdAt,
+        previousClosing?.getPreviousClosing?.date,
       );
       const saleLastDate = moment(lastSale?.getLastSale?.createdAt);
       const purchaseLastDate = moment(lastPurchase?.getLastPurchase?.createdAt);
@@ -66,16 +90,15 @@ const Home: NextPage<Props> = () => {
         (purchaseLastDate.isBefore(moment(), 'day') &&
           moment(closingLastDate).isBefore(purchaseLastDate, 'day'))
       ) {
-        setNavItems((currentState) => ({
-          ...currentState,
+        setNavItems({
           sale: false,
           stock: false,
           purchase: false,
           purchases: false,
           sales: false,
           closing: true,
-          report: true,
-        }));
+          report: false,
+        });
         setSelectedMenu(NavItems.CLOSING);
         setNeedsClosing(true);
       }

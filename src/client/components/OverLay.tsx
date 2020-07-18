@@ -2,15 +2,18 @@ import React from 'react';
 interface Props {
   children?: object;
   className?: string;
+  show?: boolean;
 }
-const OverLay: React.FC<Props> = ({ children, className }) => {
+const OverLay: React.FC<Props> = ({ children, className, show }) => {
   return (
     <>
-      <div id="layout" key="layout" className={'container-overlay'}>
-        <div className={`overlay-content${className ? ` ${className}` : ''}`}>
-          {children}
+      {show && (
+        <div id="layout" key="layout" className={'container-overlay'}>
+          <div className={`overlay-content${className ? ` ${className}` : ''}`}>
+            {children}
+          </div>
         </div>
-      </div>
+      )}
       <style jsx global>
         {`
           .container-overlay {

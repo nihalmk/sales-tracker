@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, 
+  // useContext 
+} from 'react';
 import { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import SuccessMessage from '../Alerts/SuccessMessage';
@@ -15,6 +17,9 @@ import { Received } from './Received';
 import { GET_PREVIOUS_CLOSING } from '../../graphql/query/closing';
 import Loader from '../Loaders/Loader';
 import { currency } from '../../utils/helpers';
+import ConfirmationDialog from '../Alerts/ConfirmationDialog';
+import OverLay from '../OverLay';
+// import UserContext from '../UserWrapper/UserContext';
 
 interface Props {
   closingId?: string;
@@ -22,6 +27,8 @@ interface Props {
 }
 
 const NewClosing: NextPage<Props> = function ({ date }) {
+  // const { setSelectedMenu } = useContext(UserContext);
+
   const [submitCreateClosing, { loading: createLoading }] = useMutation(
     CREATE_CLOSING,
   );
@@ -41,7 +48,7 @@ const NewClosing: NextPage<Props> = function ({ date }) {
   const [today, setToday] = useState(date ? moment(date) : moment());
   const [newClosing, setNewClosing] = useState<CreateClosingInput>();
   const [prevClosing, setPrevClosing] = useState<Closing>();
-
+  const [closingConfirmation, setClosingConfirmation] = useState(false);
   useEffect(() => {
     setToday(moment(date));
   }, [date]);
@@ -96,10 +103,11 @@ const NewClosing: NextPage<Props> = function ({ date }) {
 
     return [inHandTotal, spentTotal];
   };
+
   if (previousClosingLoading) {
     return (
       <React.Fragment>
-        <div>Getting previous closing data...</div>
+        <div className="text-center p-4">Getting previous closing data...</div>
         <Loader />
       </React.Fragment>
     );
@@ -209,16 +217,33 @@ const NewClosing: NextPage<Props> = function ({ date }) {
               className={
                 'btn btn-primary ml-auto ' + (createLoading && 'btn-loading')
               }
-              onClick={onNewClosingCreate}
+              onClick={() => {
+                setClosingConfirmation(true);
+              }}
             >
               Submit
             </button>
           </div>
         </div>
       </div>
+      <OverLay show={!!closingConfirmation}>
+        <ConfirmationDialog
+          success={(success) => {
+            if (success) {
+              onNewClosingCreate();
+            }
+            setClosingConfirmation(false);
+          }}
+          message={`You won't be able to make changes after you submit. ${
+            !date
+              ? 'Please continue if you are closing for the day!'
+              : 'Please confirm and continue!'
+          }`}
+        />
+      </OverLay>
       <style jsx>{`
         .bigger {
-          font-size: 25px;
+          font-size: 23px;
         }
       `}</style>
     </React.Fragment>

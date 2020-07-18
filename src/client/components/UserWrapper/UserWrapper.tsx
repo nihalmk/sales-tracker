@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { validateToken } from '../../accounts/login';
 import React from 'react';
 import moment from 'moment-timezone';
+import { NavItems } from '../Navigation/Navigation';
 
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,7 +20,16 @@ interface Props {
 
 export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
   const [intervalCounter, setIntervalCounter] = useState<NodeJS.Timeout>();
-
+  const [selectedMenu, setSelectedMenu] = useState<string>(NavItems.SALE);
+  const [enabledNavItems, setNavItems] = useState<{ [key: string]: boolean; }>({
+    sale: true,
+    stock: true,
+    purchase: true,
+    purchases: true,
+    sales: true,
+    closing: true,
+    report: true,
+  }); 
   const currentUser = useQuery(GET_USER, {
     fetchPolicy: 'no-cache',
   });
@@ -92,6 +102,10 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
                 loading: currentUser.loading,
                 clearContext,
                 refetchUser,
+                enabledNavItems,
+                setNavItems,
+                setSelectedMenu,
+                selectedMenu,
               }}
             >
               <Component {...pageProps} />

@@ -28,53 +28,62 @@ export class ClosingService {
   }
 
   async getClosingByClosingId(closingId: string): Promise<Closing[]> {
-    return this.model
-      .find({
-        shop: this.ctx.user.shop,
-        closingId: new RegExp(closingId, 'g'),
-      })
+    return this.model.find({
+      shop: this.ctx.user.shop,
+      closingId: new RegExp(closingId, 'g'),
+    });
   }
 
   async getClosings(date: { from: Date; to: Date }): Promise<Closing[]> {
-    return this.model
-      .find({
-        shop: this.ctx.user.shop,
-        createdAt: {
-          $gte: date.from,
-          $lte: date.to,
-        },
-      })
+    return this.model.find({
+      shop: this.ctx.user.shop,
+      createdAt: {
+        $gte: date.from,
+        $lte: date.to,
+      },
+    });
   }
 
   // Create a new closing
 
   async createClosing(closing: CreateClosingInput): Promise<Closing> {
-    const previousClosing = (await this.getClosings({
-      from: moment().subtract(1, 'days').toDate(),
-      to: moment().subtract(1, 'days').toDate()
-    }))[0]
+    const previousClosing = (
+      await this.getClosings({
+        from: moment().subtract(1, 'days').toDate(),
+        to: moment().subtract(1, 'days').toDate(),
+      })
+    )[0];
     let closingObj: Partial<Closing> = {};
     if (!closing.active) {
       closingObj = {
         sales: [],
         spentItems: [],
         receivedItems: [],
-        inHandTotal: previousClosing ? previousClosing.inHandTotal : closing.inHandTotal ||0,
-        spentTotal: previousClosing ? previousClosing.spentTotal : closing.spentTotal || 0,
+        inHandTotal: previousClosing
+          ? previousClosing.inHandTotal
+          : closing.inHandTotal || 0,
+        spentTotal: previousClosing
+          ? previousClosing.spentTotal
+          : closing.spentTotal || 0,
         date: closing.date,
-        active: false
-      }
+        active: false,
+      };
     } else {
       const sales = await this.saleService.getSalesByIds(closing.salesIds);
-      const purchases = await this.purchaseService.getPurchasesByIds(closing.salesIds);
+      const purchases = await this.purchaseService.getPurchasesByIds(
+        closing.salesIds,
+      );
 
-      const receivedItemsTotal = _.sum(closing.receivedItems?.map(s => s.amount))
-      const salesTotal = _.sum(sales?.map(s => s.total))
-      const purchaseTotal = _.sum(purchases?.map(s => s.total))
+      const receivedItemsTotal = _.sum(
+        closing.receivedItems?.map((s) => s.amount),
+      );
+      const salesTotal = _.sum(sales?.map((s) => s.total));
+      const purchaseTotal = _.sum(purchases?.map((s) => s.total));
 
-      const spentTotal = _.sum(closing.spentItems?.map(s => s.amount));
+      const spentTotal = _.sum(closing.spentItems?.map((s) => s.amount));
 
-      const inHandTotal = (salesTotal + receivedItemsTotal) - (purchaseTotal + spentTotal);
+      const inHandTotal =
+        salesTotal + receivedItemsTotal - (purchaseTotal + spentTotal);
 
       closingObj = {
         sales: closing.salesIds,
@@ -83,8 +92,8 @@ export class ClosingService {
         inHandTotal: inHandTotal,
         spentTotal: spentTotal,
         date: closing.date,
-        active: true
-      }
+        active: true,
+      };
     }
     const createdClosing = await this.model.create({
       ...closingObj,
@@ -113,7 +122,12 @@ export class ClosingService {
   }
 
   async getPreviousClosing(): Promise<Closing> {
-    const closing = await this.model.find().sort({createdAt: -1}).limit(1)
+    const closing = await this.model
+      .find({
+        shop: this.ctx.user.shop,
+      })
+      .sort({ createdAt: -1 })
+      .limit(1);
     return closing[0];
   }
 }
