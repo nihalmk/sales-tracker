@@ -74,7 +74,7 @@ const Home: NextPage<Props> = () => {
       });
       setSelectedMenu(NavItems.SALE);
       setNeedsClosing(false);
-    }
+    };
     if (
       !_.isEmpty(previousClosing?.getPreviousClosing) &&
       moment(previousClosing?.getPreviousClosing?.date).isSame(moment(), 'day')
@@ -111,14 +111,19 @@ const Home: NextPage<Props> = () => {
       setNeedsClosing(true);
     };
 
-    const checkForClosing = () => {
-      if (lastSale?.getLastSale && closingLastDate.isBefore(saleLastDate, 'day')) {
+    const checkForClosing = (noClosing: boolean) => {
+      if (
+        lastSale?.getLastSale &&
+        (closingLastDate.isBefore(saleLastDate, 'day') ||
+          (noClosing && saleLastDate.isBefore(moment(), 'day')))
+      ) {
         needClosing();
         return;
       }
       if (
         lastPurchase?.getLastPurchase &&
-        closingLastDate.isBefore(purchaseLastDate, 'day')
+        (closingLastDate.isBefore(purchaseLastDate, 'day') ||
+          (noClosing && saleLastDate.isBefore(moment(), 'day')))
       ) {
         needClosing();
         return;
@@ -127,7 +132,7 @@ const Home: NextPage<Props> = () => {
     };
     // Did not close previous sale
     if (previousClosing?.getPreviousClosing === null) {
-      checkForClosing();
+      checkForClosing(false);
     } else if (
       previousClosing?.getPreviousClosing &&
       moment(closingLastDate).isBefore(moment().subtract(1, 'days'), 'day')
@@ -171,7 +176,7 @@ const Home: NextPage<Props> = () => {
   const isLoading =
     previousClosingLoading || lastSaleLoading || lastPurchaseLoading;
 
-    return (
+  return (
     <Layout hideHeader={false}>
       <div className="container">
         {user?.shop ? (
