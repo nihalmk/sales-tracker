@@ -17,17 +17,14 @@ import { GET_LAST_SALE } from '../graphql/query/sale';
 import { GET_LAST_PURCHASE } from '../graphql/query/purchase';
 import moment from 'moment-timezone';
 import Loader from '../components/Loaders/Loader';
+import Report from '../components/Report/Report';
 
 interface Props {}
 
 const Home: NextPage<Props> = () => {
-  const {
-    user,
-    enabledNavItems,
-    setNavItems,
-    setSelectedMenu,
-    selectedMenu,
-  } = useContext(UserContext);
+  const { user, setNavItems, setSelectedMenu, selectedMenu } = useContext(
+    UserContext,
+  );
 
   const { data: previousClosing, loading: previousClosingLoading } = useQuery(
     GET_PREVIOUS_CLOSING,
@@ -42,11 +39,9 @@ const Home: NextPage<Props> = () => {
   const [needsClosing, setNeedsClosing] = useState(false);
 
   useEffect(() => {
+    // Closed for today
     if (
-      moment(previousClosing?.getPreviousClosing?.date).isSame(
-        moment(),
-        'day',
-      )
+      moment(previousClosing?.getPreviousClosing?.date).isSame(moment(), 'day')
     ) {
       setNavItems({
         sale: false,
@@ -55,7 +50,7 @@ const Home: NextPage<Props> = () => {
         purchases: true,
         sales: true,
         closing: false,
-        // report: true,
+        report: true,
       });
       setSelectedMenu(NavItems.SALES);
     } else {
@@ -66,19 +61,18 @@ const Home: NextPage<Props> = () => {
         purchases: true,
         sales: true,
         closing: true,
-        // report: true,
+        report: true,
       });
       setSelectedMenu(NavItems.SALE);
     }
+    // Did not close previous sale
     if (
       (previousClosing?.getPreviousClosing ||
         previousClosing?.getPreviousClosing === null) &&
       lastSale?.getLastSale &&
       lastPurchase?.getLastPurchase
     ) {
-      const closingLastDate = moment(
-        previousClosing?.getPreviousClosing?.date,
-      );
+      const closingLastDate = moment(previousClosing?.getPreviousClosing?.date);
       const saleLastDate = moment(lastSale?.getLastSale?.createdAt);
       const purchaseLastDate = moment(lastPurchase?.getLastPurchase?.createdAt);
       if (
@@ -97,7 +91,7 @@ const Home: NextPage<Props> = () => {
           purchases: false,
           sales: false,
           closing: true,
-          report: false,
+          report: true,
         });
         setSelectedMenu(NavItems.CLOSING);
         setNeedsClosing(true);
@@ -129,6 +123,8 @@ const Home: NextPage<Props> = () => {
             }
           />
         );
+      case 'report':
+        return <Report />;
       default:
         return <div className="text-center">Not Available</div>;
     }
@@ -148,10 +144,19 @@ const Home: NextPage<Props> = () => {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Navigation
-                selected={setSelectedMenu}
-                enabled={enabledNavItems}
-              />
+              <Navigation />
+              {moment(previousClosing?.getPreviousClosing?.date).isSame(
+                moment(),
+                'day',
+              ) && (
+                <small className="btn btn-outline-danger w-100 mt-3">
+                  * You are closed for the day and closing details available on
+                  date:{' '}
+                  {moment(previousClosing?.getPreviousClosing?.date).format(
+                    'DD/MM/YYYY',
+                  )}
+                </small>
+              )}
               {needsClosing && (
                 <small className="btn btn-outline-danger w-100 mt-3">
                   * You need to close your Sales/Purchase for date{' '}

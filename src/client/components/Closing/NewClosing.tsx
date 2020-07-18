@@ -1,5 +1,8 @@
-import React, { useState, useEffect, 
-  // useContext 
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  // useContext
 } from 'react';
 import { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -14,20 +17,26 @@ import Sales from '../Sale/Sales';
 import Purchases from '../Purchase/Purchases';
 import { Spent } from './Spent';
 import { Received } from './Received';
-import { GET_PREVIOUS_CLOSING } from '../../graphql/query/closing';
+import {
+  GET_PREVIOUS_CLOSING,
+  GET_CLOSINGS,
+} from '../../graphql/query/closing';
 import Loader from '../Loaders/Loader';
 import { currency } from '../../utils/helpers';
 import ConfirmationDialog from '../Alerts/ConfirmationDialog';
 import OverLay from '../OverLay';
+import { NavItems } from '../Navigation/Navigation';
+import UserContext from '../UserWrapper/UserContext';
 // import UserContext from '../UserWrapper/UserContext';
 
 interface Props {
   closingId?: string;
   date?: Date;
+  isView?: boolean;
 }
 
-const NewClosing: NextPage<Props> = function ({ date }) {
-  // const { setSelectedMenu } = useContext(UserContext);
+const NewClosing: NextPage<Props> = function ({ date, isView }) {
+  const { setSelectedMenu, setNavItems } = useContext(UserContext);
 
   const [submitCreateClosing, { loading: createLoading }] = useMutation(
     CREATE_CLOSING,
@@ -37,8 +46,19 @@ const NewClosing: NextPage<Props> = function ({ date }) {
     GET_PREVIOUS_CLOSING,
     {
       fetchPolicy: 'no-cache',
+      skip: isView,
     },
   );
+
+  const { data: closings, loading: closingsLoading } = useQuery(GET_CLOSINGS, {
+    variables: {
+      date: {
+        from: moment(date).startOf('day').toDate(),
+        to: moment(date).endOf('day').toDate(),
+      },
+    },
+    fetchPolicy: 'no-cache',
+  });
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -48,7 +68,15 @@ const NewClosing: NextPage<Props> = function ({ date }) {
   const [today, setToday] = useState(date ? moment(date) : moment());
   const [newClosing, setNewClosing] = useState<CreateClosingInput>();
   const [prevClosing, setPrevClosing] = useState<Closing>();
+  // const [selectedClosing, setSelectedClosing] = useState<Closing>();
   const [closingConfirmation, setClosingConfirmation] = useState(false);
+
+  useEffect(() => {
+    if (closings?.getClosingForUser) {
+      setNewClosing(closings.getClosingForUser[0]);
+    }
+  }, [closings]);
+
   useEffect(() => {
     setToday(moment(date));
   }, [date]);
@@ -73,12 +101,22 @@ const NewClosing: NextPage<Props> = function ({ date }) {
           spentTotal,
           inHandTotal,
           active: true,
-          date: today.startOf('day').toDate(),
+          date: today.endOf('day').toDate(),
         },
       });
       setMessage('New closing added successfully');
       setNewClosing(undefined);
       setSubmitted(false);
+      setSelectedMenu(NavItems.REPORT);
+      setNavItems({
+        sale: false,
+        stock: true,
+        purchase: false,
+        purchases: true,
+        sales: true,
+        closing: false,
+        report: true,
+      });
       setTimeout(() => {
         setMessage('');
       }, 5000);
@@ -104,11 +142,20 @@ const NewClosing: NextPage<Props> = function ({ date }) {
     return [inHandTotal, spentTotal];
   };
 
-  if (previousClosingLoading) {
+  if (previousClosingLoading || closingsLoading) {
     return (
       <React.Fragment>
-        <div className="text-center p-4">Getting previous closing data...</div>
+        <div className="text-center p-4">Getting closing data...</div>
         <Loader />
+      </React.Fragment>
+    );
+  }
+  if (isView && !newClosing) {
+    return (
+      <React.Fragment>
+        <div className="card">
+          <div className="text-center p-4">No closing found</div>
+        </div>
       </React.Fragment>
     );
   }
@@ -117,28 +164,32 @@ const NewClosing: NextPage<Props> = function ({ date }) {
       <div className="card">
         <div className="card-header">
           <div className="card-title">
-            {'New Closing | '}
+            {isView ? 'Closing | ' : 'New Closing | '}
             {today.format('DD/MM/YYYY')}
           </div>
           <div className="card-options">
-            <span className="mr-2">
-              Previous (
-              {moment(
-                prevClosing?.date || moment(today).subtract(1, 'days'),
-              ).format('DD/MM/YYYY')}
-              ):
-            </span>
-            <span className="profit">
-              {prevClosing?.inHandTotal || 0}
-              {currency}
-            </span>
+            {!isView && (
+              <React.Fragment>
+                <span className="mr-2">
+                  Previous (
+                  {moment(
+                    prevClosing?.date || moment(today).subtract(1, 'days'),
+                  ).format('DD/MM/YYYY')}
+                  ):
+                </span>
+                <span className="profit">
+                  {prevClosing?.inHandTotal || 0}
+                  {currency}
+                </span>
+              </React.Fragment>
+            )}
           </div>
         </div>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
         <div className="card-body pb-0">
           <div className="mb-3">
-            {!prevClosing?.inHandTotal && (
+            {!isView && !prevClosing?.inHandTotal && (
               <small className="btn btn-outline-danger w-100">
                 * Add Total in hand on <strong>Received</strong> section for
                 first time closing
@@ -181,6 +232,8 @@ const NewClosing: NextPage<Props> = function ({ date }) {
                   spentItems,
                 }));
               }}
+              isView={isView}
+              spentItemsList={newClosing?.spentItems}
             />
           </div>
           <h4 className="pt-3">Received</h4>
@@ -192,13 +245,17 @@ const NewClosing: NextPage<Props> = function ({ date }) {
                   receivedItems,
                 }));
               }}
+              isView={isView}
+              receivedItemsList={newClosing?.receivedItems}
             />
           </div>
           <div className="card-body mt-3 mb-3 p-2 border">
             <div className="row bigger">
               <strong className="col-md-9">Closing Balance</strong>
               <strong className="col-md-3 profit">
-                {getTotal()[0].toFixed(2)}
+                {isView
+                  ? newClosing?.inHandTotal || 0
+                  : getTotal()[0].toFixed(2)}
                 {currency}
               </strong>
             </div>
@@ -217,8 +274,9 @@ const NewClosing: NextPage<Props> = function ({ date }) {
               className={
                 'btn btn-primary ml-auto ' + (createLoading && 'btn-loading')
               }
+              disabled={isView}
               onClick={() => {
-                setClosingConfirmation(true);
+                !isView && setClosingConfirmation(true);
               }}
             >
               Submit

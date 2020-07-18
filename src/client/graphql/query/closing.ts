@@ -18,8 +18,8 @@ export const closing = `{
     }`;
 
 export const GET_CLOSINGS = gql`
-  query getClosings($date: DateRange!) {
-    getClosings(date: $date) ${closing}
+  query getClosingForUser($date: DateRange!) {
+    getClosingForUser(date: $date) ${closing}
   }
 `;
 

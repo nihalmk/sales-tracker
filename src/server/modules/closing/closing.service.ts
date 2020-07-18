@@ -4,7 +4,6 @@ import { CTX } from '../../interfaces/common';
 import { UserService } from '../user/user.service';
 import _ from 'lodash';
 import { ItemsService } from '../items/items.service';
-import moment from 'moment-timezone';
 import { SaleService } from '../sale/sale.service';
 import { PurchaseService } from '../purchase/purchase.service';
 
@@ -35,9 +34,13 @@ export class ClosingService {
   }
 
   async getClosings(date: { from: Date; to: Date }): Promise<Closing[]> {
+    console.log({
+      $gte: date.from,
+      $lte: date.to,
+    });
     return this.model.find({
       shop: this.ctx.user.shop,
-      createdAt: {
+      date: {
         $gte: date.from,
         $lte: date.to,
       },
@@ -47,12 +50,9 @@ export class ClosingService {
   // Create a new closing
 
   async createClosing(closing: CreateClosingInput): Promise<Closing> {
-    const previousClosing = (
-      await this.getClosings({
-        from: moment().subtract(1, 'days').toDate(),
-        to: moment().subtract(1, 'days').toDate(),
-      })
-    )[0];
+    // TODO: use shop timezone
+    const previousClosing = await this.getPreviousClosing();
+    console.log(previousClosing);
     let closingObj: Partial<Closing> = {};
     if (!closing.active) {
       closingObj = {
@@ -83,7 +83,8 @@ export class ClosingService {
       const spentTotal = _.sum(closing.spentItems?.map((s) => s.amount));
 
       const inHandTotal =
-        salesTotal + receivedItemsTotal - (purchaseTotal + spentTotal);
+        (previousClosing.inHandTotal || 0 + salesTotal + receivedItemsTotal) -
+        (purchaseTotal + spentTotal);
 
       closingObj = {
         sales: closing.salesIds,
