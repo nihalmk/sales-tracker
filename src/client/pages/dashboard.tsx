@@ -132,7 +132,7 @@ const Home: NextPage<Props> = () => {
     };
     // Did not close previous sale
     if (previousClosing?.getPreviousClosing === null) {
-      checkForClosing(false);
+      checkForClosing(true);
     } else if (
       previousClosing?.getPreviousClosing &&
       moment(closingLastDate).isBefore(moment().subtract(1, 'days'), 'day')
