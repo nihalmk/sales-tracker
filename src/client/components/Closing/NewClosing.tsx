@@ -202,7 +202,7 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
               hideExtraFields={true}
               saleDate={today.toDate()}
               callback={(salesIds, total) => {
-                setNewClosing((currentState) => ({
+                !isView && setNewClosing((currentState) => ({
                   ...currentState,
                   salesIds,
                 }));
@@ -216,7 +216,7 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
               hideExtraFields={true}
               purchaseDate={today.toDate()}
               callback={(_purchaseIds, total) => {
-                setPurchaseTotal(total);
+                !isView && setPurchaseTotal(total);
               }}
             />
           </div>
@@ -224,29 +224,31 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
           <small className="text-muted">
             * Include borrowed money to deduct money received from sales
           </small>
-          <div className="card-body p-0 border">
+          <div className="card-body p-0 border" id={newClosing.date}>
             <Spent
               callback={(spentItems) => {
-                setNewClosing((currentState) => ({
+                !isView && setNewClosing((currentState) => ({
                   ...currentState,
                   spentItems,
                 }));
               }}
               isView={isView}
               spentItemsList={newClosing?.spentItems}
+              id={newClosing.date}
             />
           </div>
           <h4 className="pt-3">Received</h4>
-          <div className="card-body p-0 border">
+          <div className="card-body p-0 border" id={newClosing.date}>
             <Received
               callback={(receivedItems) => {
-                setNewClosing((currentState) => ({
+                !isView && setNewClosing((currentState) => ({
                   ...currentState,
                   receivedItems,
                 }));
               }}
               isView={isView}
               receivedItemsList={newClosing?.receivedItems}
+              id={newClosing.date}
             />
           </div>
           <div className="card-body mt-3 mb-3 p-2 border">

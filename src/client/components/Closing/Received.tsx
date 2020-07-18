@@ -8,12 +8,14 @@ interface Props {
   receivedItemsList?: ReceivedItemsInput[];
   callback?: (receivedItems: ReceivedItemsInput[]) => void;
   isView?: boolean;
+  id: string;
 }
 
 export const Received: NextPage<Props> = function ({
   receivedItemsList,
   callback,
   isView,
+  id,
 }) {
   const [receivedItems, setReceivedItems] = useState(receivedItemsList || []);
   const [newReceivedItem, setNewReceivedItem] = useState<ReceivedItemsInput>();
@@ -21,11 +23,15 @@ export const Received: NextPage<Props> = function ({
   const formFocus = useRef<any>(null);
 
   useEffect(() => {
-    callback(receivedItems);
+    !isView && callback(receivedItems);
   }, [receivedItems]);
+
+  useEffect(() => {
+    setReceivedItems(receivedItemsList);
+  }, [receivedItemsList]);
   return (
     <React.Fragment>
-      <div className="table-responsive">
+      <div className="table-responsive" id={id}>
         <table className="table card-table table-hover table-outline">
           <thead>
             <tr>

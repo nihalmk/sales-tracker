@@ -18,6 +18,7 @@ import { GET_LAST_PURCHASE } from '../graphql/query/purchase';
 import moment from 'moment-timezone';
 import Loader from '../components/Loaders/Loader';
 import Report from '../components/Report/Report';
+import _ from 'lodash';
 
 interface Props {}
 
@@ -61,7 +62,21 @@ const Home: NextPage<Props> = () => {
 
   useEffect(() => {
     // Closed for today
+    const proceedSale = () => {
+      setNavItems({
+        sale: true,
+        stock: true,
+        purchase: true,
+        purchases: true,
+        sales: true,
+        closing: true,
+        report: true,
+      });
+      setSelectedMenu(NavItems.SALE);
+      setNeedsClosing(false);
+    }
     if (
+      !_.isEmpty(previousClosing?.getPreviousClosing) &&
       moment(previousClosing?.getPreviousClosing?.date).isSame(moment(), 'day')
     ) {
       setNavItems({
@@ -74,51 +89,52 @@ const Home: NextPage<Props> = () => {
         report: true,
       });
       setSelectedMenu(NavItems.SALES);
+      return;
     } else {
+      proceedSale();
+    }
+    const closingLastDate = moment(previousClosing?.getPreviousClosing?.date);
+    const saleLastDate = moment(lastSale?.getLastSale?.createdAt);
+    const purchaseLastDate = moment(lastPurchase?.getLastPurchase?.createdAt);
+
+    const needClosing = () => {
       setNavItems({
-        sale: true,
-        stock: true,
-        purchase: true,
-        purchases: true,
-        sales: true,
+        sale: false,
+        stock: false,
+        purchase: false,
+        purchases: false,
+        sales: false,
         closing: true,
         report: true,
       });
-      setSelectedMenu(NavItems.SALE);
-    }
-    // Did not close previous sale
-    if (
-      (previousClosing?.getPreviousClosing ||
-        previousClosing?.getPreviousClosing === null) &&
-      lastSale?.getLastSale &&
-      lastPurchase?.getLastPurchase
-    ) {
-      const closingLastDate = moment(previousClosing?.getPreviousClosing?.date);
-      const saleLastDate = moment(lastSale?.getLastSale?.createdAt);
-      const purchaseLastDate = moment(lastPurchase?.getLastPurchase?.createdAt);
-      if (
-        (previousClosing?.getPreviousClosing === null &&
-          (saleLastDate.isBefore(moment(), 'day') ||
-            purchaseLastDate.isBefore(moment(), 'day'))) ||
-        (saleLastDate.isBefore(moment(), 'day') &&
-          moment(closingLastDate).isBefore(saleLastDate, 'day')) ||
-        (purchaseLastDate.isBefore(moment(), 'day') &&
-          moment(closingLastDate).isBefore(purchaseLastDate, 'day'))
-      ) {
-        setNavItems({
-          sale: false,
-          stock: false,
-          purchase: false,
-          purchases: false,
-          sales: false,
-          closing: true,
-          report: true,
-        });
-        setSelectedMenu(NavItems.CLOSING);
-        setNeedsClosing(true);
-      } else {
-        setNeedsClosing(false);
+      setSelectedMenu(NavItems.CLOSING);
+      setNeedsClosing(true);
+    };
+
+    const checkForClosing = () => {
+      if (lastSale?.getLastSale && saleLastDate.isBefore(moment(), 'day')) {
+        needClosing();
+        return;
       }
+      if (
+        lastPurchase?.getLastPurchase &&
+        purchaseLastDate.isBefore(moment(), 'day')
+      ) {
+        needClosing();
+        return;
+      }
+      setNeedsClosing(false);
+    };
+    // Did not close previous sale
+    if (previousClosing?.getPreviousClosing === null) {
+      checkForClosing();
+    } else if (
+      previousClosing?.getPreviousClosing &&
+      moment(closingLastDate).isBefore(moment().subtract(1, 'days'), 'day')
+    ) {
+      checkForClosing();
+    } else {
+      proceedSale();
     }
   }, [previousClosing, lastSale, lastPurchase]);
   const component = () => {
@@ -154,7 +170,7 @@ const Home: NextPage<Props> = () => {
   };
   const isLoading =
     previousClosingLoading || lastSaleLoading || lastPurchaseLoading;
-    console.log(previousClosing?.getPreviousClosing)
+  console.log(previousClosing?.getPreviousClosing);
   return (
     <Layout hideHeader={false}>
       <div className="container">
@@ -190,7 +206,7 @@ const Home: NextPage<Props> = () => {
                       lastSale?.getLastSale?.createdAt ||
                         lastPurchase?.getLastPurchase?.createdAt,
                     ).format('DD/MM/YYYY')})`}
-                  </strong>
+                  </strong>{' '}
                   before adding new Sales
                 </small>
               )}

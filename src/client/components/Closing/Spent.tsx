@@ -8,12 +8,14 @@ interface Props {
   spentItemsList?: SpentItemsInput[];
   callback?: (spentItems: SpentItemsInput[]) => void;
   isView?: boolean;
+  id: string;
 }
 
 export const Spent: NextPage<Props> = function ({
   spentItemsList,
   callback,
   isView,
+  id
 }) {
   const [spentItems, setSpentItems] = useState(spentItemsList || []);
   const [newSpentItem, setNewSpentItem] = useState<SpentItemsInput>();
@@ -21,11 +23,16 @@ export const Spent: NextPage<Props> = function ({
   const formFocus = useRef<any>(null);
 
   useEffect(() => {
-    callback(spentItems);
+    !isView && callback(spentItems);
   }, [spentItems]);
+
+  useEffect(() => {
+    setSpentItems(spentItemsList);
+  }, [spentItemsList]);
+
   return (
     <React.Fragment>
-      <div className="table-responsive">
+      <div className="table-responsive" id={id}>
         <table className="table card-table table-hover table-outline">
           <thead>
             <tr>
