@@ -10,6 +10,7 @@ import { Logo } from '../components/Header/Logo';
 import { GET_USER } from '../graphql/query/user';
 import { useQuery } from '@apollo/react-hooks';
 import Link from 'next/link';
+import { IconAttribute } from '../components/IconAttribute';
 
 interface Props {}
 
@@ -64,11 +65,58 @@ export const Login: NextPage<Props> = function () {
         <title>Login</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <div className="text-center mb-6">
+        <Logo setColor />
+      </div>
       <div className="row">
-        <div className="col col-login mx-auto">
-          <div className="text-center mb-6">
-            <Logo setColor />
+        <div className="col-md-8">
+          <div className="card">
+            <div className="card-body p-6">
+              <div className="card-title text-center pb-7">
+                <img src="/static/STName2.png" className={'ml-2'} alt="" />
+              </div>
+              <div className="card card-aside">
+                <a
+                  href="#"
+                  className="card-aside-column"
+                  style={{
+                    backgroundImage: "url(/static/STLogo.svg)"
+                  }}
+                ></a>
+                <div className="card-body d-flex flex-column">
+                  <h4>
+                    <a href="#">Sales tracking made easy</a>
+                  </h4>
+                  <div className="text-muted">
+                    Add your total stock, sales and purchases. Also track current and previous sales.
+                    Track your profit on each sale.
+                    Track your closing sales and tally the cash!
+                  </div>
+                  <div className="d-flex align-items-center pt-5 mt-auto">
+                    <div
+                      className="avatar avatar-md mr-3"
+                    ></div>
+                    <div>
+                      <a href="#" className="text-default">
+                        Shop Tracker
+                      </a>
+                      <small className="d-block text-muted">Contact</small>
+                    </div>
+                    <div className="ml-auto text-muted">
+                      <a
+                        href="javascript:void(0)"
+                        className="icon d-none d-md-inline-block ml-3"
+                      >
+                        <i className="fe fe-heart mr-1"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+        <div className="col col-login ml-auto">
           <form className="card" action="" method="post" onSubmit={onSubmit}>
             <div className="card-body p-6">
               <div className="card-title text-center">Sign in to your Shop</div>
@@ -119,6 +167,8 @@ export const Login: NextPage<Props> = function () {
           </form>
         </div>
       </div>
+      <IconAttribute />
+
       <style jsx>{``}</style>
     </div>
   );

@@ -6,7 +6,7 @@ interface Props {
 export const Logo: React.FC<Props> = ({}) => {
   return (
     <React.Fragment>
-      <img src="/static/favicon.ico" className={'h-7 w-7 '} alt="" />
+      <img src="/static/STLogo.svg" className={'h-7 w-7 mt-2'} alt="" />
       <style jsx>{``}</style>
     </React.Fragment>
   );

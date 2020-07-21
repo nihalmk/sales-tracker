@@ -224,7 +224,7 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
           <small className="text-muted">
             * Include borrowed money to deduct money received from sales
           </small>
-          <div className="card-body p-0 border" id={newClosing?.date}>
+          <div className="card p-0" id={newClosing?.date}>
             <Spent
               callback={(spentItems) => {
                 !isView && setNewClosing((currentState) => ({
@@ -238,7 +238,7 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
             />
           </div>
           <h4 className="pt-3">Received</h4>
-          <div className="card-body p-0 border" id={newClosing?.date}>
+          <div className="card p-0" id={newClosing?.date}>
             <Received
               callback={(receivedItems) => {
                 !isView && setNewClosing((currentState) => ({
@@ -251,7 +251,7 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
               id={newClosing?.date}
             />
           </div>
-          <div className="card-body mt-3 mb-3 p-2 border">
+          <div className="card mt-3 mb-3 p-2">
             <div className="row bigger">
               <strong className="col-md-9">Closing Balance</strong>
               <strong className="col-md-3 profit">

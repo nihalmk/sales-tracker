@@ -1,11 +1,11 @@
 version: '3'
 services:
-  gfs-kitchen-screens:
+  shop-tracker:
     build: .
-    image: gfs-kitchen-screens
+    image: shop-tracker
     environment:
       GRAPHQL_SERVER: http://localhost:3000/graphql
-      MONGO_URI: mongodb://mongo:27017/gfs_kitchen_screens_dev
+      MONGO_URI: mongodb://mongo:27017/shop-tracker
       PORT: 3000
     ports:
       - '80:3000'

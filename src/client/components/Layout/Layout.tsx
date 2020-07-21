@@ -4,6 +4,7 @@ import { Site, Page } from 'tabler-react';
 import { Titles } from '../../utils/pages';
 import { useRouter } from 'next/router';
 import { Header } from '../Header/Header';
+import { IconAttribute } from '../IconAttribute';
 
 interface Props {
   children?: object;
@@ -35,6 +36,7 @@ export const Layout: React.FC<Props> = ({ children, hideHeader }) => {
       <Page>
         <Page.Content>{children}</Page.Content>
       </Page>
+      <IconAttribute />
       <style jsx global>{`
         .bg-blue-global {
           background: #1a74c5;
@@ -49,7 +51,10 @@ export const Layout: React.FC<Props> = ({ children, hideHeader }) => {
           color: red;
         }
         .page-content {
-          margin-top: 0
+          margin-top: 0;
+        }
+        .card {
+          border: 1px solid rgba(0, 40, 100, 0.12);
         }
         @media (max-width: 768px) {
           .hide-small-screen {
