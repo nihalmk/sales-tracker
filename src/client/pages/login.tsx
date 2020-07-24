@@ -80,7 +80,7 @@ export const Login: NextPage<Props> = function () {
                   href="#"
                   className="card-aside-column"
                   style={{
-                    backgroundImage: "url(/static/STLogo.svg)"
+                    backgroundImage: 'url(/static/STLogo.svg)',
                   }}
                 ></a>
                 <div className="card-body d-flex flex-column">
@@ -88,14 +88,12 @@ export const Login: NextPage<Props> = function () {
                     <a href="#">Sales tracking made easy</a>
                   </h4>
                   <div className="text-muted">
-                    Add your total stock, sales and purchases. Also track current and previous sales.
-                    Track your profit on each sale.
+                    Add your total stock, sales and purchases. Also track
+                    current and previous sales. Track your profit on each sale.
                     Track your closing sales and tally the cash!
                   </div>
                   <div className="d-flex align-items-center pt-5 mt-auto">
-                    <div
-                      className="avatar avatar-md mr-3"
-                    ></div>
+                    <div className="avatar avatar-md mr-3"></div>
                     <div>
                       <a href="#" className="text-default">
                         Shop Tracker
@@ -161,6 +159,11 @@ export const Login: NextPage<Props> = function () {
                 >
                   Sign in
                 </button>
+                <Link href={Pages.REGISTER}>
+                  <button className={'btn btn-success btn-block mt-2'} type="button">
+                    Sign Up
+                  </button>
+                </Link>
                 <button type="submit" hidden></button>
               </div>
             </div>

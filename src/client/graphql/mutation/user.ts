@@ -7,3 +7,9 @@ export const RESET_PASSWORD = gql`
     sendResetPasswordEmail(email: $email)
   }
 `;
+
+export const CREATE_NEW_USER = gql`
+  mutation createNewUser($user: CreateUserInput!) {
+    createNewUser(user: $user)
+  }
+`;

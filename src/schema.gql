@@ -4,17 +4,17 @@
 # -----------------------------------------------
 
 type Address {
-  street: String!
-  pincode: String!
   lat: String
   long: String
+  pincode: String!
+  street: String!
 }
 
 input AddressInput {
-  street: String!
-  pincode: String!
   lat: String
   long: String
+  pincode: String!
+  street: String!
 }
 
 type Branches {
@@ -32,97 +32,97 @@ type Channel {
 }
 
 type Charges {
-  joker_fee: Float!
-  service_fee: Float!
   discount_fee: Float!
+  joker_fee: Float!
   payment_fee: Float!
+  service_fee: Float!
 }
 
 """The Closings model"""
 type Closing {
   _id: ID!
-  closingId: String!
-  sales: [Sale!]!
-  spentItems: [SpentItems!]!
-  receivedItems: [ReceivedItems!]!
-  inHandTotal: Float!
-  spentTotal: Float!
   active: Boolean!
-  date: DateTime!
-  shop: Shop
+  closingId: String!
   createdAt: DateTime!
+  date: DateTime!
+  inHandTotal: Float!
+  receivedItems: [ReceivedItems!]!
+  sales: [Sale!]!
+  shop: Shop
+  spentItems: [SpentItems!]!
+  spentTotal: Float!
   updatedAt: DateTime!
 }
 
 type Commission {
-  commissionable_value: Float!
   amount: Float!
+  commissionable_value: Float!
   rate: Float!
 }
 
 input CreateClosingInput {
-  salesIds: [ID!]
-  spentItems: [SpentItemsInput!]
-  receivedItems: [ReceivedItemsInput!]
-  inHandTotal: Float
-  spentTotal: Float
   active: Boolean!
   date: DateTime!
+  inHandTotal: Float
+  receivedItems: [ReceivedItemsInput!]
+  salesIds: ID
   shop: ID
+  spentItems: [SpentItemsInput!]
+  spentTotal: Float
 }
 
 input CreateItemsInput {
-  name: String!
   category: String
+  name: String!
   price: PriceInput
-  stock: Float!
   shop: ID
+  stock: Float!
 }
 
 input CreatePurchaseInput {
-  items: [PurchaseItemInput!]!
-  vendor: String
   contact: String
-  email: String
-  total: Float!
   discount: Float
+  email: String
+  items: [PurchaseItemInput!]!
   shop: ID
+  total: Float!
+  vendor: String
 }
 
 input CreateSaleInput {
-  items: [SaleItemInput!]!
-  customer: String
   contact: String
-  email: String
-  total: Float!
+  customer: String
   discount: Float
-  profit: Float!
+  email: String
+  items: [SaleItemInput!]!
   loss: Float!
+  profit: Float!
   shop: ID
+  total: Float!
 }
 
 input CreateShopInput {
-  name: String!
-  type: ShopType!
   address: AddressInput!
-  timezone: String
   branches: [BranchesInput!]
+  name: String!
+  timezone: String
+  type: ShopType!
 }
 
 input CreateUserInput {
   email: String!
-  password: String!
   firstName: String!
   lastName: String!
-  roles: [Roles!]!
+  password: String!
+  phone: String!
   shop: ID
 }
 
 type Customer {
-  customer_id: String!
-  profile: Profile!
   channel: Channel!
+  customer_id: String!
   payment: Payment!
+  profile: Profile!
 }
 
 input DateRange {
@@ -136,17 +136,17 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Delivery {
-  tip: Float!
   delivery_fee: Float!
-  tax: Tax!
   location: Location
   provider: String!
+  tax: Tax!
+  tip: Float!
 }
 
 type Item {
+  customer_notes: String!
   id: String!
   name: String!
-  customer_notes: String!
   options: [Option!]!
   quantity: Float!
 }
@@ -154,229 +154,229 @@ type Item {
 """The Items model"""
 type Items {
   _id: ID!
-  shortId: String!
-  name: String!
   category: String
-  price: Price
-  stock: Float!
-  shop: Shop
   createdAt: DateTime!
+  name: String!
+  price: Price
+  shop: Shop
+  shortId: String!
+  stock: Float!
   updatedAt: DateTime!
 }
 
 type Location {
+  address_text: String!
+  building: String!
+  city: String!
+  description: String!
+  district: String!
   id: String!
   label: String!
-  address_text: String!
-  street: String!
-  building: String!
-  district: String!
-  description: String!
-  postal_code: String!
-  city: String!
   latitude: Float!
   longitude: Float!
+  postal_code: String!
+  street: String!
 }
 
 type Mutation {
   createClosing(closing: CreateClosingInput!): Closing
-  updateClosing(closing: UpdateClosingInput!): Closing
   createItem(item: CreateItemsInput!): Items
-  updateItem(item: UpdateItemsInput!): Items
-  createPurchase(purchase: CreatePurchaseInput!): Purchase
-  updatePurchase(purchase: UpdatePurchaseInput!): Purchase
-  createSale(sale: CreateSaleInput!): Sale
-  updateSale(sale: UpdateSaleInput!): Sale
-  createShop(shop: CreateShopInput!): Shop
   createNewUser(user: CreateUserInput!): ID!
+  createPurchase(purchase: CreatePurchaseInput!): Purchase
+  createSale(sale: CreateSaleInput!): Sale
+  createShop(shop: CreateShopInput!): Shop
   sendResetPasswordEmail(email: String!): Boolean!
+  updateClosing(closing: UpdateClosingInput!): Closing
+  updateItem(item: UpdateItemsInput!): Items
+  updatePurchase(purchase: UpdatePurchaseInput!): Purchase
+  updateSale(sale: UpdateSaleInput!): Sale
 }
 
 type Option {
+  customer_notes: String!
   id: String!
   name: String!
-  type: String!
   quantity: Float!
-  customer_notes: String!
+  type: String!
 }
 
 type OrderContent {
-  order_id: String!
   brand_name: String!
-  country_code: String!
-  locale: String!
-  global_entity_id: String!
-  timestamp: String!
-  promised_customer_timestamp: String!
-  currency: String!
   business_type: String!
-  vendor: VendorInfo!
-  customer: Customer!
   commission: Commission!
-  order: OrderInfo!
-  delivery: Delivery!
   corporate: Boolean!
+  country_code: String!
+  currency: String!
+  customer: Customer!
+  delivery: Delivery!
+  global_entity_id: String!
+  locale: String!
+  order: OrderInfo!
+  order_id: String!
   preorder: Boolean!
+  promised_customer_timestamp: String!
   test_order: Boolean!
+  timestamp: String!
+  vendor: VendorInfo!
 }
 
 type OrderInfo {
-  minimum_order_value: Float!
   deposit: Float!
+  items: [Item!]!
+  minimum_order_value: Float!
   order_value: Float!
   tax: Tax!
-  items: [Item!]!
 }
 
 type Payment {
-  payment_method: String!
-  paid: Boolean!
-  transaction_number: String!
-  total_order_value: Float!
-  total_tax: Float!
   coupon: Float!
   discount: Float!
-  minimum_order_value_fee: Float!
-  wallet_balance: Float!
   loyalty_point_balance: Float!
+  minimum_order_value_fee: Float!
+  paid: Boolean!
+  payment_method: String!
   service_fee: Float!
+  total_order_value: Float!
+  total_tax: Float!
+  transaction_number: String!
+  wallet_balance: Float!
 }
 
 type Price {
-  sale: Float!
   cost: Float!
   list: Float!
+  sale: Float!
 }
 
 input PriceInput {
-  sale: Float!
   cost: Float!
   list: Float!
+  sale: Float!
 }
 
 type Profile {
-  id: String!
-  guest: Boolean!
-  locale: String!
-  first_name: String!
-  last_name: String!
-  name: String!
   email: String!
+  first_name: String!
+  guest: Boolean!
+  id: String!
+  last_name: String!
+  locale: String!
+  name: String!
   phone: String!
 }
 
 """The Purchase model"""
 type Purchase {
   _id: ID!
-  billNumber: String!
-  items: [PurchaseItem!]!
-  vendor: String
-  contact: String
-  email: String
-  total: Float!
-  discount: Float
   active: Boolean!
-  shop: Shop
+  billNumber: String!
   closing: Closing
+  contact: String
   createdAt: DateTime!
+  discount: Float
+  email: String
+  items: [PurchaseItem!]!
+  shop: Shop
+  total: Float!
   updatedAt: DateTime!
+  vendor: String
 }
 
 type PurchaseItem {
+  cost: Float!
   item: Items!
   quantity: Float!
-  cost: Float!
   total: Float!
 }
 
 input PurchaseItemInput {
+  cost: Float!
   item: ID!
   quantity: Float!
-  cost: Float!
   total: Float!
 }
 
 type Query {
-  getClosingForUser(date: DateRange!): [Closing!]!
-  getPreviousClosing: Closing
   getClosingByClosingId(closingId: String!): [Closing!]!
+  getClosingForUser(date: DateRange!): [Closing!]!
   getItemsForUser: [Items!]!
-  getPurchasesForUser(date: DateRange!): [Purchase!]!
   getLastPurchase: Purchase
-  getPurchaseWithoutClosing: [Purchase!]
+  getLastSale: Sale
+  getPreviousClosing: Closing
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
   getPurchaseByVendorName(vendor: String!): [Purchase!]!
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
-  getSalesForUser(date: DateRange!): [Sale!]!
-  getLastSale: Sale
-  getSaleWithoutClosing: [Sale!]
+  getPurchasesForUser(date: DateRange!): [Purchase!]!
+  getPurchaseWithoutClosing: [Purchase!]
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!
+  getSalesForUser(date: DateRange!): [Sale!]!
+  getSaleWithoutClosing: [Sale!]
   getShopForUser: Shop
-  me: User
   getUserById(id: ID!): User
+  me: User
 }
 
 type ReceivedItems {
-  receivedFor: String!
   amount: Float!
+  receivedFor: String!
 }
 
 input ReceivedItemsInput {
-  receivedFor: String!
   amount: Float!
+  receivedFor: String!
 }
 
 enum Roles {
-  Sales
-  Manager
   Admin
+  Manager
+  Sales
 }
 
 """The Sales model"""
 type Sale {
   _id: ID!
-  billNumber: String!
-  items: [SaleItem!]!
-  customer: String
-  contact: String
-  email: String
-  total: Float!
-  discount: Float
-  profit: Float!
-  loss: Float!
   active: Boolean!
-  shop: Shop
+  billNumber: String!
   closing: Closing
+  contact: String
   createdAt: DateTime!
+  customer: String
+  discount: Float
+  email: String
+  items: [SaleItem!]!
+  loss: Float!
+  profit: Float!
+  shop: Shop
+  total: Float!
   updatedAt: DateTime!
 }
 
 type SaleItem {
-  item: Items!
-  quantity: Float!
   cost: Float!
   discount: Float!
+  item: Items!
+  quantity: Float!
   total: Float!
 }
 
 input SaleItemInput {
-  item: ID!
-  quantity: Float!
   cost: Float!
   discount: Float!
+  item: ID!
+  quantity: Float!
   total: Float!
 }
 
 """The Shop model"""
 type Shop {
   _id: ID!
-  name: String!
-  type: ShopType!
-  timezone: String
   address: Address
   branches: [Branches!]
+  name: String!
+  timezone: String
+  type: ShopType!
 }
 
 enum ShopType {
@@ -384,80 +384,83 @@ enum ShopType {
 }
 
 type SpentItems {
-  spentOn: String!
   amount: Float!
+  spentOn: String!
 }
 
 input SpentItemsInput {
-  spentOn: String!
   amount: Float!
+  spentOn: String!
 }
 
 type Tax {
-  tax_rate_percent: Float!
-  net_amount: Float!
   amount: Float!
+  net_amount: Float!
+  tax_rate_percent: Float!
 }
 
 input UpdateClosingInput {
-  salesIds: [ID!]
-  spentItems: [SpentItemsInput!]
-  receivedItems: [ReceivedItemsInput!]
-  inHandTotal: Float
-  spentTotal: Float
+  _id: ID!
   active: Boolean!
   date: DateTime!
+  inHandTotal: Float
+  receivedItems: [ReceivedItemsInput!]
+  salesIds: ID
   shop: ID
-  _id: ID!
+  spentItems: [SpentItemsInput!]
+  spentTotal: Float
 }
 
 input UpdateItemsInput {
   _id: ID!
-  name: String!
   category: String
+  name: String!
   price: PriceInput
   stock: Float!
 }
 
 input UpdatePurchaseInput {
-  items: [PurchaseItemInput!]!
-  vendor: String
-  contact: String
-  email: String
-  total: Float!
-  discount: Float
-  shop: ID
   _id: ID!
+  contact: String
+  discount: Float
+  email: String
+  items: [PurchaseItemInput!]!
+  shop: ID
+  total: Float!
+  vendor: String
 }
 
 input UpdateSaleInput {
-  items: [SaleItemInput!]!
-  customer: String
-  contact: String
-  email: String
-  total: Float!
-  discount: Float
-  profit: Float!
-  loss: Float!
-  shop: ID
   _id: ID!
+  contact: String
+  customer: String
+  discount: Float
+  email: String
+  items: [SaleItemInput!]!
+  loss: Float!
+  profit: Float!
+  shop: ID
+  total: Float!
 }
 
 """The User model"""
 type User {
   _id: ID!
-  firstName: String!
-  lastName: String!
-  fullName: String!
-  roles: [Roles!]!
-  role: Roles!
-  shop: Shop
   createdAt: DateTime!
+  firstName: String!
+  fullName: String!
+  lastName: String!
+  paid: Boolean!
+  phone: String!
+  registeredAt: DateTime!
+  role: Roles!
+  roles: [Roles!]!
+  shop: Shop
   updatedAt: DateTime!
 }
 
 type VendorInfo {
+  charges: Charges
   id: String!
   name: String!
-  charges: Charges
 }

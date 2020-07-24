@@ -3,14 +3,13 @@ import Koa from 'koa';
 import koaBody from 'koa-bodyparser';
 import KoaReqLogger from 'koa-req-logger';
 import cors from 'kcors';
-import getSecret from '../common/getSecret';
 import helmet from 'koa-helmet';
 import { logger } from '../common/logger';
-import { ApolloServer, makeExecutableSchema } from 'apollo-server-koa';
+import { ApolloServer } from 'apollo-server-koa';
 import * as path from 'path';
 import { setUpAccounts } from '../accounts/setup';
 import { connect } from 'mongoose';
-import { mergeResolvers, mergeTypeDefs, mergeSchemas } from 'graphql-toolkit';
+import { mergeSchemas, makeExecutableSchema } from "graphql-tools";
 import { buildSchema } from 'type-graphql';
 import { addRoutes } from './routes';
 import compression from 'compression';
@@ -22,9 +21,7 @@ const koaConnect = require('koa-connect');
 const startUp = async () => {
   const PORT = process.env.PORT || 3000;
 
-  const mongoURI = process.env.MONGO_URI
-    ? process.env.MONGO_URI
-    : await getSecret(process.env.MONGO_URI_SECRET || '');
+  const mongoURI = process.env.MONGO_URI;
 
   const app = new Koa();
 
@@ -50,7 +47,7 @@ const startUp = async () => {
       useUnifiedTopology: true,
     });
 
-    logger.info(`Connection to MongoDB at ${mongoURI}] successful`);
+    logger.info(`Connection to MongoDB successful`);
 
     logger.info(`Setting up account-js authentication`);
 
@@ -68,8 +65,8 @@ const startUp = async () => {
     });
 
     const schema = makeExecutableSchema({
-      typeDefs: mergeTypeDefs([accountsGraphQL.typeDefs]),
-      resolvers: mergeResolvers([accountsGraphQL.resolvers]),
+      typeDefs: accountsGraphQL.typeDefs,
+      resolvers: accountsGraphQL.resolvers,
       schemaDirectives: {
         ...accountsGraphQL.schemaDirectives,
       },

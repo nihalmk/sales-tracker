@@ -65,7 +65,6 @@ export default class UserResolver {
 
   // this overrides accounts js `createUser` function to create new user
   @Mutation((_returns) => ID)
-  @Authorized([Roles.Admin])
   async createNewUser(
     @Arg('user', (_returns) => CreateUserInput) user: CreateUserInput,
   ): Promise<ObjectId> {
@@ -74,7 +73,7 @@ export default class UserResolver {
       password: user.password,
     });
     // updates user after accountsPassword creates user
-    await this.userService.updateUser(
+    await this.userService.updateUserRegistration(
       (createdUserId as unknown) as ObjectId,
       user,
     );

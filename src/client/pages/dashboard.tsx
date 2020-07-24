@@ -198,11 +198,12 @@ const Home: NextPage<Props> = () => {
                   'day',
                 ) && (
                   <small className="btn btn-outline-danger w-100 mt-3">
-                    * You are closed for the day and the closing details are available
-                    on date:{' '}
+                    * You are closed for the day and the closing details are
+                    available on date:{' '}
                     {moment(previousClosing?.getPreviousClosing?.date).format(
                       'DD/MM/YYYY',
-                    )}{' '} on Report
+                    )}{' '}
+                    on Report
                   </small>
                 )}
               {needsClosing && (
@@ -225,7 +226,11 @@ const Home: NextPage<Props> = () => {
             error={`You don't have any shop assigned to you. Please contact your admin and get assigned to a Shop`}
           />
         )}
-        <style jsx global>{``}</style>
+        <style jsx global>{`
+          .page-content {
+            margin-top: 0;
+          }
+        `}</style>
       </div>
     </Layout>
   );

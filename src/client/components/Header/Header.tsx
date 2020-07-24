@@ -45,7 +45,9 @@ export const Header: React.FC<Props> = ({ hide }) => {
                 </a>
               </Link>
               <div className="logo-text d-flex flex-column justify-content-center">
-                <h3 className="header-name">{user?.shop?.name}</h3>
+                <h3 className="header-name">
+                  {user?.shop?.name || 'Sales Tracker'}
+                </h3>
               </div>
               <div className="d-flex flex-row ml-auto">
                 <Dropdown
@@ -53,18 +55,19 @@ export const Header: React.FC<Props> = ({ hide }) => {
                   className="acc-dropdown d-flex"
                   triggerContent={
                     <>
-                      {/* <UIAvatar user={currentUser}></UIAvatar> */}
-                      <span className="ml-2 d-none d-sm-block white">
-                        <span className="">
-                          <b>{user?.fullName}</b>
+                      {user && (
+                        <span className="ml-2 d-none d-sm-block white">
+                          <span className="">
+                            <b>{user?.fullName}</b>
+                          </span>
+                          <small className="d-block">{user?.role}</small>
+                          <small>
+                            <strong className="float-right mb-2">
+                              {moment().format('DD/MM/YYYY')}
+                            </strong>
+                          </small>
                         </span>
-                        <small className="d-block">{user?.role}</small>
-                        <small>
-                          <strong className="float-right mb-2">
-                            {moment().format('DD/MM/YYYY')}
-                          </strong>
-                        </small>
-                      </span>
+                      )}
                     </>
                   }
                   itemsObject={getItems()}

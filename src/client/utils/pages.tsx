@@ -2,6 +2,7 @@ export const Pages = {
   INDEX: '/',
   DASHBOARD: '/dashboard',
   LOGIN: '/login',
+  REGISTER: '/register',
 };
 
 export const AuthenticatedPages: { [key: string]: string } = {
@@ -11,7 +12,8 @@ export const AuthenticatedPages: { [key: string]: string } = {
 
 export const Titles: { [key: string]: string } = {
   HOME: 'Sales Tracker',
-  '/': 'Order Dashboard',
-  '/dashboard': 'Order Dashboard',
+  '/': 'Sales Dashboard',
+  '/dashboard': 'Sales Dashboard',
   '/login': 'Login',
+  register: 'Register',
 };

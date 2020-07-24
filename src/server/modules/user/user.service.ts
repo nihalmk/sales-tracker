@@ -37,7 +37,7 @@ export class UserService {
     this.model = UserModel;
   }
 
-  // Get th euser by Id
+  // Get the user by Id
 
   async findById(id: ObjectId): Promise<User | null> {
     return this.model.findById(id);
@@ -45,18 +45,20 @@ export class UserService {
 
   // Updates the user by id
 
-  async updateUser(id: ObjectId, user: CreateUserInput): Promise<User> {
+  async updateUserRegistration(id: ObjectId, user: CreateUserInput): Promise<User> {
     return this.model.findOneAndUpdate(
       {
         _id: id,
       },
       {
         $set: {
-          roles: user.roles,
+          role: Roles.Manager,
+          roles: [Roles.Manager],
           firstName: user.firstName,
           lastName: user.lastName,
-          role: getRole(user.roles),
-          ...(user.shop && { shop: user.shop }),
+          phone: user.phone,
+          registeredAt: new Date(),
+          paid: false,
         },
       },
     );

@@ -2,7 +2,7 @@ import { Field, ID, ObjectType } from 'type-graphql';
 import { getModelForClass, prop, Ref, arrayProp } from '@typegoose/typegoose';
 import { ObjectId } from 'mongodb';
 import { Shop } from '../shop/shop.model';
-import { StringField, DateField } from '../../common/fields';
+import { StringField, DateField, BooleanField } from '../../common/fields';
 
 // User roles
 
@@ -25,6 +25,10 @@ export class User {
   @prop()
   lastName!: string;
 
+  @Field(StringField)
+  @prop()
+  phone!: string;
+
   @Field()
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
@@ -37,6 +41,14 @@ export class User {
   @Field((_type) => Roles)
   @prop({ enum: Roles })
   public role!: Roles;
+
+  @Field(DateField)
+  @prop()
+  registeredAt!: Date;
+
+  @Field(BooleanField)
+  @prop()
+  paid!: boolean;
 
   @prop({ ref: 'Shop', required: false, index: true })
   @Field((_type) => Shop, { nullable: true })

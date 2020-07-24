@@ -50,9 +50,6 @@ export const Layout: React.FC<Props> = ({ children, hideHeader }) => {
         .loss {
           color: red;
         }
-        .page-content {
-          margin-top: 0;
-        }
         .card {
           border: 1px solid rgba(0, 40, 100, 0.12);
         }
