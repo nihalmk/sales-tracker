@@ -10,6 +10,7 @@ interface Context {
   setNavItems?: (navItems: {[key: string]: boolean}) => void;
   setSelectedMenu?: (navItem: string) => void;
   selectedMenu?: string;
+  isPaid?: boolean;
 }
 const UserContext = createContext({} as Context);
 

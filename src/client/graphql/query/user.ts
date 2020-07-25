@@ -12,6 +12,8 @@ export const GET_USER = gql`
       lastName
       roles
       role
+      paid
+      registeredAt
       shop {
         _id
         name

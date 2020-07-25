@@ -3,6 +3,7 @@ export const Pages = {
   DASHBOARD: '/dashboard',
   LOGIN: '/login',
   REGISTER: '/register',
+  ACCOUNTS: '/accounts',
 };
 
 export const AuthenticatedPages: { [key: string]: string } = {

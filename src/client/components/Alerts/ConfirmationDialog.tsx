@@ -5,11 +5,13 @@ import { Card, Alert } from 'tabler-react';
 
 interface Props {
   message: string;
+  headerMessage?: string;
   className?: string;
   success: (success: boolean) => void;
 }
 const ConfirmationDialog: React.FC<Props> = ({
   message,
+  headerMessage,
   className = '',
   success,
 }) => {
@@ -17,12 +19,11 @@ const ConfirmationDialog: React.FC<Props> = ({
     <React.Fragment>
       <Card className="mb-0">
         <Card.Header>
-          <Card.Title>Are you Sure?</Card.Title>
+          <Card.Title>{headerMessage || 'Are you Sure?'}</Card.Title>
         </Card.Header>
         <Card.Body>
           {message && (
             <Alert className={`${className} alert-align`} type="warning">
-              {/* <FontAwesomeIcon icon={faExclamationTriangle}></FontAwesomeIcon> */}
               {message}
             </Alert>
           )}

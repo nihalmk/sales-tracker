@@ -5,7 +5,8 @@ export const ClientResolvers = {
       {
         isConnected,
         reconnected,
-      }: { isConnected: boolean; reconnected: boolean },
+        isPaid,
+      }: { isConnected: boolean; reconnected: boolean, isPaid: boolean },
       { cache }: { cache: any },
     ): null => {
       const data = {
@@ -13,6 +14,7 @@ export const ClientResolvers = {
           __typename: 'NetworkStatus',
           isConnected,
           reconnected,
+          isPaid
         },
       };
       cache.writeData({ data });

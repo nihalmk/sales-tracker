@@ -24,7 +24,7 @@ export class ReceivedItemsInput {
 @InputType()
 export class CreateClosingInput implements Partial<Closing> {
 
-  @Field((_type) => ID, { nullable: true })
+  @Field((_type) => [ID], { nullable: true })
   salesIds?: ObjectId[];
 
   @Field((_type) => [SpentItemsInput], { nullable: true })

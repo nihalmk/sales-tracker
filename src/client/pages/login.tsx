@@ -98,7 +98,9 @@ export const Login: NextPage<Props> = function () {
                       <a href="#" className="text-default">
                         Shop Tracker
                       </a>
-                      <small className="d-block text-muted">Contact</small>
+                      <small className="d-block text-muted">
+                        Contact: shoptrackerforsales@gmail.com
+                      </small>
                     </div>
                     <div className="ml-auto text-muted">
                       <a
@@ -111,6 +113,9 @@ export const Login: NextPage<Props> = function () {
                   </div>
                 </div>
               </div>
+              <small className="alert alert-info mt-3">
+                let us know your feedback on <strong>shoptrackerforsales@gmail.com</strong>
+              </small>
             </div>
           </div>
         </div>

@@ -239,12 +239,13 @@ function createApolloClient(
     cache,
   });
 
-  const setNetworkStatus = (status: boolean, reconnected: boolean) => {
+  const setNetworkStatus = (status: boolean, reconnected: boolean, isPaid?: boolean) => {
     client.mutate({
       mutation: UPDATE_NETWORK_STATUS,
       variables: {
         isConnected: status,
         reconnected: reconnected,
+        isPaid: isPaid,
       },
       fetchPolicy: 'no-cache',
     });

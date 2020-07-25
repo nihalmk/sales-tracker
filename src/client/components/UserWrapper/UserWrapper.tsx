@@ -20,6 +20,7 @@ interface Props {
 
 export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
   const [intervalCounter, setIntervalCounter] = useState<NodeJS.Timeout>();
+  const [isPaid, setPaidUser] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState<string>(NavItems.SALE);
   const [enabledNavItems, setNavItems] = useState<{ [key: string]: boolean; }>({
     sale: true,
@@ -67,6 +68,9 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
       if (TZ) {
         moment.tz.setDefault(TZ);
       }
+      if (moment(currentUser?.data?.me.registeredAt).isBefore(moment().subtract(7, 'days')) && !currentUser?.data?.me.paid) {
+        setPaidUser(false)
+      }
     }
   }, [currentUser]);
 
@@ -106,6 +110,7 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
                 setNavItems,
                 setSelectedMenu,
                 selectedMenu,
+                isPaid
               }}
             >
               <Component {...pageProps} />

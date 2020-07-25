@@ -21,13 +21,20 @@ import Report from '../components/Report/Report';
 import _ from 'lodash';
 import Link from 'next/link';
 import { Pages } from '../utils/pages';
+import OverLay from '../components/OverLay';
+import ConfirmationDialog from '../components/Alerts/ConfirmationDialog';
+import { useRouter } from 'next/router';
 
 interface Props {}
 
 const Home: NextPage<Props> = () => {
-  const { user, setNavItems, setSelectedMenu, selectedMenu } = useContext(
-    UserContext,
-  );
+  const {
+    user,
+    setNavItems,
+    setSelectedMenu,
+    selectedMenu,
+    isPaid,
+  } = useContext(UserContext);
 
   const {
     data: previousClosing,
@@ -61,89 +68,97 @@ const Home: NextPage<Props> = () => {
   }, [selectedMenu]);
 
   const [needsClosing, setNeedsClosing] = useState(false);
+  const [expiredPopup, setExpiredPopup] = useState('');
+
+  const router = useRouter();
 
   useEffect(() => {
     // Closed for today
-    const proceedSale = () => {
-      setNavItems({
-        sale: true,
-        stock: true,
-        purchase: true,
-        purchases: true,
-        sales: true,
-        closing: true,
-        report: true,
-      });
-      setSelectedMenu(NavItems.SALE);
-      setNeedsClosing(false);
-    };
-    if (
-      !_.isEmpty(previousClosing?.getPreviousClosing) &&
-      moment(previousClosing?.getPreviousClosing?.date).isSame(moment(), 'day')
-    ) {
-      setNavItems({
-        sale: false,
-        stock: true,
-        purchase: false,
-        purchases: true,
-        sales: true,
-        closing: false,
-        report: true,
-      });
-      setSelectedMenu(NavItems.SALES);
-      return;
-    } else {
-      proceedSale();
-    }
-    const closingLastDate = moment(previousClosing?.getPreviousClosing?.date);
-    const saleLastDate = moment(lastSale?.getLastSale?.createdAt);
-    const purchaseLastDate = moment(lastPurchase?.getLastPurchase?.createdAt);
-
-    const needClosing = () => {
-      setNavItems({
-        sale: false,
-        stock: false,
-        purchase: false,
-        purchases: false,
-        sales: false,
-        closing: true,
-        report: true,
-      });
-      setSelectedMenu(NavItems.CLOSING);
-      setNeedsClosing(true);
-    };
-
-    const checkForClosing = (noClosing?: boolean) => {
+    if (isPaid) {
+      const proceedSale = () => {
+        setNavItems({
+          sale: true,
+          stock: true,
+          purchase: true,
+          purchases: true,
+          sales: true,
+          closing: true,
+          report: true,
+        });
+        setSelectedMenu(NavItems.SALE);
+        setNeedsClosing(false);
+      };
       if (
-        lastSale?.getLastSale &&
-        ((closingLastDate.isBefore(saleLastDate, 'day') &&
-          saleLastDate.isBefore(moment(), 'day')) ||
-          (noClosing && saleLastDate.isBefore(moment(), 'day')))
+        !_.isEmpty(previousClosing?.getPreviousClosing) &&
+        moment(previousClosing?.getPreviousClosing?.date).isSame(
+          moment(),
+          'day',
+        )
       ) {
-        needClosing();
+        setNavItems({
+          sale: false,
+          stock: true,
+          purchase: false,
+          purchases: true,
+          sales: true,
+          closing: false,
+          report: true,
+        });
+        setSelectedMenu(NavItems.SALES);
         return;
+      } else {
+        proceedSale();
       }
-      if (
-        lastPurchase?.getLastPurchase &&
-        ((closingLastDate.isBefore(purchaseLastDate, 'day') &&
-          purchaseLastDate.isBefore(moment(), 'day')) ||
-          (noClosing && saleLastDate.isBefore(moment(), 'day')))
+      const closingLastDate = moment(previousClosing?.getPreviousClosing?.date);
+      const saleLastDate = moment(lastSale?.getLastSale?.createdAt);
+      const purchaseLastDate = moment(lastPurchase?.getLastPurchase?.createdAt);
+
+      const needClosing = () => {
+        setNavItems({
+          sale: false,
+          stock: false,
+          purchase: false,
+          purchases: false,
+          sales: false,
+          closing: true,
+          report: true,
+        });
+        setSelectedMenu(NavItems.CLOSING);
+        setNeedsClosing(true);
+      };
+
+      const checkForClosing = (noClosing?: boolean) => {
+        if (
+          lastSale?.getLastSale &&
+          ((closingLastDate.isBefore(saleLastDate, 'day') &&
+            saleLastDate.isBefore(moment(), 'day')) ||
+            (noClosing && saleLastDate.isBefore(moment(), 'day')))
+        ) {
+          needClosing();
+          return;
+        }
+        if (
+          lastPurchase?.getLastPurchase &&
+          ((closingLastDate.isBefore(purchaseLastDate, 'day') &&
+            purchaseLastDate.isBefore(moment(), 'day')) ||
+            (noClosing && saleLastDate.isBefore(moment(), 'day')))
+        ) {
+          needClosing();
+          return;
+        }
+        setNeedsClosing(false);
+      };
+      // Did not close previous sale
+      if (previousClosing?.getPreviousClosing === null) {
+        checkForClosing(true);
+      } else if (
+        previousClosing?.getPreviousClosing &&
+        moment(closingLastDate).isBefore(moment().subtract(1, 'days'), 'day')
       ) {
-        needClosing();
-        return;
+        checkForClosing();
+      } else {
+        proceedSale();
       }
-      setNeedsClosing(false);
-    };
-    // Did not close previous sale
-    if (previousClosing?.getPreviousClosing === null) {
-      checkForClosing(true);
-    } else if (
-      previousClosing?.getPreviousClosing &&
-      moment(closingLastDate).isBefore(moment().subtract(1, 'days'), 'day')
-    ) {
-      checkForClosing();
-    } else {
-      proceedSale();
     }
   }, [previousClosing, lastSale, lastPurchase]);
   const component = () => {
@@ -194,7 +209,19 @@ const Home: NextPage<Props> = () => {
           ) : (
             <React.Fragment>
               <Navigation />
-              {previousClosing?.getPreviousClosing !== null &&
+              {!isPaid && (
+                <Link href={Pages.ACCOUNTS}>
+                  <small className="btn btn-warning w-100 mt-3">
+                    Your trial period for 7 days has expired. Please purchase a
+                    paid account to proceed further with the sales.
+                    <br />
+                    You will no longer be able to see or add any sales or
+                    purchase data
+                  </small>
+                </Link>
+              )}
+              {isPaid &&
+                previousClosing?.getPreviousClosing !== null &&
                 moment(previousClosing?.getPreviousClosing?.date).isSame(
                   moment(),
                   'day',
@@ -233,6 +260,19 @@ const Home: NextPage<Props> = () => {
             </Link>
           </div>
         )}
+        <OverLay show={expiredPopup !== 'cancelled' && !isPaid}>
+          <ConfirmationDialog
+            headerMessage={'Trial Expired!'}
+            success={(success) => {
+              if (success) {
+                router.push(Pages.ACCOUNTS);
+              } else {
+                setExpiredPopup('cancelled');
+              }
+            }}
+            message="Your trial period for 7 days has expired. Please purchase a paid account to proceed further with the sales"
+          />
+        </OverLay>
         <style jsx global>{`
           .page-content {
             margin-top: 0;
