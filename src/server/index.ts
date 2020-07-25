@@ -9,7 +9,7 @@ import { ApolloServer } from 'apollo-server-koa';
 import * as path from 'path';
 import { setUpAccounts } from '../accounts/setup';
 import { connect } from 'mongoose';
-import { mergeSchemas, makeExecutableSchema } from "graphql-tools";
+import { mergeSchemas, makeExecutableSchema } from 'graphql-tools';
 import { buildSchema } from 'type-graphql';
 import { addRoutes } from './routes';
 import compression from 'compression';

@@ -12,6 +12,7 @@ import { ShopService } from './shop.service';
 import { Shop, ShopType } from './shop.model';
 import { ObjectId } from 'mongodb';
 import { CreateShopInput } from './shop.input';
+import { LabelValueObj } from '../common/Types/InputTypes';
 
 registerEnumType(ShopType, {
   name: 'ShopType',
@@ -34,6 +35,13 @@ export default class ShopResolver {
     if (ctx.user && ctx.user.shop) {
       return await shopService.getShop(ctx.user.shop as ObjectId);
     }
+  }
+
+  @Query((_returns) => [LabelValueObj], { nullable: true })
+  @Authorized()
+  async getShopTypes(@Ctx() ctx: CTX): Promise<LabelValueObj[]> {
+    const shopService = new ShopService(ctx);
+    return await shopService.getDistinctTypes();
   }
 
   // Mutations

@@ -157,10 +157,13 @@ export const Login: NextPage<Props> = function () {
                     'btn btn-primary btn-block ' + (isLoading && 'btn-loading')
                   }
                 >
-                  Sign in
+                  Log in
                 </button>
                 <Link href={Pages.REGISTER}>
-                  <button className={'btn btn-success btn-block mt-2'} type="button">
+                  <button
+                    className={'btn btn-success btn-block mt-2'}
+                    type="button"
+                  >
                     Sign Up
                   </button>
                 </Link>

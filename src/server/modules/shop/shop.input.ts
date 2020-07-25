@@ -1,5 +1,5 @@
 import { InputType, Field, ID } from 'type-graphql';
-import { Shop, ShopType } from './shop.model';
+import { Shop } from './shop.model';
 import { StringField } from '../../common/fields';
 import { ObjectId } from 'mongodb';
 
@@ -32,8 +32,8 @@ export class CreateShopInput implements Partial<Shop> {
   @Field(StringField)
   name!: string;
 
-  @Field(() => ShopType)
-  type!: ShopType;
+  @Field(() => String)
+  type!: string;
 
   @Field(() => AddressInput)
   address!: AddressInput;

@@ -1,4 +1,4 @@
-import { InputType, Field } from "type-graphql";
+import { InputType, Field, ObjectType } from "type-graphql";
 
 @InputType()
 export class DateRange {
@@ -7,4 +7,13 @@ export class DateRange {
 
   @Field(() => Date)
   to: Date;
+}
+
+@ObjectType()
+export class LabelValueObj {
+  @Field(() => String)
+  label: string;
+
+  @Field(() => String)
+  value: string;
 }

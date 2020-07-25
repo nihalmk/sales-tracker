@@ -1,5 +1,5 @@
 import React from 'react';
-import CreatableSelect from 'react-select/creatable';
+import SelectBox from 'react-select/creatable';
 import { LabelValueObj } from './SelectBox';
 
 interface Props {
@@ -10,9 +10,11 @@ interface Props {
   isInvalid?: boolean;
   formClass?: boolean;
   isDisabled?: boolean;
-  value?: LabelValueObj[];
+  value?: LabelValueObj;
+  isMulti?: boolean;
+  tabIndex?: number;
 }
-const CreatableMultiSelect: React.FC<Props> = ({
+const CreatableSelect: React.FC<Props> = ({
   onChange,
   options,
   selectLabel,
@@ -20,14 +22,17 @@ const CreatableMultiSelect: React.FC<Props> = ({
   isDisabled,
   formClass,
   value,
+  isMulti,
+  tabIndex
 }) => {
   return (
     <>
       <div className={selectLabel && 'form-group'}>
         {selectLabel && <label className="form-label">{selectLabel}</label>}
-        <CreatableSelect
+        <SelectBox
+          tabIndex={(tabIndex || '').toString()}
           options={options}
-          isMulti
+          isMulti={isMulti}
           onChange={onChange}
           value={value}
           isDisabled={isDisabled}
@@ -61,4 +66,4 @@ const CreatableMultiSelect: React.FC<Props> = ({
   );
 };
 
-export default CreatableMultiSelect;
+export default CreatableSelect;

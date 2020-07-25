@@ -45,8 +45,8 @@ export class Shop {
   @Field(StringField)
   name: string;
 
-  @prop({ enum: ShopType })
-  @Field(() => ShopType)
+  @prop({ enum: String })
+  @Field(() => String)
   type: string;
 
   @prop()

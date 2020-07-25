@@ -6,10 +6,11 @@ import Register from '../components/User/Register';
 interface Props {}
 
 const RegisterPage: NextPage<Props> = () => {
-
   return (
     <React.Fragment>
-      <Layout hideHeader={false}><Register /></Layout>
+      <Layout hideHeader={false}>
+        <Register />
+      </Layout>
     </React.Fragment>
   );
 };

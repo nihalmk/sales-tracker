@@ -45,7 +45,10 @@ export class UserService {
 
   // Updates the user by id
 
-  async updateUserRegistration(id: ObjectId, user: CreateUserInput): Promise<User> {
+  async updateUserRegistration(
+    id: ObjectId,
+    user: CreateUserInput,
+  ): Promise<User> {
     return this.model.findOneAndUpdate(
       {
         _id: id,

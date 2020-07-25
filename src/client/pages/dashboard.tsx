@@ -19,6 +19,8 @@ import moment from 'moment-timezone';
 import Loader from '../components/Loaders/Loader';
 import Report from '../components/Report/Report';
 import _ from 'lodash';
+import Link from 'next/link';
+import { Pages } from '../utils/pages';
 
 interface Props {}
 
@@ -222,9 +224,14 @@ const Home: NextPage<Props> = () => {
             </React.Fragment>
           )
         ) : (
-          <ErrorMessage
-            error={`You don't have any shop assigned to you. Please contact your admin and get assigned to a Shop`}
-          />
+          <div className="p-5">
+            <ErrorMessage
+              error={`You don't have any shop assigned to you. Please contact your admin and get assigned to a Shop`}
+            />
+            <Link href={Pages.INDEX}>
+            <button className="btn btn-primary">Create your own shop</button>
+            </Link>
+          </div>
         )}
         <style jsx global>{`
           .page-content {

@@ -106,7 +106,7 @@ input CreateShopInput {
   branches: [BranchesInput!]
   name: String!
   timezone: String
-  type: ShopType!
+  type: String!
 }
 
 input CreateUserInput {
@@ -162,6 +162,11 @@ type Items {
   shortId: String!
   stock: Float!
   updatedAt: DateTime!
+}
+
+type LabelValueObj {
+  label: String!
+  value: String!
 }
 
 type Location {
@@ -314,6 +319,7 @@ type Query {
   getSalesForUser(date: DateRange!): [Sale!]!
   getSaleWithoutClosing: [Sale!]
   getShopForUser: Shop
+  getShopTypes: [LabelValueObj!]
   getUserById(id: ID!): User
   me: User
 }
@@ -376,11 +382,7 @@ type Shop {
   branches: [Branches!]
   name: String!
   timezone: String
-  type: ShopType!
-}
-
-enum ShopType {
-  Mobile
+  type: String!
 }
 
 type SpentItems {

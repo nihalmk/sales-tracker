@@ -1,8 +1,8 @@
-import { useState, ChangeEvent, useContext } from 'react';
+import { useState, ChangeEvent, useContext, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { CREATE_SHOP } from '../../graphql/mutation/shop';
-import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import { LabelValueObj } from '../common/SelectBoxes/SelectBox';
 import Input from '../common/Inputs/FormInput';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
@@ -10,25 +10,31 @@ import _ from 'lodash';
 import Link from 'next/link';
 import { Pages } from '../../utils/pages';
 import { useRouter } from 'next/router';
-import { ShopType, Shop } from '../../generated/graphql';
-import { getLabelValueFromEnum } from '../../utils/helpers';
+import { Shop } from '../../generated/graphql';
 import UserContext from '../UserWrapper/UserContext';
+import { GET_SHOP_TYPE } from '../../graphql/query/shop';
+import CreatableSelect from '../common/SelectBoxes/CreatableSelect';
 
 interface Props {}
-
-const shopTypes = getLabelValueFromEnum(ShopType);
 
 const AddShop: NextPage<Props> = function () {
   const { refetchUser } = useContext(UserContext);
 
   const [submitShopForm, { loading: loadingCreate }] = useMutation(CREATE_SHOP);
+  const { data: shopTypesData } = useQuery(GET_SHOP_TYPE);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
-
+  const [shopTypes, setShopTypes] = useState<LabelValueObj[]>([]);
   const [shopState, setShopState] = useState<Shop>();
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (shopTypesData?.getShopTypes) {
+      setShopTypes(shopTypesData.getShopTypes);
+    }
+  }, [shopTypesData]);
 
   const onSubmit = async (e: React.SyntheticEvent) => {
     e && e.preventDefault();
@@ -126,22 +132,29 @@ const AddShop: NextPage<Props> = function () {
               />
             </div>
             <div className="col-md-6">
-              <SelectBox
+              <CreatableSelect
                 tabIndex={2}
                 selectLabel="Type"
-                selectData={shopTypes}
-                onSelectChange={(e: LabelValueObj) => {
+                options={shopTypes}
+                onChange={(e: LabelValueObj) => {
                   const type = e.value;
                   setShopState((currentState) => ({
                     ...currentState,
-                    type: type as ShopType,
+                    type: type,
                   }));
+                  setShopTypes((c) => {
+                    const types = _.uniqBy([
+                      ...c,
+                      e
+                    ], 'label')
+                    return types;
+                  })
                 }}
-                selectDefault={shopTypes.find((c) => {
+                value={shopTypes.find((c) => {
                   return c.value === shopState?.type;
                 })}
                 isInvalid={!!(submitted && !shopState?.type)}
-              ></SelectBox>
+              ></CreatableSelect>
               <Input
                 tabIndex={3}
                 inputName="Pin Code"

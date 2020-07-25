@@ -202,10 +202,11 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
               hideExtraFields={true}
               saleDate={today.toDate()}
               callback={(salesIds, total) => {
-                !isView && setNewClosing((currentState) => ({
-                  ...currentState,
-                  salesIds,
-                }));
+                !isView &&
+                  setNewClosing((currentState) => ({
+                    ...currentState,
+                    salesIds,
+                  }));
                 setSalesTotal(total);
               }}
             />
@@ -227,10 +228,11 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
           <div className="card p-0" id={newClosing?.date}>
             <Spent
               callback={(spentItems) => {
-                !isView && setNewClosing((currentState) => ({
-                  ...currentState,
-                  spentItems,
-                }));
+                !isView &&
+                  setNewClosing((currentState) => ({
+                    ...currentState,
+                    spentItems,
+                  }));
               }}
               isView={isView}
               spentItemsList={newClosing?.spentItems}
@@ -241,10 +243,11 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
           <div className="card p-0" id={newClosing?.date}>
             <Received
               callback={(receivedItems) => {
-                !isView && setNewClosing((currentState) => ({
-                  ...currentState,
-                  receivedItems,
-                }));
+                !isView &&
+                  setNewClosing((currentState) => ({
+                    ...currentState,
+                    receivedItems,
+                  }));
               }}
               isView={isView}
               receivedItemsList={newClosing?.receivedItems}
