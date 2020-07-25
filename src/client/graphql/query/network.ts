@@ -11,9 +11,16 @@ export const GET_NETWORK_STATUS = gql`
 `;
 
 export const UPDATE_NETWORK_STATUS = gql`
-  mutation updateNetworkStatus($isConnected: Boolean, $reconnected: Boolean, $isPaid: Boolean) {
-    updateNetworkStatus(isConnected: $isConnected, reconnected: $reconnected, isPaid: $isPaid)
-      @client
+  mutation updateNetworkStatus(
+    $isConnected: Boolean
+    $reconnected: Boolean
+    $isPaid: Boolean
+  ) {
+    updateNetworkStatus(
+      isConnected: $isConnected
+      reconnected: $reconnected
+      isPaid: $isPaid
+    ) @client
   }
 `;
 

@@ -114,7 +114,8 @@ export const Login: NextPage<Props> = function () {
                 </div>
               </div>
               <small className="alert alert-info mt-3">
-                let us know your feedback on <strong>shoptrackerforsales@gmail.com</strong>
+                let us know your feedback on{' '}
+                <strong>shoptrackerforsales@gmail.com</strong>
               </small>
             </div>
           </div>

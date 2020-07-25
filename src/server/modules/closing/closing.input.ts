@@ -23,7 +23,6 @@ export class ReceivedItemsInput {
 
 @InputType()
 export class CreateClosingInput implements Partial<Closing> {
-
   @Field((_type) => [ID], { nullable: true })
   salesIds?: ObjectId[];
 
@@ -33,10 +32,10 @@ export class CreateClosingInput implements Partial<Closing> {
   @Field((_type) => [ReceivedItemsInput], { nullable: true })
   receivedItems?: ReceivedItemsInput[];
 
-  @Field(NumberField, { nullable: true})
+  @Field(NumberField, { nullable: true })
   inHandTotal?: number;
 
-  @Field(NumberField, { nullable: true})
+  @Field(NumberField, { nullable: true })
   spentTotal?: number;
 
   @Field(BooleanField)

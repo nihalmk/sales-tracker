@@ -22,7 +22,7 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
   const [intervalCounter, setIntervalCounter] = useState<NodeJS.Timeout>();
   const [isPaid, setPaidUser] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState<string>(NavItems.SALE);
-  const [enabledNavItems, setNavItems] = useState<{ [key: string]: boolean; }>({
+  const [enabledNavItems, setNavItems] = useState<{ [key: string]: boolean }>({
     sale: true,
     stock: true,
     purchase: true,
@@ -30,7 +30,7 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
     sales: true,
     closing: true,
     report: true,
-  }); 
+  });
   const currentUser = useQuery(GET_USER, {
     fetchPolicy: 'no-cache',
   });
@@ -68,8 +68,13 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
       if (TZ) {
         moment.tz.setDefault(TZ);
       }
-      if (moment(currentUser?.data?.me.registeredAt).isBefore(moment().subtract(7, 'days')) && !currentUser?.data?.me.paid) {
-        setPaidUser(false)
+      if (
+        moment(currentUser?.data?.me.registeredAt).isBefore(
+          moment().subtract(7, 'days'),
+        ) &&
+        !currentUser?.data?.me.paid
+      ) {
+        setPaidUser(false);
       }
     }
   }, [currentUser]);
@@ -110,7 +115,7 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
                 setNavItems,
                 setSelectedMenu,
                 selectedMenu,
-                isPaid
+                isPaid,
               }}
             >
               <Component {...pageProps} />

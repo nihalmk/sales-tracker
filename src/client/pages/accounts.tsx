@@ -11,8 +11,8 @@ const Accounts: NextPage<Props> = () => {
     <React.Fragment>
       <Layout hideHeader={false}>
         <div className="alert alert-primary" role="alert">
-          Please send a mail to <strong>shoptrackerforsales@gmail.com</strong> to receive details
-          regarding purchasing a paid account!
+          Please send a mail to <strong>shoptrackerforsales@gmail.com</strong>{' '}
+          to receive details regarding purchasing a paid account!
         </div>
         <Link href={Pages.DASHBOARD}>
           <button className="btn btn-primary mt-3">Go to home page</button>
