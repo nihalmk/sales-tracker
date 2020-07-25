@@ -143,12 +143,9 @@ const AddShop: NextPage<Props> = function () {
                     type: type,
                   }));
                   setShopTypes((c) => {
-                    const types = _.uniqBy([
-                      ...c,
-                      e
-                    ], 'label')
+                    const types = _.uniqBy([...c, e], 'label');
                     return types;
-                  })
+                  });
                 }}
                 value={shopTypes.find((c) => {
                   return c.value === shopState?.type;

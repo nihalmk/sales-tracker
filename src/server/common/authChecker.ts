@@ -8,7 +8,10 @@ export const authChecker: AuthChecker<CTX> = ({ context }, roles: Roles[]) => {
   if (!user) {
     return false;
   }
-  if (moment(user.registeredAt).isBefore(moment().subtract(7, 'days')) && !user.paid) {
+  if (
+    moment(user.registeredAt).isBefore(moment().subtract(7, 'days')) &&
+    !user.paid
+  ) {
     return false;
   }
   if (roles && roles.length > 0 && roles.includes(user.role)) {

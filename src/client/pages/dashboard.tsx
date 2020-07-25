@@ -229,7 +229,7 @@ const Home: NextPage<Props> = () => {
               error={`You don't have any shop assigned to you. Please contact your admin and get assigned to a Shop`}
             />
             <Link href={Pages.INDEX}>
-            <button className="btn btn-primary">Create your own shop</button>
+              <button className="btn btn-primary">Create your own shop</button>
             </Link>
           </div>
         )}

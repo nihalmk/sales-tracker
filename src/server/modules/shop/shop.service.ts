@@ -37,13 +37,13 @@ export class ShopService {
     return createdShop;
   }
 
-  async getDistinctTypes() : Promise<LabelValueObj[]> {
+  async getDistinctTypes(): Promise<LabelValueObj[]> {
     const types = await this.model.distinct('type');
     let typeLabelValue: LabelValueObj[] = [];
     for (const type of types) {
       typeLabelValue.push({
         label: type,
-        value: type
+        value: type,
       });
     }
     return typeLabelValue;

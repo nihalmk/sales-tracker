@@ -23,7 +23,7 @@ const CreatableSelect: React.FC<Props> = ({
   formClass,
   value,
   isMulti,
-  tabIndex
+  tabIndex,
 }) => {
   return (
     <>
