@@ -52,8 +52,8 @@ export class ItemsService {
         },
       },
       {
-        new: true
-      }
+        new: true,
+      },
     );
     return updateItems;
   }
@@ -62,15 +62,17 @@ export class ItemsService {
     for (const item of items) {
       const inStockItem = await this.model.findById(item.item);
       if (inStockItem.stock !== -1) {
-        await this.model.updateOne({
-          _id: item.item
-        }, {
-          $set: {
-            stock: inStockItem.stock - item.quantity
-          }
-        })
+        await this.model.updateOne(
+          {
+            _id: item.item,
+          },
+          {
+            $set: {
+              stock: inStockItem.stock - item.quantity,
+            },
+          },
+        );
       }
-
     }
   }
 
@@ -78,20 +80,22 @@ export class ItemsService {
     for (const item of items) {
       const inStockItem = await this.model.findById(item.item);
       if (inStockItem.stock !== -1) {
-        await this.model.updateOne({
-          _id: item.item
-        }, {
-          $set: {
-            stock: inStockItem.stock + item.quantity,
-            price: {
-              list: inStockItem.price.list,
-              sale: item.sale || inStockItem.price.sale,
-              cost: item.cost || inStockItem.price.cost,
-            }
-          }
-        })
+        await this.model.updateOne(
+          {
+            _id: item.item,
+          },
+          {
+            $set: {
+              stock: inStockItem.stock + item.quantity,
+              price: {
+                list: inStockItem.price.list,
+                sale: item.sale || inStockItem.price.sale,
+                cost: item.cost || inStockItem.price.cost,
+              },
+            },
+          },
+        );
       }
-
     }
   }
 }

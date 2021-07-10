@@ -14,7 +14,7 @@ export class PurchaseItemInput {
   @Field(NumberField)
   cost: number;
 
-  @Field(NumberField, { nullable : true})
+  @Field(NumberField, { nullable: true })
   sale?: number;
 
   @Field(NumberField)
@@ -26,7 +26,7 @@ export class CreatePurchaseInput implements Partial<Purchase> {
   @Field((_type) => [PurchaseItemInput])
   items: PurchaseItemInput[];
 
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   vendor?: string;
 
   @Field(StringField, { nullable: true })

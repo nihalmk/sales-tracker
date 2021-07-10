@@ -12,7 +12,9 @@ export const NavItems = {
   REPORT: 'report',
 };
 const Navigation: React.FC<{}> = ({}) => {
-  const { setSelectedMenu, enabledNavItems, selectedMenu } = useContext(UserContext);
+  const { setSelectedMenu, enabledNavItems, selectedMenu } = useContext(
+    UserContext,
+  );
 
   return (
     <React.Fragment>

@@ -1,7 +1,18 @@
-import { getModelForClass, prop, Ref, pre, arrayProp } from '@typegoose/typegoose';
+import {
+  getModelForClass,
+  prop,
+  Ref,
+  pre,
+  arrayProp,
+} from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
-import { StringField, NumberField, BooleanField, DateField } from '../../common/fields';
+import {
+  StringField,
+  NumberField,
+  BooleanField,
+  DateField,
+} from '../../common/fields';
 import { Shop } from '../shop/shop.model';
 import { Items } from '../items/items.model';
 import moment from 'moment-timezone';
@@ -22,7 +33,7 @@ export class PurchaseItem {
   cost: number;
 
   @prop()
-  @Field(NumberField, { nullable : true})
+  @Field(NumberField, { nullable: true })
   sale?: number;
 
   @prop()
@@ -30,14 +41,15 @@ export class PurchaseItem {
   total: number;
 }
 
-function between(min: number, max: number): number {  
-  return Math.floor(
-    Math.random() * (max - min + 1) + min
-  )
+function between(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 @pre<Purchase>('save', async function () {
-  this.billNumber = `P${moment().format('YYYYMMDD')}${between(10000, 99999).toString()}`;
+  this.billNumber = `P${moment().format('YYYYMMDD')}${between(
+    10000,
+    99999,
+  ).toString()}`;
 })
 @ObjectType({ description: 'The Purchase model' })
 export class Purchase {
@@ -53,11 +65,11 @@ export class Purchase {
   items: PurchaseItem[];
 
   @prop()
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   vendor?: string;
 
   @prop()
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   contact?: string;
 
   @prop()

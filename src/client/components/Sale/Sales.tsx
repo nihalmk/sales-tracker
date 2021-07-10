@@ -45,7 +45,10 @@ const Sales: NextPage<Props> = function ({
 
   useEffect(() => {
     if (sales && callback) {
-      callback(sales.map((s) => s._id), _.sum(sales.map((s) => s.total)));
+      callback(
+        sales.map((s) => s._id),
+        _.sum(sales.map((s) => s.total)),
+      );
     }
   }, [sales]);
 
