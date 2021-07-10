@@ -16,7 +16,7 @@ const Navigation: React.FC<{}> = ({}) => {
 
   return (
     <React.Fragment>
-      <Card className="mb-0 mt-0 bg-nav">
+      <Card className="hide-in-print mb-0 mt-0 bg-nav">
         <Card.Header>
           <button
             type="button"

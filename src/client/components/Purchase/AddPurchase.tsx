@@ -95,11 +95,6 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   }, [purchaseData]);
 
   useEffect(() => {
-    console.log(purchase);
-    console.log(submitted);
-  }, [purchase]);
-
-  useEffect(() => {
     setNewPurchase((currentState) => ({
       ...currentState,
       items: purchaseItems,
@@ -325,7 +320,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         >
           <div className="card-body pt-0">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-4">
                 <SelectBox
                   tabIndex={4}
                   selectLabel="Product"
@@ -373,7 +368,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                       total: currentState.quantity * cost,
                     }));
                   }}
-                  disabled={true || itemsLoading || !newItem}
+                  disabled={itemsLoading || !newItem}
                   isInvalid={!!(newItemSubmitted && !newPurchaseItem?.cost)}
                   value={newPurchaseItem?.cost || ''}
                 />
@@ -381,6 +376,26 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
               <div className="col-md-2">
                 <Input
                   tabIndex={6}
+                  inputName="Sale"
+                  inputLabel="Sale Price"
+                  inputType="number"
+                  max={20}
+                  placeholderValue="Sale Price"
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    const sale = Number(e.target.value);
+                    setNewPurchaseItem((currentState) => ({
+                      ...currentState,
+                      sale,
+                    }));
+                  }}
+                  disabled={itemsLoading || !newItem}
+                  isInvalid={!!(newItemSubmitted && !newPurchaseItem?.sale)}
+                  value={newPurchaseItem?.sale || ''}
+                />
+              </div>
+              <div className="col-md-2">
+                <Input
+                  tabIndex={7}
                   inputName="quantity"
                   inputLabel="Quantity"
                   inputType="number"
@@ -401,7 +416,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
               </div>
               <div className="col-md-2">
                 <Input
-                  tabIndex={7}
+                  tabIndex={8}
                   inputName="total"
                   inputLabel="Total"
                   inputType="tel"

@@ -13,11 +13,16 @@ export const GET_USER = gql`
       roles
       role
       paid
+      phone
       registeredAt
       shop {
         _id
         name
         timezone
+        address {
+          street
+          pincode
+        }
       }
     }
   }

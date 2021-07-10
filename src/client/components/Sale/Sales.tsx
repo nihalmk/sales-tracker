@@ -62,7 +62,7 @@ const Sales: NextPage<Props> = function ({
   return (
     <React.Fragment>
       <div className="">
-        <div className="row">
+        <div className="hide-in-print row">
           {!hideExtraFields && (
             <div className="col-md-2">
               <label className="form-label">{'P/L'}</label>{' '}
@@ -73,7 +73,7 @@ const Sales: NextPage<Props> = function ({
             </div>
           )}
           {!saleDate && (
-            <div className="col-md-4  ml-auto">
+            <div className="hide-in-print col-md-4  ml-auto">
               <DatePicker
                 inputLabel="Select Date"
                 maxDate={new Date()}

@@ -24,6 +24,8 @@ const SaleCard: NextPage<Props> = function ({
 }) {
   const [view, setView] = useState(showContent);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [selectedPrint, setSelectedPrint] = useState('');
+
   const { loading: saleLoading, data: saleData } = useQuery(
     GET_SALE_BY_BILL_NUMBER,
     {
@@ -52,34 +54,42 @@ const SaleCard: NextPage<Props> = function ({
   });
 
   // TODO: improve printing
-  const print = (selectedId: string) => {
-    if (html2canvas) {
-      setIsPrinting(true);
-      html2canvas(document.querySelector(`#sale-${selectedId}`)).then(
-        async (canvas: any) => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF({
-            orientation: 'landscape',
-          });
-          const imgProps = pdf.getImageProperties(imgData);
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          await pdf.save(`${selectedId}.pdf`);
-          setIsPrinting(false);
-        },
-      );
-    }
-  };
+  // const print = (selectedId: string) => {
+  //   if (html2canvas) {
+  //     setIsPrinting(true);
+  //     html2canvas(document.querySelector(`#sale-${selectedId}`)).then(
+  //       async (canvas: any) => {
+  //         const imgData = canvas.toDataURL('image/png');
+  //         const pdf = new jsPDF({
+  //           orientation: 'landscape',
+  //         });
+  //         const imgProps = pdf.getImageProperties(imgData);
+  //         const pdfWidth = pdf.internal.pageSize.getWidth();
+  //         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+  //         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  //         await pdf.save(`${selectedId}.pdf`);
+  //         setIsPrinting(false);
+  //       },
+  //     );
+  //   }
+  // };
+
+  const currentBillNumber = billNumber || sale?.billNumber;
+
   return (
     <React.Fragment>
-      <div className="card" id={`sale-${billNumber || sale?.billNumber}`}>
+      <div
+        className={
+          'card ' + (selectedPrint !== currentBillNumber ? 'hide-in-print' : '')
+        }
+        id={`sale-${currentBillNumber}`}
+      >
         <div className="card-header">
           <div className="card-title">
-            #{billNumber || sale?.billNumber} |{' '}
+            #{currentBillNumber} |{' '}
             {moment(sale?.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
           </div>
-          <div className="card-options">
+          <div className="hide-in-print card-options">
             <strong className="profit mr-4">
               {sale?.total}
               {currency}
@@ -169,21 +179,28 @@ const SaleCard: NextPage<Props> = function ({
           </div>
           <div className="card-footer">
             <div className="d-flex">
-              {(billNumber || sale?.billNumber) && (
+              {currentBillNumber && (
                 <button
                   type="button"
                   className={
-                    'btn btn-primary ' + (isPrinting ? 'btn-loading' : '')
+                    'hide-in-print btn btn-primary ' +
+                    (isPrinting ? 'btn-loading' : '')
                   }
-                  onClick={() => print(billNumber || sale?.billNumber)}
+                  onClick={() => {
+                    setSelectedPrint(currentBillNumber);
+                    setTimeout(() => {
+                      window && window.print();
+                      setSelectedPrint(undefined);
+                    }, 0);
+                  }}
                 >
-                  Download
+                  Print
                 </button>
               )}
               <button
                 id="shop-submit"
                 type="submit"
-                className={'btn btn-primary ml-auto '}
+                className={'hide-in-print btn btn-primary ml-auto '}
                 disabled={true}
                 // onClick={onSaleEdit}
               >
@@ -217,6 +234,27 @@ const SaleCard: NextPage<Props> = function ({
         }
         .card-options .form-group {
           width: 100%;
+        }
+        @media print {
+          .hide-in-print,
+          .container-overlay {
+            display: none !important;
+          }
+          .show-in-print {
+            display: block !important;
+          }
+          .card-header {
+            display: flex;
+          }
+          .card {
+            border: 1px solid rgba(0, 40, 100, 0.12);
+          }
+          .col-md-12,
+          .form-group,
+          .selectgroup,
+          .form-label {
+            page-break-inside: avoid !important;
+          }
         }
       `}</style>
     </React.Fragment>

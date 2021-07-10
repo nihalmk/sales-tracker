@@ -67,7 +67,7 @@ const AddStock: NextPage<Props> = function () {
           sale: 0,
           list: 0,
         },
-        stock: -1,
+        stock: 0,
       } as Items);
     }
   });

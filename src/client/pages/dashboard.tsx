@@ -198,6 +198,14 @@ const Home: NextPage<Props> = () => {
   return (
     <Layout hideHeader={false}>
       <div className="container">
+        <div className="d-none show-in-print">
+          <h3>{user?.shop.name}</h3>
+          <h4>
+            {user?.shop.address?.street} {user?.shop.address?.pincode}
+          </h4>
+          <h4>{user?.shop.type}</h4>
+          <h5>{user?.phone}</h5>
+        </div>
         {user?.shop ? (
           isLoading ? (
             <React.Fragment>

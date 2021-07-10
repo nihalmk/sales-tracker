@@ -72,6 +72,7 @@
     "next": "^9.3.5",
     "next-compose-plugins": "^2.2.0",
     "next-cookies": "^2.0.3",
+    "nodemon": "^2.0.11",
     "pino": "^6.2.0",
     "react": "^16.13.1",
     "react-datepicker": "^3.0.0",

@@ -92,11 +92,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   }, [saleData]);
 
   useEffect(() => {
-    console.log(sale);
-    console.log(submitted);
-  }, [sale]);
-
-  useEffect(() => {
     setNewSale((currentState) => ({
       ...currentState,
       items: saleItems,
@@ -265,7 +260,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   };
   return (
     <React.Fragment>
-      <div className="card">
+      <div className="hide-in-print card">
         <div className="card-header">
           <div className="card-title">{'New Sale'}</div>
           <div className="card-options"></div>
@@ -692,7 +687,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
           </div>
         </div>
       </div>
-      <h3>Today's Sales</h3>
+      <h3 className="hide-in-print">Today's Sales</h3>
       {createLoading ? <Loader /> : <Sales saleDate={moment().toDate()} />}
       <style jsx>{`
         .w-10 {

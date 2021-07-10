@@ -82,7 +82,12 @@ export class ItemsService {
           _id: item.item
         }, {
           $set: {
-            stock: inStockItem.stock + item.quantity
+            stock: inStockItem.stock + item.quantity,
+            price: {
+              list: inStockItem.price.list,
+              sale: item.sale || inStockItem.price.sale,
+              cost: item.cost || inStockItem.price.cost,
+            }
           }
         })
       }
