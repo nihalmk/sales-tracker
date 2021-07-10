@@ -130,7 +130,12 @@ const startUp = async () => {
     graphQLServer.installSubscriptionHandlers(httpServer);
 
     let url = `http://localhost:${PORT}`;
-    let start = (process.platform == 'darwin'? 'open': process.platform == 'win32'? 'start': 'xdg-open');
+    let start =
+      process.platform == 'darwin'
+        ? 'open'
+        : process.platform == 'win32'
+        ? 'start'
+        : 'xdg-open';
     require('child_process').exec(start + ' ' + url);
 
     app.on('error', (error) => {
