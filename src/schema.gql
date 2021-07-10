@@ -38,9 +38,7 @@ type Charges {
   service_fee: Float!
 }
 
-"""
-The Closings model
-"""
+"""The Closings model"""
 type Closing {
   _id: ID!
   active: Boolean!
@@ -153,9 +151,7 @@ type Item {
   quantity: Float!
 }
 
-"""
-The Items model
-"""
+"""The Items model"""
 type Items {
   _id: ID!
   category: String
@@ -274,9 +270,7 @@ type Profile {
   phone: String!
 }
 
-"""
-The Purchase model
-"""
+"""The Purchase model"""
 type Purchase {
   _id: ID!
   active: Boolean!
@@ -348,9 +342,7 @@ enum Roles {
   Sales
 }
 
-"""
-The Sales model
-"""
+"""The Sales model"""
 type Sale {
   _id: ID!
   active: Boolean!
@@ -385,9 +377,7 @@ input SaleItemInput {
   total: Float!
 }
 
-"""
-The Shop model
-"""
+"""The Shop model"""
 type Shop {
   _id: ID!
   address: Address
@@ -457,9 +447,7 @@ input UpdateSaleInput {
   total: Float!
 }
 
-"""
-The User model
-"""
+"""The User model"""
 type User {
   _id: ID!
   createdAt: DateTime!
