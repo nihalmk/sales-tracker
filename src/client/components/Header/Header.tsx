@@ -1,12 +1,13 @@
 import { Dropdown } from 'tabler-react';
 import Link from 'next/link';
 import UserContext from '../UserWrapper/UserContext';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Logo } from './Logo';
 import { logout } from '../../accounts/login';
 import { useRouter } from 'next/router';
 import { Pages } from '../../utils/pages';
 import moment from 'moment-timezone';
+import PopUpMessage from '../common/PopUpMessage';
 
 interface Props {
   hide?: boolean;
@@ -14,7 +15,17 @@ interface Props {
 export const Header: React.FC<Props> = ({ hide }) => {
   const { user, clearContext } = useContext(UserContext);
 
+  const [message, setMessage] = useState('');
+
   const router = useRouter();
+
+  useEffect(() => {
+    if (message) {
+      setTimeout(() => {
+        setMessage('');
+      }, 3000);
+    }
+  }, [message]);
 
   const getItems = (): Record<string, string | boolean | Function>[] => {
     let itemsObject: Record<string, string | boolean | Function>[] = [
@@ -24,6 +35,19 @@ export const Header: React.FC<Props> = ({ hide }) => {
           await logout();
           await clearContext();
           router.push(Pages.LOGIN);
+        },
+        enabled: true,
+      },
+      {
+        value: 'Generate DB Backup',
+        onClick: async () => {
+          const res = await fetch(
+            `${process.env.SERVER_URL || 'http://localhost:3000'}/dbbackup`,
+          );
+          const message = await res.json();
+          setMessage(
+            message?.message || "DB Sync queued. Check 'dbbackup' folder",
+          );
         },
         enabled: true,
       },
@@ -80,6 +104,7 @@ export const Header: React.FC<Props> = ({ hide }) => {
             </div>
           </div>
         </div>
+        <PopUpMessage description={message} show={!!message} />
       </div>
       <style jsx global>{`
         .dropdown-item {
