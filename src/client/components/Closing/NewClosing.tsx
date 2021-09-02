@@ -27,15 +27,17 @@ import ConfirmationDialog from '../Alerts/ConfirmationDialog';
 import OverLay from '../OverLay';
 import { NavItems } from '../Navigation/Navigation';
 import UserContext from '../UserWrapper/UserContext';
+import Print from '../common/Print';
 // import UserContext from '../UserWrapper/UserContext';
 
 interface Props {
   closingId?: string;
-  date?: Date;
+  startDate?: Date;
+  endDate?: Date;
   isView?: boolean;
 }
 
-const NewClosing: NextPage<Props> = function ({ date, isView }) {
+const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const { setSelectedMenu, setNavItems } = useContext(UserContext);
 
   const [submitCreateClosing, { loading: createLoading }] = useMutation(
@@ -53,8 +55,10 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
   const { data: closings, loading: closingsLoading } = useQuery(GET_CLOSINGS, {
     variables: {
       date: {
-        from: moment(date).startOf('day').toDate(),
-        to: moment(date).endOf('day').toDate(),
+        from: moment(startDate).startOf('day').toDate(),
+        to: moment(endDate || startDate)
+          .endOf('day')
+          .toDate(),
       },
     },
     fetchPolicy: 'no-cache',
@@ -65,21 +69,46 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
   const [, setSubmitted] = useState(false);
   const [salesTotal, setSalesTotal] = useState(0);
   const [purchaseTotal, setPurchaseTotal] = useState(0);
-  const [today, setToday] = useState(date ? moment(date) : moment());
+  const [today, setToday] = useState(startDate ? moment(startDate) : moment());
   const [newClosing, setNewClosing] = useState<CreateClosingInput>();
+  const [allClosings, setAllClosings] = useState<CreateClosingInput[]>();
   const [prevClosing, setPrevClosing] = useState<Closing>();
-  // const [selectedClosing, setSelectedClosing] = useState<Closing>();
+  const [spentTotal, setSpentTotal] = useState(0);
+  const [receivedTotal, setReceivedTotal] = useState(0);
   const [closingConfirmation, setClosingConfirmation] = useState(false);
+  const [spentView, setSpentView] = useState(!isView);
+  const [receivedView, setRecievedView] = useState(!isView);
+  const [purchasesView, setPurchasesView] = useState(false);
+  const [salesView, setSalesView] = useState(false);
 
   useEffect(() => {
     if (closings?.getClosingForUser) {
       setNewClosing(closings.getClosingForUser[0]);
+      setAllClosings(closings.getClosingForUser);
+      setReceivedTotal(
+        _.sum(
+          _.flatMap(
+            (closings.getClosingForUser as CreateClosingInput[])?.map((c) =>
+              c.receivedItems.map((s) => s.amount),
+            ),
+          ),
+        ),
+      );
+      setSpentTotal(
+        _.sum(
+          _.flatMap(
+            (closings.getClosingForUser as CreateClosingInput[])?.map((c) =>
+              c.spentItems.map((s) => s.amount),
+            ),
+          ),
+        ),
+      );
     }
   }, [closings]);
 
   useEffect(() => {
-    setToday(moment(date));
-  }, [date]);
+    setToday(moment(startDate));
+  }, [startDate]);
 
   useEffect(() => {
     if (previousClosing?.getPreviousClosing) {
@@ -159,13 +188,20 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
       </React.Fragment>
     );
   }
+  console.log(salesTotal, receivedTotal, purchaseTotal, spentTotal);
+
+  const getNetTotal = () => {
+    console.log(salesTotal, receivedTotal, purchaseTotal, spentTotal);
+    return salesTotal + receivedTotal - purchaseTotal - spentTotal;
+  };
   return (
     <React.Fragment>
       <div className="card">
         <div className="card-header">
           <div className="card-title">
-            {isView ? 'Closing | ' : 'New Closing | '}
-            {today.format('DD/MM/YYYY')}
+            {isView ? 'Report | ' : 'New Closing | '}
+            {today.format('DD/MM/YYYY')}{' '}
+            {endDate && `- ${moment(endDate).format('DD/MM/YYYY')}`}
           </div>
           <div className="card-options">
             {!isView && (
@@ -197,10 +233,20 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
             )}
           </div>
           <h4>Sales</h4>
+          <button
+            type="button"
+            className="btn btn-icon btn-primary btn-sm w-100 hide-in-print"
+            onClick={() => {
+              setSalesView(!salesView);
+            }}
+          >
+            {(salesView ? 'Hide' : 'View') + ' Sales'}
+          </button>
           <div className="card-body pb-0">
             <Sales
-              hideExtraFields={true}
-              saleDate={today.toDate()}
+              hideExtraFields={!salesView}
+              saleDateFrom={today.toDate()}
+              saleDateTo={endDate}
               callback={(salesIds, total) => {
                 !isView &&
                   setNewClosing((currentState) => ({
@@ -212,12 +258,22 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
             />
           </div>
           <h4>Purchases</h4>
+          <button
+            type="button"
+            className="btn btn-icon btn-primary btn-sm w-100 hide-in-print"
+            onClick={() => {
+              setPurchasesView(!purchasesView);
+            }}
+          >
+            {(purchasesView ? 'Hide' : 'View') + ' Purchases'}
+          </button>
           <div className="card-body pb-0">
             <Purchases
-              hideExtraFields={true}
-              purchaseDate={today.toDate()}
+              hideExtraFields={!purchasesView}
+              purchaseFromDate={today.toDate()}
+              purchaseToDate={endDate}
               callback={(_purchaseIds, total) => {
-                !isView && setPurchaseTotal(total);
+                setPurchaseTotal(total);
               }}
             />
           </div>
@@ -226,41 +282,82 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
             * Include borrowed money to deduct money received from sales
           </small>
           <div className="card p-0" id={newClosing?.date}>
-            <Spent
-              callback={(spentItems) => {
-                !isView &&
-                  setNewClosing((currentState) => ({
-                    ...currentState,
-                    spentItems,
-                  }));
+            <div className={'p-2 loss  ml-auto'}>
+              {spentTotal}
+              {currency}
+            </div>
+            <button
+              type="button"
+              className="btn btn-icon btn-primary btn-sm hide-in-print"
+              onClick={() => {
+                setSpentView(!spentView);
               }}
-              isView={isView}
-              spentItemsList={newClosing?.spentItems}
-              id={newClosing?.date}
-            />
+            >
+              {(spentView ? 'Hide' : 'View') + ' Received Items'}
+            </button>
+            {spentView && (
+              <Spent
+                callback={(spentItems) => {
+                  !isView &&
+                    setSpentTotal(_.sum(spentItems.map((s) => s.amount)));
+                  !isView &&
+                    setNewClosing((currentState) => ({
+                      ...currentState,
+                      spentItems,
+                    }));
+                }}
+                isView={isView}
+                spentItemsList={_.flatMap(
+                  allClosings?.map((c) => c.spentItems),
+                )}
+                id={newClosing?.date}
+              />
+            )}
           </div>
           <h4 className="pt-3">Received</h4>
           <div className="card p-0" id={newClosing?.date}>
-            <Received
-              callback={(receivedItems) => {
-                !isView &&
-                  setNewClosing((currentState) => ({
-                    ...currentState,
-                    receivedItems,
-                  }));
+            <div className={'p-2 profit ml-auto'}>
+              {receivedTotal}
+              {currency}
+            </div>
+            <button
+              type="button"
+              className="btn btn-icon btn-primary btn-sm hide-in-print "
+              onClick={() => {
+                setRecievedView(!receivedView);
               }}
-              isView={isView}
-              receivedItemsList={newClosing?.receivedItems}
-              id={newClosing?.date}
-            />
+            >
+              {(receivedView ? 'Hide' : 'View') + ' Spent Items'}
+            </button>
+            {receivedView && (
+              <Received
+                callback={(receivedItems) => {
+                  !isView &&
+                    setReceivedTotal(_.sum(receivedItems.map((s) => s.amount)));
+
+                  !isView &&
+                    setNewClosing((currentState) => ({
+                      ...currentState,
+                      receivedItems,
+                    }));
+                }}
+                isView={isView}
+                receivedItemsList={_.flatMap(
+                  allClosings?.map((c) => c.receivedItems),
+                )}
+                id={newClosing?.date}
+              />
+            )}
           </div>
           <div className="card mt-3 mb-3 p-2">
             <div className="row bigger">
-              <strong className="col-md-9">Closing Balance</strong>
-              <strong className="col-md-3 profit">
+              <strong className="col-md-9">
                 {isView
-                  ? newClosing?.inHandTotal || 0
-                  : getTotal()[0].toFixed(2)}
+                  ? 'Net Balance (Sales Total + Received Total - Purchases Total - Expenses Total)'
+                  : 'Closing Balance'}
+              </strong>
+              <strong className="col-md-3 profit">
+                {isView ? getNetTotal() || 0 : getTotal()[0].toFixed(2)}
                 {currency}
               </strong>
             </div>
@@ -269,15 +366,20 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
         <div className="card-footer">
           <div className="d-flex">
             <Link href="/dashboard">
-              <button type="button" className={'btn btn-outline-danger'}>
+              <button
+                type="button"
+                className={'btn btn-outline-danger hide-in-print'}
+              >
                 Cancel
               </button>
             </Link>
+            <Print setPrintStatus={() => {}} className="ml-auto" />
             <button
               id="shop-submit"
               type="submit"
               className={
-                'btn btn-primary ml-auto ' + (createLoading && 'btn-loading')
+                'btn btn-primary ml-3 hide-in-print ' +
+                (createLoading && 'btn-loading')
               }
               disabled={isView}
               onClick={() => {
@@ -298,7 +400,7 @@ const NewClosing: NextPage<Props> = function ({ date, isView }) {
             setClosingConfirmation(false);
           }}
           message={`You won't be able to make changes after you submit. ${
-            !date
+            !startDate
               ? 'Please continue if you are closing for the day!'
               : 'Please confirm and continue!'
           }`}

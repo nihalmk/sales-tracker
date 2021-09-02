@@ -8,25 +8,30 @@ import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import SaleCard from './Sale';
 import DatePicker from '../common/DatePicker/DatePicker';
+import { currency } from '../../utils/helpers';
 
 interface Props {
   billNumber?: string;
-  saleDate?: Date;
+  saleDateFrom?: Date;
+  saleDateTo?: Date;
   hideExtraFields?: boolean;
   callback?: (salesIds: string[], total: number) => void;
 }
 
 const Sales: NextPage<Props> = function ({
-  saleDate,
+  saleDateFrom,
+  saleDateTo,
   hideExtraFields,
   callback,
 }) {
-  const [date, setDate] = useState(saleDate ? moment(saleDate) : moment());
+  const [date, setDate] = useState(
+    saleDateFrom ? moment(saleDateFrom) : moment(),
+  );
   const { loading: saleLoading, data: saleData } = useQuery(GET_SALES, {
     variables: {
       date: {
         from: date.startOf('day').toDate(),
-        to: date.endOf('day').toDate(),
+        to: (saleDateTo ? moment(saleDateTo) : date).endOf('day').toDate(),
       },
     },
     fetchPolicy: 'no-cache',
@@ -52,9 +57,10 @@ const Sales: NextPage<Props> = function ({
     }
   }, [sales]);
 
+  const total = _.sum(sales?.map((s) => s.total));
   const getTotalProfit = () => {
     const profit =
-      _.sum(sales?.map((s) => s.total)) -
+      total -
       _.sum(
         _.flatten(sales?.map((s) => s.items)).map(
           (i) => (i.item?.price?.cost || i.item?.price?.list) * i.quantity,
@@ -62,20 +68,30 @@ const Sales: NextPage<Props> = function ({
       );
     return profit;
   };
+
+  const TotalSection = () => {
+    return (
+      <div className={`col-md-2 ${hideExtraFields && 'ml-auto text-right'}`}>
+        <label className="form-label">{'Total'}</label>{' '}
+        <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
+          {total}
+          {currency}
+        </div>
+        <label className="form-label">{'Profile/Loss'}</label>{' '}
+        <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
+          {getTotalProfit() > 0 && '+'}
+          {getTotalProfit()}
+          {currency}
+        </div>
+      </div>
+    );
+  };
   return (
     <React.Fragment>
       <div className="">
         <div className="hide-in-print row">
-          {!hideExtraFields && (
-            <div className="col-md-2">
-              <label className="form-label">{'P/L'}</label>{' '}
-              <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
-                {getTotalProfit() > 0 && '+'}
-                {getTotalProfit()}₹
-              </div>
-            </div>
-          )}
-          {!saleDate && (
+          <TotalSection />
+          {!saleDateFrom && (
             <div className="hide-in-print col-md-4  ml-auto">
               <DatePicker
                 inputLabel="Select Date"
@@ -88,21 +104,28 @@ const Sales: NextPage<Props> = function ({
             </div>
           )}
         </div>
-        {saleLoading ? (
-          <Loader />
-        ) : (
-          (!_.isEmpty(sales) &&
-            sales.map((sale: Sale, i) => {
-              return (
-                <React.Fragment key={i}>
-                  <SaleCard saleDetails={sale} showContent={!hideExtraFields} />
+        {!hideExtraFields && (
+          <React.Fragment>
+            {saleLoading ? (
+              <Loader />
+            ) : (
+              (!_.isEmpty(sales) &&
+                sales.map((sale: Sale, i) => {
+                  return (
+                    <React.Fragment key={i}>
+                      <SaleCard
+                        saleDetails={sale}
+                        showContent={!hideExtraFields}
+                      />
+                    </React.Fragment>
+                  );
+                })) || (
+                <React.Fragment>
+                  <div className="card text-center p-5">No sales found</div>
                 </React.Fragment>
-              );
-            })) || (
-            <React.Fragment>
-              <div className="card text-center p-5">No sales found</div>
-            </React.Fragment>
-          )
+              )
+            )}
+          </React.Fragment>
         )}
       </div>
       <style jsx global>{`

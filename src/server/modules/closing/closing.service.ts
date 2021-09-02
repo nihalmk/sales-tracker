@@ -102,9 +102,9 @@ export class ClosingService {
     const dateRange = {
       from: moment(closing.date).startOf('day').toDate(),
       to: moment(closing.date).endOf('day').toDate(),
-    }
+    };
     this.saleService.updateClosing(dateRange, createdClosing._id);
-    this.purchaseService.updateClosing(dateRange, createdClosing._id)
+    this.purchaseService.updateClosing(dateRange, createdClosing._id);
     return createdClosing;
   }
 
@@ -132,7 +132,7 @@ export class ClosingService {
       .find({
         shop: this.ctx.user.shop,
       })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .limit(1);
     return closing[0];
   }

@@ -99,7 +99,7 @@ export const Received: NextPage<Props> = function ({
             formFocus?.current?.focus();
           }}
         >
-          <div className="row pl-2 pr-2">
+          <div className="row pl-2 pr-2 hide-in-print">
             <div className="col-md-6">
               <Input
                 tabIndex={4}

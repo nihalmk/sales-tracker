@@ -3,7 +3,7 @@ import Head from 'next/head';
 import App from 'next/app';
 import { withApollo } from '../apollo/client';
 import 'tabler-react/dist/Tabler.css';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 import UserWrapper from '../components/UserWrapper/UserWrapper';
 // import { config } from '@fortawesome/fontawesome-svg-core';
 // import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -45,6 +45,15 @@ class MyApp extends App {
           ) : (
             <Component {...pageProps} />
           ))}
+        <style jsx global>{`
+          .form-group {
+            margin-bottom: 0.5rem;
+          }
+          td {
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+          }
+        `}</style>
       </React.Fragment>
     );
   }

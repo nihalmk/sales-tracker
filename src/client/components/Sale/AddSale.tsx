@@ -49,6 +49,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const [showProfit, setShowProfit] = useState(false);
   const [sale, setSale] = useState<Sale[]>();
+  console.log(submitted, sale);
 
   useEffect(() => {
     setSale(saleData?.getSaleByBillNumber?.[0]);
@@ -73,7 +74,9 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         sortedItems.map((i) => {
           if (i.stock > 0 || i.stock === -1) {
             return {
-              label: `${i.name} ${i.stock > 0 ? `(${i.price.cost}₹)` : ''}`,
+              label: `${i.shortId} | ${i.name} ${
+                i.stock > 0 ? `(${i.price.cost}₹)` : ''
+              }`,
               value: i._id,
             };
           }
@@ -688,7 +691,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         </div>
       </div>
       <h3 className="hide-in-print">Today's Sales</h3>
-      {createLoading ? <Loader /> : <Sales saleDate={moment().toDate()} />}
+      {createLoading ? <Loader /> : <Sales saleDateFrom={moment().toDate()} />}
       <style jsx>{`
         .w-10 {
           width: 10%;

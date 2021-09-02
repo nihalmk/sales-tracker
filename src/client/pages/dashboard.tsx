@@ -176,7 +176,7 @@ const Home: NextPage<Props> = () => {
       case 'closing':
         return (
           <NewClosing
-            date={
+            startDate={
               needsClosing
                 ? moment(
                     lastSale?.getLastSale?.createdAt ||

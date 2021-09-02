@@ -146,7 +146,7 @@ const PurchaseCard: NextPage<Props> = function ({
               <button
                 id="shop-submit"
                 type="submit"
-                className={'btn btn-primary ml-auto '}
+                className={'btn btn-primary ml-auto hide-in-print'}
                 disabled={true}
                 // onClick={onPurchaseEdit}
               >

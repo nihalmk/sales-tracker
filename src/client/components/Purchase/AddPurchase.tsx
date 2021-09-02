@@ -54,7 +54,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   const [newItemSubmitted, setNewItemSubmitted] = useState(false);
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const [purchase, setPurchase] = useState<Purchase[]>();
-
+  console.log(submitted, purchase);
   useEffect(() => {
     setPurchase(purchaseData?.getPurchaseByBillNumber?.[0]);
   }, [purchaseData]);
@@ -77,7 +77,9 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
       _.compact(
         sortedItems.map((i) => {
           return {
-            label: `${i.name} ${i.stock > 0 ? `(${i.price.cost}₹)` : ''}`,
+            label: `${i.shortId} | ${i.name} ${
+              i.stock > 0 ? `(${i.price.cost}₹)` : ''
+            }`,
             value: i._id,
           };
         }),
@@ -448,9 +450,14 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
               </div>
             </div>
             <div className="p1 mb-2 text-muted">
-              <i>
+              <i className="loss">
                 * For any change in cost price of item, add new a item from
                 Stock menu with new cost
+              </i>
+              <br />
+              <i className="loss">
+                * Changing Purchase price will create a new product with a new
+                ID
               </i>
             </div>
           </div>

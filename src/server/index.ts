@@ -129,15 +129,16 @@ const startUp = async () => {
     const httpServer = app.listen(PORT);
     graphQLServer.installSubscriptionHandlers(httpServer);
 
-    let url = `http://localhost:${PORT}`;
-    let start =
-      process.platform == 'darwin'
-        ? 'open'
-        : process.platform == 'win32'
-        ? 'start'
-        : 'xdg-open';
-    require('child_process').exec(start + ' ' + url);
-
+    if (process.env.NODE_ENV !== 'production') {
+      let url = `http://localhost:${PORT}`;
+      let start =
+        process.platform == 'darwin'
+          ? 'open'
+          : process.platform == 'win32'
+          ? 'start'
+          : 'xdg-open';
+      require('child_process').exec(start + ' ' + url);
+    }
     app.on('error', (error) => {
       if (error.code === 'EPIPE') {
         logger.warn('Koa app-level EPIPE error.', { error });

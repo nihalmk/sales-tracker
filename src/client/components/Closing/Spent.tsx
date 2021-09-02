@@ -15,7 +15,7 @@ export const Spent: NextPage<Props> = function ({
   spentItemsList,
   callback,
   isView,
-  id
+  id,
 }) {
   const [spentItems, setSpentItems] = useState(spentItemsList || []);
   const [newSpentItem, setNewSpentItem] = useState<SpentItemsInput>();
@@ -95,7 +95,7 @@ export const Spent: NextPage<Props> = function ({
             formFocus?.current?.focus();
           }}
         >
-          <div className="row pl-2 pr-2">
+          <div className="row pl-2 pr-2 hide-in-print">
             <div className="col-md-6">
               <Input
                 tabIndex={2}

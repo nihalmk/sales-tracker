@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import _ from 'lodash';
 import { SaleItemInput } from '../sale/sale.input';
 import { PurchaseItemInput } from '../purchase/purchase.input';
+import { ObjectId } from 'mongodb';
 
 // Queries on models to to get/create/update items data
 
@@ -20,6 +21,17 @@ export class ItemsService {
   }
 
   // get Items by given id
+
+  async getItemById(id: ObjectId): Promise<Items> {
+    return this.model
+      .findOne({
+        shop: this.ctx.user.shop,
+        _id: id,
+      })
+      .populate('shop');
+  }
+
+  // get all Items of shop
 
   async getItems(): Promise<Items[]> {
     return this.model

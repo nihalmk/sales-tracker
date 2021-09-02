@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Card } from 'tabler-react';
 import UserContext from '../UserWrapper/UserContext';
+import { useRouter } from 'next/router';
+import { Pages } from '../../utils/pages';
 
-export const NavItems = {
+export const NavItems: { [key: string]: string } = {
   SALES: 'sales',
   PURCHASES: 'purchases',
   STOCK: 'stock',
@@ -16,6 +18,25 @@ const Navigation: React.FC<{}> = ({}) => {
     UserContext,
   );
 
+  const router = useRouter();
+
+  useEffect(() => {
+    const path = NavItems[router.query.selected as string];
+    if (path) {
+      setSelectedMenu(path);
+    }
+  }, [router.query.selected]);
+
+  useEffect(() => {
+    if (router.query.selected !== selectedMenu) {
+      router.push({
+        pathname: Pages.DASHBOARD,
+        query: {
+          selected: selectedMenu || NavItems.SALES,
+        },
+      });
+    }
+  }, [selectedMenu]);
   return (
     <React.Fragment>
       <Card className="hide-in-print mb-0 mt-0 bg-nav">

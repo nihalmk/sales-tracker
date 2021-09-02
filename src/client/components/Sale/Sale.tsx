@@ -8,8 +8,8 @@ import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import { currency } from '../../utils/helpers';
 
-let html2canvas: any;
-let jsPDF: any;
+// let html2canvas: any;
+// let jsPDF: any;
 
 interface Props {
   billNumber?: string;
@@ -47,32 +47,6 @@ const SaleCard: NextPage<Props> = function ({
   useEffect(() => {
     setSale(saleDetails);
   }, [sale]);
-
-  useEffect(() => {
-    html2canvas = require('html2canvas');
-    jsPDF = require('jspdf');
-  });
-
-  // TODO: improve printing
-  // const print = (selectedId: string) => {
-  //   if (html2canvas) {
-  //     setIsPrinting(true);
-  //     html2canvas(document.querySelector(`#sale-${selectedId}`)).then(
-  //       async (canvas: any) => {
-  //         const imgData = canvas.toDataURL('image/png');
-  //         const pdf = new jsPDF({
-  //           orientation: 'landscape',
-  //         });
-  //         const imgProps = pdf.getImageProperties(imgData);
-  //         const pdfWidth = pdf.internal.pageSize.getWidth();
-  //         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  //         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  //         await pdf.save(`${selectedId}.pdf`);
-  //         setIsPrinting(false);
-  //       },
-  //     );
-  //   }
-  // };
 
   const currentBillNumber = billNumber || sale?.billNumber;
 
@@ -189,7 +163,9 @@ const SaleCard: NextPage<Props> = function ({
                   onClick={() => {
                     setSelectedPrint(currentBillNumber);
                     setTimeout(() => {
+                      setIsPrinting(true);
                       window && window.print();
+                      setIsPrinting(false);
                       setSelectedPrint(undefined);
                     }, 0);
                   }}

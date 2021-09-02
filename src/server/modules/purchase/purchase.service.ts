@@ -79,17 +79,33 @@ export class PurchaseService {
   }
 
   async getPurchasesByIds(ids: ObjectId[]): Promise<Purchase[]> {
-    return this.model
-      .find({
-        _id: {
-          $in: ids
-        },
-      });
+    return this.model.find({
+      _id: {
+        $in: ids,
+      },
+    });
   }
 
   // Create a new purchase
 
   async createPurchase(purchase: CreatePurchaseInput): Promise<Purchase> {
+    for (const item of purchase.items) {
+      const itemFromDb = await this.itemsService.getItemById(item.item);
+      // if the new purchased product has a different cost than existing one, create a new item with new cost
+      if (itemFromDb.price.cost !== item.cost) {
+        const newItem = await this.itemsService.createItem({
+          name: itemFromDb.name,
+          category: itemFromDb.category,
+          price: {
+            ...itemFromDb.price,
+            cost: item.cost,
+            sale: item.sale,
+          },
+          stock: 0,
+        });
+        item.item = newItem._id;
+      }
+    }
     const createdPurchase = await this.model.create({
       ...purchase,
       shop: purchase.shop || this.ctx.user.shop,
@@ -118,9 +134,12 @@ export class PurchaseService {
   }
 
   async getLastPurchase(): Promise<Purchase> {
-    const purchase = await this.model.find({
-      shop: this.ctx.user.shop,
-    }).sort({createdAt: -1}).limit(1)
+    const purchase = await this.model
+      .find({
+        shop: this.ctx.user.shop,
+      })
+      .sort({ createdAt: -1 })
+      .limit(1);
     return purchase[0];
   }
 
@@ -128,9 +147,9 @@ export class PurchaseService {
     return await this.model.find({
       shop: this.ctx.user.shop,
       closing: {
-        $exists: false
-      }
-    })
+        $exists: false,
+      },
+    });
   }
 
   async updateClosing(date: DateRange, closingId: ObjectId): Promise<void> {
