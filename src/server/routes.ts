@@ -1,6 +1,7 @@
 import next from 'next';
 import Koa from 'koa';
 import Router from 'koa-router';
+import moment from 'moment';
 const { mongoExport } = require('mongoback');
 
 const dev = !['production', 'staging'].includes(process.env.NODE_ENV || '');
@@ -25,7 +26,7 @@ export const addRoutes = async (app: Koa) => {
     try {
       const options = {
         uri: process.env.MONGO_URI,
-        outDir: '../../dbbackup',
+        outDir: `../../dbbackup${moment().format('DD-MM-YYYY')}`,
         databases: 'sales-tracker',
       };
 

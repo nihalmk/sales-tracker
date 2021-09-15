@@ -137,6 +137,9 @@ export class PurchaseService {
     const purchase = await this.model
       .find({
         shop: this.ctx.user.shop,
+        closing: {
+          $exists: false,
+        },
       })
       .sort({ createdAt: -1 })
       .limit(1);

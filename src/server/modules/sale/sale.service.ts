@@ -120,6 +120,9 @@ export class SaleService {
     const sale = await this.model
       .find({
         shop: this.ctx.user.shop,
+        closing: {
+          $exists: false,
+        },
       })
       .sort({ createdAt: -1 })
       .limit(1);
@@ -130,9 +133,9 @@ export class SaleService {
     return await this.model.find({
       shop: this.ctx.user.shop,
       closing: {
-        $exists: false
-      }
-    })
+        $exists: false,
+      },
+    });
   }
 
   async updateClosing(date: DateRange, closingId: ObjectId): Promise<void> {

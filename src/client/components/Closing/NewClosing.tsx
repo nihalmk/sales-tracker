@@ -22,7 +22,7 @@ import {
   GET_CLOSINGS,
 } from '../../graphql/query/closing';
 import Loader from '../Loaders/Loader';
-import { currency } from '../../utils/helpers';
+import { currency, omitTypenameKey } from '../../utils/helpers';
 import ConfirmationDialog from '../Alerts/ConfirmationDialog';
 import OverLay from '../OverLay';
 import { NavItems } from '../Navigation/Navigation';
@@ -80,7 +80,9 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const [receivedView, setRecievedView] = useState(!isView);
   const [purchasesView, setPurchasesView] = useState(false);
   const [salesView, setSalesView] = useState(false);
-
+  console.log({
+    newClosing,
+  });
   useEffect(() => {
     if (closings?.getClosingForUser) {
       setNewClosing(closings.getClosingForUser[0]);
@@ -125,8 +127,8 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
       await submitCreateClosing({
         variables: {
           salesIds,
-          spentItems,
-          receivedItems,
+          spentItems: spentItems && omitTypenameKey(spentItems),
+          receivedItems: receivedItems && omitTypenameKey(receivedItems),
           spentTotal,
           inHandTotal,
           active: true,
@@ -194,6 +196,12 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
     console.log(salesTotal, receivedTotal, purchaseTotal, spentTotal);
     return salesTotal + receivedTotal - purchaseTotal - spentTotal;
   };
+
+  // const inHandTotalAtLastDate = () => {
+  //   const lastClosing = allClosings.sort((closing) => closing.date);
+  //   return lastClosing[lastClosing.length - 1];
+  // };
+
   return (
     <React.Fragment>
       <div className="card">
@@ -362,6 +370,20 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               </strong>
             </div>
           </div>
+          {/* {isView && (
+            <div className="card mt-3 mb-3 p-2">
+              <div className="row bigger">
+                <strong className="col-md-9">
+                  In Hand at{' '}
+                  {moment(inHandTotalAtLastDate().date).format('DD/MM/YYYY')}
+                </strong>
+                <strong className="col-md-3 profit">
+                  {inHandTotalAtLastDate().inHandTotal}
+                  {currency}
+                </strong>
+              </div>
+            </div>
+          )} */}
         </div>
         <div className="card-footer">
           <div className="d-flex">
