@@ -129,7 +129,7 @@ const startUp = async () => {
     const httpServer = app.listen(PORT);
     graphQLServer.installSubscriptionHandlers(httpServer);
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'development') {
       let url = `http://localhost:${PORT}`;
       let start =
         process.platform == 'darwin'

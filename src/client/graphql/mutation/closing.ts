@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 export const CREATE_CLOSING = gql`
   mutation createClosing(
     $salesIds: [ID!]
+    $purchaseIds: [ID!]
     $spentItems: [SpentItemsInput!]
     $receivedItems: [ReceivedItemsInput!]
     $inHandTotal: Float
@@ -12,6 +13,7 @@ export const CREATE_CLOSING = gql`
   ) {
     createClosing(
       closing: {
+        purchaseIds: $purchaseIds
         salesIds: $salesIds
         spentItems: $spentItems
         receivedItems: $receivedItems

@@ -46,6 +46,7 @@ type Closing {
   createdAt: DateTime!
   date: DateTime!
   inHandTotal: Float!
+  purchases: [Purchase!]!
   receivedItems: [ReceivedItems!]!
   sales: [Sale!]!
   shop: Shop
@@ -64,6 +65,7 @@ input CreateClosingInput {
   active: Boolean!
   date: DateTime!
   inHandTotal: Float
+  purchaseIds: [ID!]
   receivedItems: [ReceivedItemsInput!]
   salesIds: [ID!]
   shop: ID
@@ -408,6 +410,7 @@ input UpdateClosingInput {
   active: Boolean!
   date: DateTime!
   inHandTotal: Float
+  purchaseIds: [ID!]
   receivedItems: [ReceivedItemsInput!]
   salesIds: [ID!]
   shop: ID

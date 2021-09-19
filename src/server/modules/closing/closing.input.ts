@@ -26,6 +26,9 @@ export class CreateClosingInput implements Partial<Closing> {
   @Field((_type) => [ID], { nullable: true })
   salesIds?: ObjectId[];
 
+  @Field((_type) => [ID], { nullable: true })
+  purchaseIds?: ObjectId[];
+
   @Field((_type) => [SpentItemsInput], { nullable: true })
   spentItems?: SpentItemsInput[];
 

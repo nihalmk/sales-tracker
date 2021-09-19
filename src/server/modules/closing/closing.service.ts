@@ -67,7 +67,7 @@ export class ClosingService {
     } else {
       const sales = await this.saleService.getSalesByIds(closing.salesIds);
       const purchases = await this.purchaseService.getPurchasesByIds(
-        closing.salesIds,
+        closing.purchaseIds,
       );
 
       const receivedItemsTotal = _.sum(

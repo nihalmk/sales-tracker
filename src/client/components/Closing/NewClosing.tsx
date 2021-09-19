@@ -82,6 +82,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const [salesView, setSalesView] = useState(false);
   console.log({
     newClosing,
+    previousClosing,
   });
   useEffect(() => {
     if (closings?.getClosingForUser) {
@@ -120,12 +121,19 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
 
   const onNewClosingCreate = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
-    const { salesIds, spentItems, receivedItems, spentTotal, inHandTotal } =
-      newClosing || {};
+    const {
+      salesIds,
+      spentItems,
+      receivedItems,
+      spentTotal,
+      inHandTotal,
+      purchaseIds,
+    } = newClosing || {};
     setSubmitted(true);
     try {
       await submitCreateClosing({
         variables: {
+          purchaseIds,
           salesIds,
           spentItems: spentItems && omitTypenameKey(spentItems),
           receivedItems: receivedItems && omitTypenameKey(receivedItems),
@@ -194,7 +202,13 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
 
   const getNetTotal = () => {
     console.log(salesTotal, receivedTotal, purchaseTotal, spentTotal);
-    return salesTotal + receivedTotal - purchaseTotal - spentTotal;
+    return (
+      prevClosing.inHandTotal +
+      salesTotal +
+      receivedTotal -
+      purchaseTotal -
+      spentTotal
+    );
   };
 
   // const inHandTotalAtLastDate = () => {
@@ -281,6 +295,12 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               purchaseFromDate={today.toDate()}
               purchaseToDate={endDate}
               callback={(_purchaseIds, total) => {
+                console.log(_purchaseIds);
+                !isView &&
+                  setNewClosing((currentState) => ({
+                    ...currentState,
+                    purchaseIds: _purchaseIds,
+                  }));
                 setPurchaseTotal(total);
               }}
             />
@@ -301,7 +321,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
                 setSpentView(!spentView);
               }}
             >
-              {(spentView ? 'Hide' : 'View') + ' Received Items'}
+              {(spentView ? 'Hide' : 'View') + ' Spent Items'}
             </button>
             {spentView && (
               <Spent
@@ -335,7 +355,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
                 setRecievedView(!receivedView);
               }}
             >
-              {(receivedView ? 'Hide' : 'View') + ' Spent Items'}
+              {(receivedView ? 'Hide' : 'View') + ' Received Items'}
             </button>
             {receivedView && (
               <Received
@@ -357,19 +377,21 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               />
             )}
           </div>
-          <div className="card mt-3 mb-3 p-2">
-            <div className="row bigger">
-              <strong className="col-md-9">
-                {isView
-                  ? 'Net Balance (Sales Total + Received Total - Purchases Total - Expenses Total)'
-                  : 'Closing Balance'}
-              </strong>
-              <strong className="col-md-3 profit">
-                {isView ? getNetTotal() || 0 : getTotal()[0].toFixed(2)}
-                {currency}
-              </strong>
+          {!isView && (
+            <div className="card mt-3 mb-3 p-2">
+              <div className="row bigger">
+                <strong className="col-md-9">
+                  {isView
+                    ? 'Net Balance (Sales Total + Received Total - Purchases Total - Expenses Total)'
+                    : 'Closing Balance'}
+                </strong>
+                <strong className="col-md-3 profit">
+                  {isView ? getNetTotal() || 0 : getTotal()[0].toFixed(2)}
+                  {currency}
+                </strong>
+              </div>
             </div>
-          </div>
+          )}
           {/* {isView && (
             <div className="card mt-3 mb-3 p-2">
               <div className="row bigger">
