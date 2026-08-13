@@ -90,9 +90,8 @@ export function withApollo(
         if (ssr) {
           try {
             // Run all GraphQL queries
-            const { getDataFromTree } = await import(
-              '@apollo/client/react/ssr'
-            );
+            const { getDataFromTree } =
+              await import('@apollo/client/react/ssr');
             await getDataFromTree(
               <AppTree
                 pageProps={{

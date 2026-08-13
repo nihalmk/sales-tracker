@@ -49,4 +49,3 @@ export const UPDATE_PURCHASE = gql`
     }
   }
 `;
-

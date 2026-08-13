@@ -27,7 +27,9 @@ export const LoggedOut: NextPage<Props> = ({ error }) => {
   return (
     <Layout>
       <Box maxW="sm" mx="auto" textAlign="center" py={10}>
-        <Heading size="md" mb={4}>You are not logged in</Heading>
+        <Heading size="md" mb={4}>
+          You are not logged in
+        </Heading>
         <Button
           colorPalette="brand"
           w="full"

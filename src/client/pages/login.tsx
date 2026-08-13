@@ -110,12 +110,18 @@ export const Login: NextPage<Props> = function () {
                   </Heading>
                   <Text color="fg.muted">
                     Add your total stock, sales and purchases. Also track
-                    current and previous sales. Track your profit on each
-                    sale. Track your closing sales and tally the cash!
+                    current and previous sales. Track your profit on each sale.
+                    Track your closing sales and tally the cash!
                   </Text>
                 </Box>
               </Flex>
-              <Flex align="center" gap={3} pt={4} borderTop="1px solid" borderColor="border.muted">
+              <Flex
+                align="center"
+                gap={3}
+                pt={4}
+                borderTop="1px solid"
+                borderColor="border.muted"
+              >
                 <Avatar.Root>
                   <Avatar.Fallback name="Shop Tracker" />
                 </Avatar.Root>
@@ -126,7 +132,14 @@ export const Login: NextPage<Props> = function () {
                   </Text>
                 </Box>
               </Flex>
-              <Text fontSize="sm" color="brand.700" bg="brand.50" borderRadius="l2" p={3} mt={6}>
+              <Text
+                fontSize="sm"
+                color="brand.700"
+                bg="brand.50"
+                borderRadius="l2"
+                p={3}
+                mt={6}
+              >
                 Let us know your feedback on{' '}
                 <Text as="span" fontWeight="semibold">
                   shoptrackerforsales@gmail.com
@@ -186,12 +199,7 @@ export const Login: NextPage<Props> = function () {
                     Log in
                   </Button>
                   <Link href={Pages.REGISTER} style={{ display: 'block' }}>
-                    <Button
-                      type="button"
-                      colorPalette="green"
-                      w="full"
-                      mt={3}
-                    >
+                    <Button type="button" colorPalette="green" w="full" mt={3}>
                       <Icon name="register" light />
                       Sign Up
                     </Button>

@@ -11,10 +11,7 @@ describe('ConfirmationDialog', () => {
     const mockSuccessCallback = jest.fn();
     render(
       <ChakraProvider value={system}>
-        <ConfirmationDialog
-          message={'Confirm'}
-          success={mockSuccessCallback}
-        />
+        <ConfirmationDialog message={'Confirm'} success={mockSuccessCallback} />
       </ChakraProvider>,
     );
     expect(screen.getByText('Confirm')).toBeInTheDocument();
@@ -24,10 +21,7 @@ describe('ConfirmationDialog', () => {
     const mockSuccessCallback = jest.fn();
     render(
       <ChakraProvider value={system}>
-        <ConfirmationDialog
-          message={'Confirm'}
-          success={mockSuccessCallback}
-        />
+        <ConfirmationDialog message={'Confirm'} success={mockSuccessCallback} />
       </ChakraProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
@@ -38,10 +32,7 @@ describe('ConfirmationDialog', () => {
     const mockSuccessCallback = jest.fn();
     render(
       <ChakraProvider value={system}>
-        <ConfirmationDialog
-          message={'Confirm'}
-          success={mockSuccessCallback}
-        />
+        <ConfirmationDialog message={'Confirm'} success={mockSuccessCallback} />
       </ChakraProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));

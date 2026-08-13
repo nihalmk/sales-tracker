@@ -8,7 +8,7 @@ const mockUser = user;
 
 jest.mock('../user.model');
 
-const mockUserModel = (UserModel as unknown) as jest.Mock<typeof UserModel> &
+const mockUserModel = UserModel as unknown as jest.Mock<typeof UserModel> &
   typeof UserModel;
 
 let service: UserService;

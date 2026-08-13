@@ -27,9 +27,8 @@ const Register: React.FC<{}> = () => {
     },
     isSubmitTriggered: false,
   });
-  const [createNewUser, { loading: mutationLoading }] = useMutation(
-    CREATE_NEW_USER,
-  );
+  const [createNewUser, { loading: mutationLoading }] =
+    useMutation(CREATE_NEW_USER);
 
   const verifyEmail = (email: string): boolean => {
     if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
@@ -166,83 +165,83 @@ const Register: React.FC<{}> = () => {
             <ErrorMessage error={error} />
             <SuccessMessage message={message} />
             <Stack gap={4}>
-            <Input
-              value={newData.form.firstName.trim()}
-              tabIndex={1}
-              inputName="firstName"
-              inputLabel="First Name"
-              inputType="text"
-              placeholderValue="First Name"
-              onChange={handleFirstNameChange}
-              isInvalid={
-                newData.isSubmitTriggered && !newData.form.firstName.trim()
-              }
-            />
-            <Input
-              value={newData.form.lastName.trim()}
-              tabIndex={2}
-              inputName="lastName"
-              inputLabel="Last Name"
-              inputType="text"
-              placeholderValue="Last Name"
-              onChange={handleLastNameChange}
-              isInvalid={
-                newData.isSubmitTriggered && !newData.form.lastName.trim()
-              }
-            />
-            <Input
-              value={newData.form.phone.trim()}
-              tabIndex={3}
-              inputName="Phone"
-              inputLabel="Phone"
-              inputType="tel"
-              placeholderValue="Phone Number"
-              onChange={handlePhoneChange}
-              isInvalid={
-                newData.isSubmitTriggered && !newData.form.phone.trim()
-              }
-            />
-            <Input
-              value={newData.form.email.trim()}
-              tabIndex={4}
-              inputName="email"
-              inputLabel="Email"
-              inputType="text"
-              placeholderValue="Email"
-              onChange={handleEmailChange}
-              isInvalid={
-                newData.isSubmitTriggered && !newData.form.email.trim()
-              }
-            />
+              <Input
+                value={newData.form.firstName.trim()}
+                tabIndex={1}
+                inputName="firstName"
+                inputLabel="First Name"
+                inputType="text"
+                placeholderValue="First Name"
+                onChange={handleFirstNameChange}
+                isInvalid={
+                  newData.isSubmitTriggered && !newData.form.firstName.trim()
+                }
+              />
+              <Input
+                value={newData.form.lastName.trim()}
+                tabIndex={2}
+                inputName="lastName"
+                inputLabel="Last Name"
+                inputType="text"
+                placeholderValue="Last Name"
+                onChange={handleLastNameChange}
+                isInvalid={
+                  newData.isSubmitTriggered && !newData.form.lastName.trim()
+                }
+              />
+              <Input
+                value={newData.form.phone.trim()}
+                tabIndex={3}
+                inputName="Phone"
+                inputLabel="Phone"
+                inputType="tel"
+                placeholderValue="Phone Number"
+                onChange={handlePhoneChange}
+                isInvalid={
+                  newData.isSubmitTriggered && !newData.form.phone.trim()
+                }
+              />
+              <Input
+                value={newData.form.email.trim()}
+                tabIndex={4}
+                inputName="email"
+                inputLabel="Email"
+                inputType="text"
+                placeholderValue="Email"
+                onChange={handleEmailChange}
+                isInvalid={
+                  newData.isSubmitTriggered && !newData.form.email.trim()
+                }
+              />
 
-            <Input
-              value={newData.form.password.trim()}
-              tabIndex={5}
-              inputName="password"
-              inputLabel="Password"
-              inputType="password"
-              placeholderValue="Password"
-              onChange={handlePasswordChange}
-              isInvalid={
-                newData.isSubmitTriggered && !newData.form.password.trim()
-              }
-            />
+              <Input
+                value={newData.form.password.trim()}
+                tabIndex={5}
+                inputName="password"
+                inputLabel="Password"
+                inputType="password"
+                placeholderValue="Password"
+                onChange={handlePasswordChange}
+                isInvalid={
+                  newData.isSubmitTriggered && !newData.form.password.trim()
+                }
+              />
 
-            <Input
-              value={newData.form.confirmPassword.trim()}
-              tabIndex={3}
-              inputName="confirmPassword"
-              inputLabel="Confirm Password"
-              inputType="password"
-              placeholderValue="Confirm Password"
-              onChange={handleConfirmPasswordChange}
-              isInvalid={
-                (newData.isSubmitTriggered &&
-                  !newData.form.confirmPassword.trim()) ||
-                (newData.form.confirmPassword.trim() &&
-                  newData.form.password !== newData.form.confirmPassword)
-              }
-            />
+              <Input
+                value={newData.form.confirmPassword.trim()}
+                tabIndex={3}
+                inputName="confirmPassword"
+                inputLabel="Confirm Password"
+                inputType="password"
+                placeholderValue="Confirm Password"
+                onChange={handleConfirmPasswordChange}
+                isInvalid={
+                  (newData.isSubmitTriggered &&
+                    !newData.form.confirmPassword.trim()) ||
+                  (newData.form.confirmPassword.trim() &&
+                    newData.form.password !== newData.form.confirmPassword)
+                }
+              />
             </Stack>
           </Card.Body>
           <Card.Footer>

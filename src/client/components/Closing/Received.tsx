@@ -59,7 +59,11 @@ export const Received: NextPage<Props> = function ({
                     return (
                       <Table.Row key={i}>
                         <Table.Cell>{received.receivedFor}</Table.Cell>
-                        <Table.Cell textAlign="end" fontWeight="semibold" color="green.600">
+                        <Table.Cell
+                          textAlign="end"
+                          fontWeight="semibold"
+                          color="green.600"
+                        >
                           {received.amount}
                         </Table.Cell>
                         <Table.Cell textAlign="center">
@@ -107,7 +111,13 @@ export const Received: NextPage<Props> = function ({
             formFocus?.current?.focus();
           }}
         >
-          <SimpleGrid className="hide-in-print" columns={{ base: 2, md: 12 }} gap={3} p={2} alignItems="end">
+          <SimpleGrid
+            className="hide-in-print"
+            columns={{ base: 2, md: 12 }}
+            gap={3}
+            p={2}
+            alignItems="end"
+          >
             <GridItem colSpan={{ base: 2, md: 6 }}>
               <Input
                 tabIndex={4}
@@ -148,7 +158,12 @@ export const Received: NextPage<Props> = function ({
               />
             </GridItem>
             <GridItem colSpan={{ base: 1, md: 3 }}>
-              <Button id="receivedfor-submit" type="submit" colorPalette="brand" w="full">
+              <Button
+                id="receivedfor-submit"
+                type="submit"
+                colorPalette="brand"
+                w="full"
+              >
                 <Icon name="add" light />
                 Add
               </Button>

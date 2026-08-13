@@ -19,7 +19,7 @@ jest.mock('next/router', () => ({
   useRouter: jest.fn(),
 }));
 
-const mockUseRouter = (useRouter as unknown) as jest.Mock<typeof useRouter> &
+const mockUseRouter = useRouter as unknown as jest.Mock<typeof useRouter> &
   typeof useRouter;
 
 describe('Layout', () => {
@@ -58,8 +58,6 @@ describe('Layout', () => {
         </Layout>
       </ChakraProvider>,
     );
-    expect(container.querySelector('.content')?.textContent).toContain(
-      'Login',
-    );
+    expect(container.querySelector('.content')?.textContent).toContain('Login');
   });
 });

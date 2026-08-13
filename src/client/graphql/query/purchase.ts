@@ -23,7 +23,7 @@ export const purchase = `{
       createdAt
     }`;
 
-  export const purchaseMinimal = `{
+export const purchaseMinimal = `{
       _id
       createdAt
     }`;

@@ -27,11 +27,7 @@ export const IconAttribute = () => {
         Magnific
       </Link>{' '}
       from{' '}
-      <Link
-        href="https://www.flaticon.com/"
-        title="Flaticon"
-        color="brand.600"
-      >
+      <Link href="https://www.flaticon.com/" title="Flaticon" color="brand.600">
         www.flaticon.com
       </Link>
     </Text>

@@ -72,14 +72,27 @@ const Sales: NextPage<Props> = function ({
 
   const TotalSection = () => {
     return (
-      <Box ml={hideExtraFields ? 'auto' : undefined} textAlign={hideExtraFields ? 'right' : undefined}>
-        <Text fontSize="sm" color="fg.muted">{'Total'}</Text>
-        <Text color={getTotalProfit() > 0 ? 'green.600' : 'red.600'} fontWeight="medium">
+      <Box
+        ml={hideExtraFields ? 'auto' : undefined}
+        textAlign={hideExtraFields ? 'right' : undefined}
+      >
+        <Text fontSize="sm" color="fg.muted">
+          {'Total'}
+        </Text>
+        <Text
+          color={getTotalProfit() > 0 ? 'green.600' : 'red.600'}
+          fontWeight="medium"
+        >
           {total}
           {currency}
         </Text>
-        <Text fontSize="sm" color="fg.muted" mt={1}>{'Profile/Loss'}</Text>
-        <Text color={getTotalProfit() > 0 ? 'green.600' : 'red.600'} fontWeight="medium">
+        <Text fontSize="sm" color="fg.muted" mt={1}>
+          {'Profile/Loss'}
+        </Text>
+        <Text
+          color={getTotalProfit() > 0 ? 'green.600' : 'red.600'}
+          fontWeight="medium"
+        >
           {getTotalProfit() > 0 && '+'}
           {getTotalProfit()}
           {currency}
@@ -90,7 +103,13 @@ const Sales: NextPage<Props> = function ({
   return (
     <React.Fragment>
       <Box>
-        <Flex className="hide-in-print" align="flex-start" wrap="wrap" gap={4} mb={4}>
+        <Flex
+          className="hide-in-print"
+          align="flex-start"
+          wrap="wrap"
+          gap={4}
+          mb={4}
+        >
           <TotalSection />
           {!saleDateFrom && (
             <Box className="hide-in-print" ml="auto" minW="200px">

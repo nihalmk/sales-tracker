@@ -31,14 +31,18 @@ const navButtons: {
     icon: 'newPurchase',
     hideOnSmall: true,
   },
-  { key: NavItems.CLOSING, label: 'Closing', icon: 'closing', hideOnSmall: true },
+  {
+    key: NavItems.CLOSING,
+    label: 'Closing',
+    icon: 'closing',
+    hideOnSmall: true,
+  },
   { key: NavItems.REPORT, label: 'Report', icon: 'report', hideOnSmall: true },
 ];
 
 const Navigation: React.FC<{}> = ({}) => {
-  const { setSelectedMenu, enabledNavItems, selectedMenu } = useContext(
-    UserContext,
-  );
+  const { setSelectedMenu, enabledNavItems, selectedMenu } =
+    useContext(UserContext);
 
   const router = useRouter();
 
@@ -80,7 +84,9 @@ const Navigation: React.FC<{}> = ({}) => {
                 variant={isActive ? 'solid' : 'outline'}
                 disabled={!enabledNavItems[key]}
                 onClick={() => setSelectedMenu(key)}
-                display={hideOnSmall ? { base: 'none', md: 'inline-flex' } : undefined}
+                display={
+                  hideOnSmall ? { base: 'none', md: 'inline-flex' } : undefined
+                }
               >
                 <Icon name={icon} light={isActive} />
                 {label}

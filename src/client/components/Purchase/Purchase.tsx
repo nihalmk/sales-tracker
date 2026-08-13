@@ -100,10 +100,16 @@ const PurchaseCard: NextPage<Props> = function ({
                 <Table.Row>
                   <Table.ColumnHeader>#ID</Table.ColumnHeader>
                   <Table.ColumnHeader>Product</Table.ColumnHeader>
-                  <Table.ColumnHeader textAlign="end">Purchase Price</Table.ColumnHeader>
-                  <Table.ColumnHeader textAlign="end">Quantity</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">
+                    Purchase Price
+                  </Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">
+                    Quantity
+                  </Table.ColumnHeader>
                   <Table.ColumnHeader textAlign="end">Total</Table.ColumnHeader>
-                  <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">
+                    Action
+                  </Table.ColumnHeader>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
@@ -131,10 +137,18 @@ const PurchaseCard: NextPage<Props> = function ({
                         const item = purchase.item;
                         return (
                           <Table.Row key={i}>
-                            <Table.Cell color="fg.muted">{item.shortId}</Table.Cell>
-                            <Table.Cell fontWeight="medium">{item.name}</Table.Cell>
-                            <Table.Cell textAlign="end">{purchase.cost}</Table.Cell>
-                            <Table.Cell textAlign="end">{purchase.quantity}</Table.Cell>
+                            <Table.Cell color="fg.muted">
+                              {item.shortId}
+                            </Table.Cell>
+                            <Table.Cell fontWeight="medium">
+                              {item.name}
+                            </Table.Cell>
+                            <Table.Cell textAlign="end">
+                              {purchase.cost}
+                            </Table.Cell>
+                            <Table.Cell textAlign="end">
+                              {purchase.quantity}
+                            </Table.Cell>
                             <Table.Cell textAlign="end" fontWeight="semibold">
                               {purchase.total}
                             </Table.Cell>
@@ -145,7 +159,11 @@ const PurchaseCard: NextPage<Props> = function ({
                         );
                       },
                     )}
-                    <Table.Row bg="gray.50" borderTopWidth="2px" borderTopColor="gray.300">
+                    <Table.Row
+                      bg="gray.50"
+                      borderTopWidth="2px"
+                      borderTopColor="gray.300"
+                    >
                       <Table.Cell colSpan={4}>
                         <Text
                           fontWeight="bold"

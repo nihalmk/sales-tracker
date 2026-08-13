@@ -57,19 +57,17 @@ const startUp = async () => {
 
     const { accountsGraphQL } = setUpAccounts(mongooseConnection.connection);
 
-    const {
-      typeDefs: typeGraphqlTypeDefs,
-      resolvers: typeGraphqlResolvers,
-    } = await buildTypeDefsAndResolvers({
-      resolvers: [
-        __dirname + '/modules/**/*.resolver.ts',
-        __dirname + '/modules/**/*.resolver.js',
-      ],
-      emitSchemaFile: path.resolve(__dirname, '../schema.gql'),
-      validate: false,
-      authChecker,
-      // pubSub,
-    });
+    const { typeDefs: typeGraphqlTypeDefs, resolvers: typeGraphqlResolvers } =
+      await buildTypeDefsAndResolvers({
+        resolvers: [
+          __dirname + '/modules/**/*.resolver.ts',
+          __dirname + '/modules/**/*.resolver.js',
+        ],
+        emitSchemaFile: path.resolve(__dirname, '../schema.gql'),
+        validate: false,
+        authChecker,
+        // pubSub,
+      });
 
     const schema = makeExecutableSchema({
       typeDefs: mergeTypeDefs([accountsGraphQL.typeDefs, typeGraphqlTypeDefs]),
@@ -137,8 +135,8 @@ const startUp = async () => {
         process.platform == 'darwin'
           ? 'open'
           : process.platform == 'win32'
-          ? 'start'
-          : 'xdg-open';
+            ? 'start'
+            : 'xdg-open';
       require('child_process').exec(start + ' ' + url);
     }
     app.on('error', (error) => {

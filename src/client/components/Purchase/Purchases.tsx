@@ -69,9 +69,16 @@ const Purchases: NextPage<Props> = function ({
 
   const TotalSection = () => {
     return (
-      <Box ml={hideExtraFields ? 'auto' : undefined} textAlign={hideExtraFields ? 'right' : undefined}>
-        <Text fontSize="sm" color="fg.muted">{'Total'}</Text>
-        <Text color="red.600" fontWeight="medium">-{getTotal()}₹</Text>
+      <Box
+        ml={hideExtraFields ? 'auto' : undefined}
+        textAlign={hideExtraFields ? 'right' : undefined}
+      >
+        <Text fontSize="sm" color="fg.muted">
+          {'Total'}
+        </Text>
+        <Text color="red.600" fontWeight="medium">
+          -{getTotal()}₹
+        </Text>
       </Box>
     );
   };

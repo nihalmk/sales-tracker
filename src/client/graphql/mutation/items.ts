@@ -24,7 +24,13 @@ export const UPDATE_ITEM = gql`
     $stock: Float!
   ) {
     updateItem(
-      item: { _id: $_id, name: $name, category: $category, price: $price, stock: $stock }
+      item: {
+        _id: $_id
+        name: $name
+        category: $category
+        price: $price
+        stock: $stock
+      }
     ) {
       _id
     }

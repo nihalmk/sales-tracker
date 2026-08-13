@@ -6,7 +6,11 @@ export const brandSelectStyles = (isInvalid?: boolean) => ({
     ...base,
     minHeight: 40,
     borderRadius: 6,
-    borderColor: isInvalid ? '#e53e3e' : state.isFocused ? '#4f46e5' : '#cbd5e1',
+    borderColor: isInvalid
+      ? '#e53e3e'
+      : state.isFocused
+        ? '#4f46e5'
+        : '#cbd5e1',
     boxShadow: state.isFocused
       ? `0 0 0 1px ${isInvalid ? '#e53e3e' : '#4f46e5'}`
       : 'none',
@@ -28,8 +32,8 @@ export const brandSelectStyles = (isInvalid?: boolean) => ({
     backgroundColor: state.isSelected
       ? '#4f46e5'
       : state.isFocused
-      ? '#eef2ff'
-      : 'white',
+        ? '#eef2ff'
+        : 'white',
     color: state.isSelected ? 'white' : '#0f172a',
   }),
   multiValue: (base: any) => ({

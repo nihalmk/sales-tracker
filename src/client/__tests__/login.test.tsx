@@ -44,7 +44,7 @@ jest.mock('@apollo/client', () => {
   };
 });
 
-const mockLogin = (login as unknown) as jest.Mock<typeof login> & typeof login;
+const mockLogin = login as unknown as jest.Mock<typeof login> & typeof login;
 
 const renderLogin = () =>
   render(
@@ -92,9 +92,7 @@ describe('Login Page', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
     await waitFor(() =>
-      expect(
-        screen.getByText('Email/Password required'),
-      ).toBeInTheDocument(),
+      expect(screen.getByText('Email/Password required')).toBeInTheDocument(),
     );
     expect(mockLogin).not.toHaveBeenCalledWith('email@email.com', 'password');
   });

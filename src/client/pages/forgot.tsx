@@ -112,8 +112,8 @@ export const Forgot: NextPage<Props> = () => {
           <Card.Body>
             {notification && getNotification(notification)}
             <Text color="fg.muted" mb={4}>
-              Enter your email address to receive an email with password
-              reset instructions.
+              Enter your email address to receive an email with password reset
+              instructions.
             </Text>
 
             <Field.Root mb={4}>

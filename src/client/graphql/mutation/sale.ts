@@ -57,4 +57,3 @@ export const UPDATE_SALE = gql`
     }
   }
 `;
-

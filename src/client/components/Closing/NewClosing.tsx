@@ -42,9 +42,8 @@ interface Props {
 const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const { setSelectedMenu, setNavItems } = useContext(UserContext);
 
-  const [submitCreateClosing, { loading: createLoading }] = useMutation(
-    CREATE_CLOSING,
-  );
+  const [submitCreateClosing, { loading: createLoading }] =
+    useMutation(CREATE_CLOSING);
 
   const { data: previousClosing, loading: previousClosingLoading } = useQuery(
     GET_PREVIOUS_CLOSING,
@@ -186,7 +185,9 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   if (previousClosingLoading || closingsLoading) {
     return (
       <React.Fragment>
-        <Text textAlign="center" py={4} color="fg.muted">Getting closing data...</Text>
+        <Text textAlign="center" py={4} color="fg.muted">
+          Getting closing data...
+        </Text>
         <Loader />
       </React.Fragment>
     );
@@ -195,7 +196,9 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
     return (
       <React.Fragment>
         <Card.Root variant="outline">
-          <Text textAlign="center" py={4}>No closing found</Text>
+          <Text textAlign="center" py={4}>
+            No closing found
+          </Text>
         </Card.Root>
       </React.Fragment>
     );
@@ -260,8 +263,8 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               py={2}
               mb={3}
             >
-              * Add Total in hand on <strong>Received</strong> section for
-              first time closing
+              * Add Total in hand on <strong>Received</strong> section for first
+              time closing
             </Text>
           )}
           <HStack gap={2} mb={2}>
@@ -433,7 +436,12 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
         </Card.Body>
         <Card.Footer>
           <HStack w="full">
-            <Button asChild className="hide-in-print" variant="outline" colorPalette="red">
+            <Button
+              asChild
+              className="hide-in-print"
+              variant="outline"
+              colorPalette="red"
+            >
               <Link href="/dashboard">
                 <Icon name="cancel" />
                 Cancel

@@ -104,8 +104,12 @@ const config = defineConfig({
         },
       },
       fonts: {
-        heading: { value: `'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` },
-        body: { value: `'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif` },
+        heading: {
+          value: `'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`,
+        },
+        body: {
+          value: `'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`,
+        },
       },
       radii: {
         l1: { value: '0.375rem' },
@@ -117,12 +121,39 @@ const config = defineConfig({
       colors: {
         brand: {
           contrast: { value: { _light: 'white', _dark: 'white' } },
-          fg: { value: { _light: '{colors.brand.700}', _dark: '{colors.brand.300}' } },
-          subtle: { value: { _light: '{colors.brand.50}', _dark: '{colors.brand.950}' } },
-          muted: { value: { _light: '{colors.brand.100}', _dark: '{colors.brand.900}' } },
-          emphasized: { value: { _light: '{colors.brand.200}', _dark: '{colors.brand.800}' } },
-          solid: { value: { _light: '{colors.brand.600}', _dark: '{colors.brand.600}' } },
-          focusRing: { value: { _light: '{colors.brand.600}', _dark: '{colors.brand.600}' } },
+          fg: {
+            value: {
+              _light: '{colors.brand.700}',
+              _dark: '{colors.brand.300}',
+            },
+          },
+          subtle: {
+            value: { _light: '{colors.brand.50}', _dark: '{colors.brand.950}' },
+          },
+          muted: {
+            value: {
+              _light: '{colors.brand.100}',
+              _dark: '{colors.brand.900}',
+            },
+          },
+          emphasized: {
+            value: {
+              _light: '{colors.brand.200}',
+              _dark: '{colors.brand.800}',
+            },
+          },
+          solid: {
+            value: {
+              _light: '{colors.brand.600}',
+              _dark: '{colors.brand.600}',
+            },
+          },
+          focusRing: {
+            value: {
+              _light: '{colors.brand.600}',
+              _dark: '{colors.brand.600}',
+            },
+          },
         },
       },
     },

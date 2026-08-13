@@ -1,7 +1,12 @@
 import { getModelForClass, prop, Ref, pre } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
-import { StringField, NumberField, BooleanField, DateField } from '../../common/fields';
+import {
+  StringField,
+  NumberField,
+  BooleanField,
+  DateField,
+} from '../../common/fields';
 import { Shop } from '../shop/shop.model';
 import { Items } from '../items/items.model';
 import moment from 'moment-timezone';
@@ -30,10 +35,8 @@ export class SaleItem {
   total: number;
 }
 
-function between(min: number, max: number): number {  
-  return Math.floor(
-    Math.random() * (max - min + 1) + min
-  )
+function between(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 @pre<Sale>('save', async function () {
@@ -53,11 +56,11 @@ export class Sale {
   items: SaleItem[];
 
   @prop()
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   customer?: string;
 
   @prop()
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   contact?: string;
 
   @prop()

@@ -14,9 +14,8 @@ const Accounts: NextPage<Props> = () => {
         <Alert.Indicator />
         <Alert.Content>
           <Alert.Description>
-            Please send a mail to{' '}
-            <strong>shoptrackerforsales@gmail.com</strong> to receive details
-            regarding purchasing a paid account!
+            Please send a mail to <strong>shoptrackerforsales@gmail.com</strong>{' '}
+            to receive details regarding purchasing a paid account!
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>

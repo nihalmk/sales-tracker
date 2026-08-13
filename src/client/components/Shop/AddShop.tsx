@@ -14,7 +14,14 @@ import { Shop } from '../../generated/graphql';
 import UserContext from '../UserWrapper/UserContext';
 import { GET_SHOP_TYPE } from '../../graphql/query/shop';
 import CreatableSelect from '../common/SelectBoxes/CreatableSelect';
-import { Card, Heading, SimpleGrid, Stack, Button, HStack } from '@chakra-ui/react';
+import {
+  Card,
+  Heading,
+  SimpleGrid,
+  Stack,
+  Button,
+  HStack,
+} from '@chakra-ui/react';
 import Icon from '../common/Icon';
 
 interface Props {}

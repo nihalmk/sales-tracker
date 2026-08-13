@@ -33,7 +33,12 @@ interface Props extends Omit<ImageProps, 'src'> {
   light?: boolean;
 }
 
-export const Icon: React.FC<Props> = ({ name, light, boxSize = 4, ...rest }) => (
+export const Icon: React.FC<Props> = ({
+  name,
+  light,
+  boxSize = 4,
+  ...rest
+}) => (
   <Image
     src={ICONS[name]}
     alt=""

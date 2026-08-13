@@ -29,13 +29,8 @@ import { Box, Heading, Text, Button, Alert } from '@chakra-ui/react';
 interface Props {}
 
 const Home: NextPage<Props> = () => {
-  const {
-    user,
-    setNavItems,
-    setSelectedMenu,
-    selectedMenu,
-    isPaid,
-  } = useContext(UserContext);
+  const { user, setNavItems, setSelectedMenu, selectedMenu, isPaid } =
+    useContext(UserContext);
 
   const {
     data: previousClosing,
@@ -246,9 +241,9 @@ const Home: NextPage<Props> = () => {
                     <Alert.Description>
                       You are closed for the day and the closing details are
                       available on date:{' '}
-                      {moment(
-                        previousClosing?.getPreviousClosing?.date,
-                      ).format('DD/MM/YYYY')}{' '}
+                      {moment(previousClosing?.getPreviousClosing?.date).format(
+                        'DD/MM/YYYY',
+                      )}{' '}
                       on Report
                     </Alert.Description>
                   </Alert.Content>

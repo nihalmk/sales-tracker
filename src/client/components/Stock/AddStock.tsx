@@ -25,12 +25,10 @@ import Icon from '../common/Icon';
 interface Props {}
 
 const AddStock: NextPage<Props> = function () {
-  const [submitCreateItem, { loading: createLoading }] = useMutation(
-    CREATE_ITEM,
-  );
-  const [submitUpdateItem, { loading: updateLoading }] = useMutation(
-    UPDATE_ITEM,
-  );
+  const [submitCreateItem, { loading: createLoading }] =
+    useMutation(CREATE_ITEM);
+  const [submitUpdateItem, { loading: updateLoading }] =
+    useMutation(UPDATE_ITEM);
 
   const {
     loading: itemsLoading,
@@ -345,11 +343,17 @@ const AddStock: NextPage<Props> = function () {
               <Table.Row>
                 <Table.ColumnHeader>#ID</Table.ColumnHeader>
                 <Table.ColumnHeader>Product</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="end">Cost Price</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Cost Price
+                </Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">MRP</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="end">Sale Price</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Sale Price
+                </Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">Stock</Table.ColumnHeader>
-                <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">
+                  Action
+                </Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -508,13 +512,15 @@ const AddStock: NextPage<Props> = function () {
                         ) : (
                           <Text
                             as="span"
-                            fontWeight={isOutOfStock || isLowStock ? 'semibold' : 'normal'}
+                            fontWeight={
+                              isOutOfStock || isLowStock ? 'semibold' : 'normal'
+                            }
                             color={
                               isOutOfStock
                                 ? 'red.600'
                                 : isLowStock
-                                ? 'orange.500'
-                                : undefined
+                                  ? 'orange.500'
+                                  : undefined
                             }
                           >
                             {item.stock}
