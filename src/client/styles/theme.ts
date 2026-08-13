@@ -69,25 +69,41 @@ const tableSlotRecipe = defineSlotRecipe({
   },
 });
 
+const cardSlotRecipe = defineSlotRecipe({
+  slots: ['root', 'header', 'body', 'footer'],
+  base: {
+    root: {
+      boxShadow:
+        '0 12px 28px -8px {colors.gray.400}, 0 4px 10px -6px {colors.gray.300}',
+      transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+      _hover: {
+        boxShadow:
+          '0 18px 36px -10px {colors.gray.400}, 0 6px 14px -6px {colors.gray.300}',
+      },
+    },
+  },
+});
+
 const config = defineConfig({
   theme: {
     slotRecipes: {
       table: tableSlotRecipe,
+      card: cardSlotRecipe,
     },
     tokens: {
       colors: {
         brand: {
-          50: { value: '#eef2ff' },
-          100: { value: '#e0e7ff' },
-          200: { value: '#c7d2fe' },
-          300: { value: '#a5b4fc' },
-          400: { value: '#818cf8' },
-          500: { value: '#6366f1' },
-          600: { value: '#4f46e5' },
-          700: { value: '#4338ca' },
-          800: { value: '#3730a3' },
-          900: { value: '#312e81' },
-          950: { value: '#1e1b4b' },
+          50: { value: '#eff6ff' },
+          100: { value: '#dbeafe' },
+          200: { value: '#bfdbfe' },
+          300: { value: '#93c5fd' },
+          400: { value: '#60a5fa' },
+          500: { value: '#2563eb' },
+          600: { value: '#1d4ed8' },
+          700: { value: '#1e40af' },
+          800: { value: '#1e3a8a' },
+          900: { value: '#172554' },
+          950: { value: '#0f172a' },
         },
         gray: {
           50: { value: '#f8fafc' },
@@ -112,9 +128,9 @@ const config = defineConfig({
         },
       },
       radii: {
-        l1: { value: '0.375rem' },
-        l2: { value: '0.5rem' },
-        l3: { value: '0.75rem' },
+        l1: { value: '0.5rem' },
+        l2: { value: '0.75rem' },
+        l3: { value: '1.125rem' },
       },
     },
     semanticTokens: {
@@ -160,7 +176,7 @@ const config = defineConfig({
   },
   globalCss: {
     body: {
-      bg: 'gray.50',
+      bg: 'gray.200',
       color: 'gray.900',
     },
   },

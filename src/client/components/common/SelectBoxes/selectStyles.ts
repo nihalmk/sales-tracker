@@ -9,10 +9,10 @@ export const brandSelectStyles = (isInvalid?: boolean) => ({
     borderColor: isInvalid
       ? '#e53e3e'
       : state.isFocused
-        ? '#4f46e5'
+        ? '#1d4ed8'
         : '#cbd5e1',
     boxShadow: state.isFocused
-      ? `0 0 0 1px ${isInvalid ? '#e53e3e' : '#4f46e5'}`
+      ? `0 0 0 1px ${isInvalid ? '#e53e3e' : '#1d4ed8'}`
       : 'none',
     '&:hover': {
       borderColor: isInvalid ? '#e53e3e' : '#94a3b8',
@@ -30,16 +30,16 @@ export const brandSelectStyles = (isInvalid?: boolean) => ({
   option: (base: any, state: any) => ({
     ...base,
     backgroundColor: state.isSelected
-      ? '#4f46e5'
+      ? '#1d4ed8'
       : state.isFocused
-        ? '#eef2ff'
+        ? '#eff6ff'
         : 'white',
     color: state.isSelected ? 'white' : '#0f172a',
   }),
   multiValue: (base: any) => ({
     ...base,
-    backgroundColor: '#e0e7ff',
+    backgroundColor: '#dbeafe',
     borderRadius: 4,
   }),
-  multiValueLabel: (base: any) => ({ ...base, color: '#3730a3' }),
+  multiValueLabel: (base: any) => ({ ...base, color: '#1e3a8a' }),
 });
