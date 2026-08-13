@@ -200,8 +200,15 @@ function createApolloClient(
     : null;
   const wsLink = isBrowser ? new WebSocketLink(subscriptionClient) : null;
 
+  // In the browser, a relative URI resolves against whatever origin the app is
+  // served from, so it works unchanged across environments/custom domains.
+  // Server-side (SSR) has no origin to resolve against, so it needs an absolute
+  // URL; loop back to the same container's own port rather than requiring the
+  // public URL to be known at build time.
   const httpLink = new HttpLink({
-    uri: process.env.GRAPHQL_SERVER || 'http://localhost:3000/graphql',
+    uri:
+      process.env.GRAPHQL_SERVER ||
+      (isBrowser ? '/graphql' : `http://localhost:${process.env.PORT || 3000}/graphql`),
     credentials: 'include',
     fetch,
   });

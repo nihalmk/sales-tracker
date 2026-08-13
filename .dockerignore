@@ -4,3 +4,11 @@
 *Dockerfile*
 *docker-compose*
 node_modules
+.next
+dist
+.env
+.env.*
+!.env.example
+.gcp
+*.log
+coverage

@@ -49,9 +49,7 @@ export const Header: React.FC<Props> = ({ hide }) => {
       {
         value: 'Generate DB Backup',
         onClick: async () => {
-          const res = await fetch(
-            `${process.env.SERVER_URL || 'http://localhost:3000'}/dbbackup`,
-          );
+          const res = await fetch(`${process.env.SERVER_URL || ''}/dbbackup`);
           const message = await res.json();
           setMessage(
             message?.message || "DB Sync queued. Check 'dbbackup' folder",

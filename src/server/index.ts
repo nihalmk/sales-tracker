@@ -129,7 +129,10 @@ const startUp = async () => {
     logger.info(`🚀 Server listening on ${PORT}`);
     app.listen(PORT);
 
-    if (process.env.NODE_ENV !== 'development') {
+    // K_SERVICE is set automatically on Cloud Run; skip the local dev-convenience
+    // browser auto-open there since no `xdg-open`/browser exists in the container,
+    // and an unhandled async exec error would otherwise crash the process.
+    if (process.env.NODE_ENV !== 'development' && !process.env.K_SERVICE) {
       let url = `http://localhost:${PORT}`;
       let start =
         process.platform == 'darwin'

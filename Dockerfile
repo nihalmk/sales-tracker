@@ -1,17 +1,22 @@
-FROM node:12-alpine
-
+FROM node:22-slim AS builder
 WORKDIR /usr/src/app
 
-# Install app dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Now we copy the compiled javascript folder only (no typescript).
+COPY . .
+RUN npm run build
 
-COPY dist ./dist
-COPY .env .env
-COPY src/client/.next /src/client/.next
-COPY src/client/public ./src/client/public
+FROM node:22-slim AS runner
+WORKDIR /usr/src/app
+ENV NODE_ENV=production
 
-EXPOSE 3000
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/src/client/.next ./src/client/.next
+COPY --from=builder /usr/src/app/src/client/public ./src/client/public
+
+EXPOSE 8080
 CMD ["node", "dist/src/server/index.js"]

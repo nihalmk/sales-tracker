@@ -1,0 +1,41 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: my-project-1545399948664
+  REGION: us-central1
+  SERVICE: sales-tracker
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/336381824035/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-deployer@my-project-1545399948664.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --source . \
+            --project="$PROJECT_ID" \
+            --region="$REGION" \
+            --allow-unauthenticated \
+            --set-env-vars=NODE_ENV=production,MAILGUN_API_KEY=placeholder-replace-me,MAILGUN_DOMAIN=placeholder.example.com \
+            --set-secrets=MONGO_URI=mongo-uri:latest \
+            --memory=512Mi \
+            --min-instances=0 \
+            --max-instances=2

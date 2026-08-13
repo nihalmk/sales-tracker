@@ -9,9 +9,7 @@
     "start": "NODE_ENV=production node -r dotenv/config dist/src/server/index.js | pino-pretty -i hostname,pid,req,res,id,responseTime,startDate -t",
     "test": "jest --config ./jest.config.js",
     "types": "graphql-codegen --config codegen.yml",
-    "prepare": "husky",
-    "heroku-prebuild": "bash preinstall.sh",
-    "heroku-postbuild": "npm run build && bash postinstall.sh"
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=20.19.0"
