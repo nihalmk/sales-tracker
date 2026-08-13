@@ -86,7 +86,10 @@ const Sales: NextPage<Props> = function ({
 
   useEffect(() => {
     if (saleData?.getSalesForUser && callback) {
-      callback(sales.map((s) => s._id), totalAmount);
+      callback(
+        sales.map((s) => s._id),
+        totalAmount,
+      );
     }
   }, [saleData]);
 
@@ -203,12 +206,7 @@ const Sales: NextPage<Props> = function ({
               )
             )}
             {!saleDateFrom && totalCount > PAGE_SIZE && (
-              <HStack
-                className="hide-in-print"
-                justify="center"
-                gap={4}
-                mt={4}
-              >
+              <HStack className="hide-in-print" justify="center" gap={4} mt={4}>
                 <Button
                   size="sm"
                   variant="outline"

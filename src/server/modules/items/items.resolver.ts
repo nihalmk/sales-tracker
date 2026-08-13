@@ -1,11 +1,4 @@
-import {
-  Resolver,
-  Query,
-  Authorized,
-  Ctx,
-  Arg,
-  Mutation,
-} from 'type-graphql';
+import { Resolver, Query, Authorized, Ctx, Arg, Mutation } from 'type-graphql';
 import { CTX } from '../../interfaces/common';
 import { ItemsService } from './items.service';
 import { Items, PaginatedItems } from './items.model';

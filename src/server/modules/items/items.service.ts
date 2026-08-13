@@ -60,7 +60,9 @@ export class ItemsService {
         {
           $group: {
             _id: null,
-            totalStockAmount: { $sum: { $multiply: ['$price.cost', '$stock'] } },
+            totalStockAmount: {
+              $sum: { $multiply: ['$price.cost', '$stock'] },
+            },
           },
         },
       ]),

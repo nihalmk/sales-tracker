@@ -33,22 +33,17 @@ export default class SaleResolver {
 
   @Query((_returns) => Sale, { nullable: true })
   @Authorized()
-  async getLastSale(
-    @Ctx() ctx: CTX,
-  ): Promise<Sale | null> {
+  async getLastSale(@Ctx() ctx: CTX): Promise<Sale | null> {
     const saleService = new SaleService(ctx);
     return await saleService.getLastSale();
   }
 
   @Query((_returns) => [Sale], { nullable: true })
   @Authorized()
-  async getSaleWithoutClosing(
-    @Ctx() ctx: CTX,
-  ): Promise<Sale[]> {
+  async getSaleWithoutClosing(@Ctx() ctx: CTX): Promise<Sale[]> {
     const saleService = new SaleService(ctx);
     return await saleService.getSaleWithoutClosing();
   }
-
 
   @Query((_returns) => [Sale])
   @Authorized()

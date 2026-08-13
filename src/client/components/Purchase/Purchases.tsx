@@ -87,7 +87,10 @@ const Purchases: NextPage<Props> = function ({
 
   useEffect(() => {
     if (purchaseData?.getPurchasesForUser && callback) {
-      callback(purchases.map((s) => s._id), totalAmount);
+      callback(
+        purchases.map((s) => s._id),
+        totalAmount,
+      );
     }
   }, [purchaseData]);
 
@@ -177,12 +180,7 @@ const Purchases: NextPage<Props> = function ({
               )
             )}
             {!purchaseFromDate && totalCount > PAGE_SIZE && (
-              <HStack
-                className="hide-in-print"
-                justify="center"
-                gap={4}
-                mt={4}
-              >
+              <HStack className="hide-in-print" justify="center" gap={4} mt={4}>
                 <Button
                   size="sm"
                   variant="outline"

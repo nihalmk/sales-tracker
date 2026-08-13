@@ -19,16 +19,13 @@ export class Price {
   list: number;
 }
 
-function between(min: number, max: number): number {  
-  return Math.floor(
-    Math.random() * (max - min + 1) + min
-  )
+function between(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 @pre<Items>('save', async function () {
   this.shortId = between(1000, 9999).toString();
 })
-
 @ObjectType({ description: 'The Items model' })
 export class Items {
   @Field((_type) => ID)
@@ -43,7 +40,7 @@ export class Items {
   name: string;
 
   @prop()
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   category?: string;
 
   @prop({ type: Price, required: false })

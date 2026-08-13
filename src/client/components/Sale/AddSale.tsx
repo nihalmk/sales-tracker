@@ -103,7 +103,10 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     // A brand new name with no matching customer — leave contact/email as
     // the user already entered them.
     if (entity.isNew) {
-      setNewSale((currentState) => ({ ...currentState, customer: entity.name }));
+      setNewSale((currentState) => ({
+        ...currentState,
+        customer: entity.name,
+      }));
       return;
     }
     setNewSale((currentState) => ({

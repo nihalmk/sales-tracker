@@ -47,23 +47,17 @@ export default class PurchaseResolver {
 
   @Query((_returns) => Purchase, { nullable: true })
   @Authorized()
-  async getLastPurchase(
-    @Ctx() ctx: CTX,
-  ): Promise<Purchase | null> {
+  async getLastPurchase(@Ctx() ctx: CTX): Promise<Purchase | null> {
     const purchaseService = new PurchaseService(ctx);
     return await purchaseService.getLastPurchase();
   }
 
-
   @Query((_returns) => [Purchase], { nullable: true })
   @Authorized()
-  async getPurchaseWithoutClosing(
-    @Ctx() ctx: CTX,
-  ): Promise<Purchase[]> {
+  async getPurchaseWithoutClosing(@Ctx() ctx: CTX): Promise<Purchase[]> {
     const purchaseService = new PurchaseService(ctx);
     return await purchaseService.getPurchaseWithoutClosing();
   }
-
 
   @Query((_returns) => [Purchase])
   @Authorized()

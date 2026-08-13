@@ -94,9 +94,7 @@ const ContactSelect: React.FC<Props> = ({
     const isHighlighted = isMenu && selected?.value === option.value;
     return (
       <Box>
-        <Text color={isHighlighted ? 'white' : undefined}>
-          {option.label}
-        </Text>
+        <Text color={isHighlighted ? 'white' : undefined}>{option.label}</Text>
         {isMenu && (option.contact || option.email) && (
           <Text
             fontSize="xs"
