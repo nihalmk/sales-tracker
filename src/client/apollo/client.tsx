@@ -208,7 +208,9 @@ function createApolloClient(
   const httpLink = new HttpLink({
     uri:
       process.env.GRAPHQL_SERVER ||
-      (isBrowser ? '/graphql' : `http://localhost:${process.env.PORT || 3000}/graphql`),
+      (isBrowser
+        ? '/graphql'
+        : `http://localhost:${process.env.PORT || 3000}/graphql`),
     credentials: 'include',
     fetch,
   });

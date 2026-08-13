@@ -244,7 +244,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         </Card.Header>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
-        <Card.Body pb={0}>
+        <Card.Body pb={2}>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
             <Input
               tabIndex={1}

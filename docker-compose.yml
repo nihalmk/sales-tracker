@@ -1,11 +1,11 @@
 version: '3'
 services:
-  shop-tracker:
+  sales-tracker:
     build: .
-    image: shop-tracker
+    image: sales-tracker
     environment:
       GRAPHQL_SERVER: http://localhost:3000/graphql
-      MONGO_URI: mongodb://mongo:27017/shop-tracker
+      MONGO_URI: mongodb://mongo:27017/sales-tracker
       PORT: 3000
     ports:
       - '80:3000'
