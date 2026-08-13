@@ -1,0 +1,36 @@
+src/accounts/client.ts
+  s_5b771625359126::t_691753a89bb058 11-14,16
+src/client/styles/theme.ts
+  s_5b771625359126::t_7fa5e5398049bc 131-133
+  s_5b771625359126::t_9893cbac81b5ca 74-81
+  s_5b771625359126::t_979befc2e323ba 72-73,82-86,91,96-106
+  s_5b771625359126::t_7662dd61826244 179
+src/client/components/common/SelectBoxes/selectStyles.ts
+  s_5b771625359126::t_69305deeb545e2 33,35,41,44
+  s_5b771625359126::t_2ec4d8d306cbd0 12,15
+src/client/next-env.d.ts
+  s_5b771625359126::t_363d097109d76f 3-4
+src/schema.gql
+  s_5b771625359126::t_ca7637cb2db7c6 41,156,275,347,382,453
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "14a48129150b342e3098f68d89e0a017280e6899",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
