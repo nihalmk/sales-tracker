@@ -1,0 +1,37 @@
+package.json
+  s_5b771625359126::t_91d75fdc16ca16 12
+src/client/apollo/client.tsx
+  s_5b771625359126::t_53e4727c43a96c 203-207,209-211
+Dockerfile
+  s_5b771625359126::t_eb044cf6d6a6ce 15
+  s_5b771625359126::t_10983d4449789d 1,5-8,10-14,17-19,21
+.dockerignore
+  s_5b771625359126::t_f0445a5700ff96 6-14
+.github/workflows/deploy.yml
+  s_5b771625359126::t_90af8e077b395d 1-41
+src/client/components/Header/Header.tsx
+  s_5b771625359126::t_d991145a99ff40 52
+src/server/index.ts
+  s_5b771625359126::t_555f931c8afd41 132-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9908ae7a7b18b8ebe959c2ccf626a4f1465a5d89",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
