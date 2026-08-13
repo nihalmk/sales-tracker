@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from 'type-graphql';
-import { getModelForClass, prop, Ref, arrayProp } from '@typegoose/typegoose';
+import { getModelForClass, prop, Ref } from '@typegoose/typegoose';
 import { ObjectId } from 'mongodb';
 import { Shop } from '../shop/shop.model';
 import { StringField, DateField, BooleanField } from '../../common/fields';
@@ -35,7 +35,7 @@ export class User {
   }
 
   @Field((_type) => [Roles])
-  @arrayProp({ items: String, enum: Roles })
+  @prop({ type: () => [String], enum: Roles })
   public roles!: Roles[];
 
   @Field((_type) => Roles)

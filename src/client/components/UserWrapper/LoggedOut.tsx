@@ -3,6 +3,7 @@ import { Layout } from '../Layout/Layout';
 import { useRouter } from 'next/router';
 import { Pages } from '../../utils/pages';
 import { NextPage } from 'next';
+import { Box, Heading, Button } from '@chakra-ui/react';
 
 interface Props {
   error: boolean;
@@ -25,20 +26,17 @@ export const LoggedOut: NextPage<Props> = ({ error }) => {
 
   return (
     <Layout>
-      <div className="row">
-        <div className="col col-login mx-auto">
-          <h3>You are not logged in</h3>
-          <button
-            type="button"
-            onClick={onSubmit}
-            className={
-              'btn btn-primary btn-block ' + (isLoading && 'btn-loading')
-            }
-          >
-            Log in
-          </button>
-        </div>
-      </div>
+      <Box maxW="sm" mx="auto" textAlign="center" py={10}>
+        <Heading size="md" mb={4}>You are not logged in</Heading>
+        <Button
+          colorPalette="brand"
+          w="full"
+          loading={isLoading}
+          onClick={onSubmit}
+        >
+          Log in
+        </Button>
+      </Box>
     </Layout>
   );
 };

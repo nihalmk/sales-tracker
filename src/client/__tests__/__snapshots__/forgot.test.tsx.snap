@@ -1,61 +1,115 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Forgot password page renders as expected 1`] = `
-<div
-  className="col col-login mx-auto"
->
+<div>
   <div
-    className="text-center mb-6"
-  >
-    <Logo
-      setColor={true}
-    />
-  </div>
-  <div
-    className="card"
+    class="css-fonxus"
   >
     <div
-      className="card-body"
+      class="css-1bali29"
     >
       <div
-        className="card-title text-center"
+        class="css-ak7bfn"
       >
-        Forgot Password
-      </div>
-    </div>
-    <div
-      className="card-body p-6"
-    >
-      <p>
-        Enter your email address to receive an email with password reset instructions.
-      </p>
-      <div
-        className="form-group"
-      >
-        <label
-          className="form-label"
-        >
-          Email
-        </label>
-        <input
-          className="form-control"
-          id="email"
-          name="email"
-          onChange={[Function]}
-          placeholder="Enter email"
-          type="email"
+        <img
+          alt=""
+          class="chakra-image css-qhs958"
+          src="/static/STLogo.svg"
         />
       </div>
       <div
-        className="form-footer"
+        class="chakra-card__root css-dlseva"
       >
-        <button
-          className="btn btn-primary btn-block false"
-          onClick={[Function]}
-          type="button"
+        <div
+          class="chakra-card__header css-cjdazw"
         >
-          Send reset email
-        </button>
+          <div
+            class="css-1ajh4q7"
+          >
+            <img
+              alt=""
+              class="chakra-image css-1a0lg1p"
+              src="/static/icons/forgot-password.png"
+            />
+          </div>
+          <h2
+            class="chakra-heading css-1868jki"
+          >
+            Forgot Password
+          </h2>
+        </div>
+        <div
+          class="chakra-card__body css-11e8ur2"
+        >
+          <div
+            class="chakra-alert__root css-36nq0t"
+            id="notification"
+          >
+            <span
+              class="css-13gnd3a"
+            >
+              <svg
+                class="css-126y6n1"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM11 7H13V13H11V7Z"
+                />
+              </svg>
+            </span>
+            <div
+              class="chakra-alert__content css-xlayl9"
+            >
+              <div
+                class="chakra-alert__description css-t6kp1r"
+              >
+                Your password reset link is either invalid or expired. Create a new link below.
+              </div>
+            </div>
+          </div>
+          <p
+            class="css-1bh4ij0"
+          >
+            Enter your email address to receive an email with password reset instructions.
+          </p>
+          <div
+            class="chakra-field__root css-d8iglh"
+            data-part="root"
+            data-scope="field"
+            id="field::_r_0_"
+            role="group"
+          >
+            <label
+              class="chakra-field__label css-65zcwe"
+              data-part="label"
+              data-scope="field"
+              for="_r_0_"
+              id="field::_r_0_::label"
+            >
+              Email
+            </label>
+            <input
+              class="chakra-input css-1yh82um"
+              data-part="input"
+              data-scope="field"
+              id="email"
+              name="email"
+              placeholder="Enter email"
+              type="email"
+            />
+          </div>
+          <button
+            class="chakra-button css-136zalh"
+            type="button"
+          >
+            <img
+              alt=""
+              class="chakra-image css-8kheo1"
+              src="/static/icons/done-icon.png"
+            />
+            Send reset email
+          </button>
+        </div>
       </div>
     </div>
   </div>

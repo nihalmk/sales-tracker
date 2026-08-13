@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 export const GET_NETWORK_STATUS = gql`
   query {
@@ -7,20 +7,6 @@ export const GET_NETWORK_STATUS = gql`
       reconnected
       isPaid
     }
-  }
-`;
-
-export const UPDATE_NETWORK_STATUS = gql`
-  mutation updateNetworkStatus(
-    $isConnected: Boolean
-    $reconnected: Boolean
-    $isPaid: Boolean
-  ) {
-    updateNetworkStatus(
-      isConnected: $isConnected
-      reconnected: $reconnected
-      isPaid: $isPaid
-    ) @client
   }
 `;
 

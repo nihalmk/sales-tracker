@@ -1,8 +1,8 @@
 import { Emailer, EmailTemplates } from '../email.service';
-import Mailgun from 'mailgun-js';
+import Mailgun from 'mailgun.js';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-jest.mock('mailgun-js');
+jest.mock('mailgun.js');
 
 const emailContext = {
   from: 'hfc@honestfoodcompany.de',

@@ -3,6 +3,8 @@ import { NextPage } from 'next';
 import _ from 'lodash';
 import { ReceivedItemsInput } from '../../generated/graphql';
 import Input from '../common/Inputs/FormInput';
+import { Table, Button, SimpleGrid, GridItem, Text } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   receivedItemsList?: ReceivedItemsInput[];
@@ -31,57 +33,63 @@ export const Received: NextPage<Props> = function ({
   }, [receivedItemsList]);
   return (
     <React.Fragment>
-      <div className="table-responsive" id={id}>
-        <table className="table card-table table-hover table-outline">
-          <thead>
-            <tr>
-              <th>Received For</th>
-              <th className="w-25">Amount</th>
-              <th className="w-10">Action</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Table.ScrollArea id={id}>
+        <Table.Root variant="outline" size="sm" striped interactive>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>Received For</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="end">Amount</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
             {receivedItems.length === 0 && (
-              <tr>
-                <td className={'text-center'} colSpan={6}>
-                  {'No additional money received!'}
-                </td>
-              </tr>
+              <Table.Row>
+                <Table.Cell textAlign="center" py={6} colSpan={3}>
+                  <Text color="fg.muted" fontSize="sm">
+                    No money received yet
+                  </Text>
+                </Table.Cell>
+              </Table.Row>
             )}
             {receivedItems && receivedItems?.length !== 0 && (
               <React.Fragment>
                 {receivedItems?.map(
                   (received: ReceivedItemsInput, i: number) => {
                     return (
-                      <tr key={i}>
-                        <td>{received.receivedFor}</td>
-                        <td>{received.amount}</td>
-                        <td>
+                      <Table.Row key={i}>
+                        <Table.Cell>{received.receivedFor}</Table.Cell>
+                        <Table.Cell textAlign="end" fontWeight="semibold" color="green.600">
+                          {received.amount}
+                        </Table.Cell>
+                        <Table.Cell textAlign="center">
                           {!isView ? (
-                            <button
-                              type="button"
-                              className="btn btn-icon btn-secondary btn-sm"
+                            <Button
+                              size="xs"
+                              minW="16"
+                              variant="ghost"
+                              colorPalette="red"
                               onClick={() => {
                                 const tempReceivedItems = [...receivedItems];
                                 tempReceivedItems.splice(i, 1);
                                 setReceivedItems(tempReceivedItems);
                               }}
                             >
-                              <strong className="bigger">X</strong>
-                            </button>
+                              Remove
+                            </Button>
                           ) : (
-                            '-'
+                            <Text color="fg.muted">—</Text>
                           )}
-                        </td>
-                      </tr>
+                        </Table.Cell>
+                      </Table.Row>
                     );
                   },
                 )}
               </React.Fragment>
             )}
-          </tbody>
-        </table>
-      </div>
+          </Table.Body>
+        </Table.Root>
+      </Table.ScrollArea>
       {!isView && (
         <form
           onSubmit={(e) => {
@@ -99,8 +107,8 @@ export const Received: NextPage<Props> = function ({
             formFocus?.current?.focus();
           }}
         >
-          <div className="row pl-2 pr-2 hide-in-print">
-            <div className="col-md-6">
+          <SimpleGrid className="hide-in-print" columns={{ base: 2, md: 12 }} gap={3} p={2} alignItems="end">
+            <GridItem colSpan={{ base: 2, md: 6 }}>
               <Input
                 tabIndex={4}
                 inputName="Received For"
@@ -119,8 +127,8 @@ export const Received: NextPage<Props> = function ({
                 value={newReceivedItem?.receivedFor || ''}
                 innerRef={formFocus}
               />
-            </div>
-            <div className="col-md-3">
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 3 }}>
               <Input
                 tabIndex={5}
                 inputName="Amount"
@@ -138,28 +146,16 @@ export const Received: NextPage<Props> = function ({
                 isInvalid={submitted && !newReceivedItem?.amount}
                 value={newReceivedItem?.amount || ''}
               />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Add</label>
-              <button
-                id="receivedfor-submit"
-                type="submit"
-                className={'btn btn-primary ml-auto'}
-              >
-                + Add
-              </button>
-            </div>
-          </div>
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 3 }}>
+              <Button id="receivedfor-submit" type="submit" colorPalette="brand" w="full">
+                <Icon name="add" light />
+                Add
+              </Button>
+            </GridItem>
+          </SimpleGrid>
         </form>
       )}
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .w-25 {
-          width: 25%;
-        }
-      `}</style>
     </React.Fragment>
   );
 };

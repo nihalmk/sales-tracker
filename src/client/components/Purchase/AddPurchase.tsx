@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import {
   CREATE_PURCHASE,
   UPDATE_PURCHASE,
@@ -21,6 +21,17 @@ import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
+import {
+  Card,
+  Heading,
+  SimpleGrid,
+  GridItem,
+  Table,
+  Button,
+  HStack,
+  Text,
+} from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   billNumber?: string;
@@ -29,12 +40,10 @@ interface Props {
 const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   const productSelectRef = useRef<any>(null);
 
-  const [submitCreatePurchase, { loading: createLoading }] = useMutation(
-    CREATE_PURCHASE,
-  );
-  const [submitUpdatePurchase, { loading: updateLoading }] = useMutation(
-    UPDATE_PURCHASE,
-  );
+  const [submitCreatePurchase, { loading: createLoading }] =
+    useMutation(CREATE_PURCHASE);
+  const [submitUpdatePurchase, { loading: updateLoading }] =
+    useMutation(UPDATE_PURCHASE);
 
   const {
     loading: purchaseLoading,
@@ -77,7 +86,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
       _.compact(
         sortedItems.map((i) => {
           return {
-            label: `${i.shortId} | ${i.name} ${
+            label: `#${i.shortId} | ${i.name} ${
               i.stock > 0 ? `(${i.price.cost}₹)` : ''
             }`,
             value: i._id,
@@ -116,7 +125,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
       return;
     }
     const purchaseItems = _.cloneDeep(items).map((i) => {
-      const purchaseItem = (i as unknown) as PurchaseItemInput;
+      const purchaseItem = i as unknown as PurchaseItemInput;
       purchaseItem.item = i.item._id;
       return purchaseItem;
     });
@@ -157,7 +166,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
       return;
     }
     const purchaseItems = _.cloneDeep(items).map((i) => {
-      const purchaseItem = (i as unknown) as PurchaseItemInput;
+      const purchaseItem = i as unknown as PurchaseItemInput;
       purchaseItem.item = i.item._id;
       return purchaseItem;
     });
@@ -226,72 +235,68 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
 
   return (
     <React.Fragment>
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">{'New Purchase'}</div>
-          <div className="card-options"></div>
-        </div>
+      <Card.Root variant="elevated" borderRadius="l3" mb={5}>
+        <Card.Header>
+          <HStack gap={2}>
+            <Icon name="newPurchase" boxSize={5} />
+            <Heading size="md">New Purchase</Heading>
+          </HStack>
+        </Card.Header>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
-        <div className="card-body pb-0">
-          <div className="row">
-            <div className="col-md-4">
-              <Input
-                tabIndex={1}
-                inputName="Vendor"
-                inputLabel="Vendor"
-                inputType="text"
-                max={20}
-                placeholderValue="Vendor Name"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const vendor = e.target.value;
-                  setNewPurchase((currentState) => ({
-                    ...currentState,
-                    vendor,
-                  }));
-                }}
-                autoFocus={true}
-                value={newPurchase?.vendor || ''}
-              />
-            </div>
-            <div className="col-md-4">
-              <Input
-                tabIndex={2}
-                inputName="Contact"
-                inputLabel="Contact Number"
-                inputType="text"
-                max={20}
-                placeholderValue="Contact Number"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const contact = e.target.value;
-                  setNewPurchase((currentState) => ({
-                    ...currentState,
-                    contact,
-                  }));
-                }}
-                value={newPurchase?.contact || ''}
-              />
-            </div>
-            <div className="col-md-4">
-              <Input
-                tabIndex={3}
-                inputName="email"
-                inputLabel="Email"
-                inputType="text"
-                max={50}
-                placeholderValue="Email Id"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const email = e.target.value;
-                  setNewPurchase((currentState) => ({
-                    ...currentState,
-                    email,
-                  }));
-                }}
-                value={newPurchase?.email || ''}
-              />
-            </div>
-          </div>
-        </div>
+        <Card.Body pb={0}>
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+            <Input
+              tabIndex={1}
+              inputName="Vendor"
+              inputLabel="Vendor"
+              inputType="text"
+              max={20}
+              placeholderValue="Vendor Name"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const vendor = e.target.value;
+                setNewPurchase((currentState) => ({
+                  ...currentState,
+                  vendor,
+                }));
+              }}
+              autoFocus={true}
+              value={newPurchase?.vendor || ''}
+            />
+            <Input
+              tabIndex={2}
+              inputName="Contact"
+              inputLabel="Contact Number"
+              inputType="text"
+              max={20}
+              placeholderValue="Contact Number"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const contact = e.target.value;
+                setNewPurchase((currentState) => ({
+                  ...currentState,
+                  contact,
+                }));
+              }}
+              value={newPurchase?.contact || ''}
+            />
+            <Input
+              tabIndex={3}
+              inputName="email"
+              inputLabel="Email"
+              inputType="text"
+              max={50}
+              placeholderValue="Email Id"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const email = e.target.value;
+                setNewPurchase((currentState) => ({
+                  ...currentState,
+                  email,
+                }));
+              }}
+              value={newPurchase?.email || ''}
+            />
+          </SimpleGrid>
+        </Card.Body>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -320,9 +325,9 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
             productSelectRef?.current?.focus();
           }}
         >
-          <div className="card-body pt-0">
-            <div className="row">
-              <div className="col-md-4">
+          <Card.Body pt={0}>
+            <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
+              <GridItem colSpan={{ base: 2, md: 3 }}>
                 <SelectBox
                   tabIndex={4}
                   selectLabel="Product"
@@ -346,15 +351,14 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   }}
                   selectDefault={itemsSelection?.find(
                     (i) =>
-                      i.value ===
-                      ((newPurchaseItem?.item as unknown) as string),
+                      i.value === (newPurchaseItem?.item as unknown as string),
                   )}
                   isInvalid={!!(newItemSubmitted && !newItem)}
                   noOptionsMessage={'Not in Stock'}
                   innerRef={productSelectRef}
                 ></SelectBox>
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={5}
                   inputName="Purchase"
@@ -374,8 +378,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newPurchaseItem?.cost)}
                   value={newPurchaseItem?.cost || ''}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={6}
                   inputName="Sale"
@@ -394,8 +398,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newPurchaseItem?.sale)}
                   value={newPurchaseItem?.sale || ''}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={7}
                   inputName="quantity"
@@ -415,8 +419,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newPurchaseItem?.quantity)}
                   value={newPurchaseItem?.quantity || ''}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 1 }}>
                 <Input
                   tabIndex={8}
                   inputName="total"
@@ -435,60 +439,63 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newPurchaseItem?.total)}
                   value={newPurchaseItem?.total || ''}
                 />
-              </div>
-              <div className="col-md-2 ml-auto">
-                <button
+              </GridItem>
+              <GridItem colSpan={{ base: 2, md: 2 }}>
+                <Button
                   id="purchase-submit"
                   type="submit"
-                  className={
-                    'btn btn-primary ml-auto w-100 ' +
-                    (createLoading && 'btn-loading')
-                  }
+                  colorPalette="brand"
+                  w="full"
+                  loading={createLoading}
                 >
+                  <Icon name="add" light />
                   Add New Item
-                </button>
-              </div>
-            </div>
-            <div className="p1 mb-2 text-muted">
-              <i className="loss">
-                * For any change in cost price of item, add new a item from
-                Stock menu with new cost
-              </i>
-              <br />
-              <i className="loss">
-                * Changing Purchase price will create a new product with a new
-                ID
-              </i>
-            </div>
-          </div>
+                </Button>
+              </GridItem>
+            </SimpleGrid>
+            <Text fontSize="sm" color="red.600" mt={3}>
+              * For any change in cost price of item, add new a item from Stock
+              menu with new cost
+              <br />* Changing Purchase price will create a new product with a
+              new ID
+            </Text>
+          </Card.Body>
         </form>
 
-        <div className="table-responsive">
-          <table className="table card-table table-hover table-outline">
-            <thead>
-              <tr>
-                <th className="w-10">#ID</th>
-                <th className="w-25">Product</th>
-                <th>Purchase Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th className="w-14">Action</th>
-              </tr>
-            </thead>
-            <tbody>
+        <Table.ScrollArea>
+          <Table.Root variant="outline" size="sm" striped interactive>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader>#ID</Table.ColumnHeader>
+                <Table.ColumnHeader>Product</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Purchase Price
+                </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Quantity
+                </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">Total</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">
+                  Action
+                </Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {(billNumber && purchaseLoading) || createLoading ? (
-                <tr>
-                  <td className={'text-center'} colSpan={6}>
+                <Table.Row>
+                  <Table.Cell textAlign="center" py={8} colSpan={6}>
                     <Loader />
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               ) : (
                 purchaseItems?.length === 0 && (
-                  <tr>
-                    <td className={'text-center'} colSpan={6}>
-                      {'No Products added!'}
-                    </td>
-                  </tr>
+                  <Table.Row>
+                    <Table.Cell textAlign="center" py={8} colSpan={6}>
+                      <Text color="fg.muted" fontSize="sm">
+                        No products added yet
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
                 )
               )}
               {!createLoading &&
@@ -500,46 +507,23 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                         editPurchase?.item._id === purchase.item._id;
                       const item = purchase.item;
                       return (
-                        <tr key={i}>
-                          <td>{item.shortId}</td>
-                          <td className="w-25">{item.name}</td>
-                          <td
-                            className="w-14"
+                        <Table.Row key={i}>
+                          <Table.Cell color="fg.muted">
+                            {item.shortId}
+                          </Table.Cell>
+                          <Table.Cell fontWeight="medium">
+                            {item.name}
+                          </Table.Cell>
+                          <Table.Cell
+                            textAlign="end"
                             onSubmit={(e) => {
                               e.preventDefault();
                               onEdit(purchase, isEdit);
                             }}
                           >
-                            {
-                              // isEdit ? (
-                              //   <Input
-                              //     tabIndex={11}
-                              //     inputName="Purchase"
-                              //     inputType="number"
-                              //     max={10}
-                              //     placeholderValue="Purchase Price"
-                              //     onChange={(
-                              //       e: ChangeEvent<HTMLInputElement>,
-                              //     ) => {
-                              //       const cost = Number(e.target.value);
-                              //       setEditPurchase((currentState) => ({
-                              //         ...currentState,
-                              //         cost,
-                              //         total: currentState.quantity * cost,
-                              //       }));
-                              //     }}
-                              //     disabled={true || updateLoading}
-                              //     isInvalid={
-                              //       !!(updateSubmitted && !editPurchase?.cost)
-                              //     }
-                              //     value={editPurchase?.cost || ''}
-                              //   />
-                              // ) : (
-                              purchase.cost
-                              // )
-                            }
-                          </td>
-                          <td className="w-14">
+                            {purchase.cost}
+                          </Table.Cell>
+                          <Table.Cell textAlign="end">
                             {isEdit ? (
                               <Input
                                 tabIndex={12}
@@ -566,91 +550,86 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                             ) : (
                               purchase.quantity
                             )}
-                          </td>
-                          <td>{purchase.total}</td>
-                          <td className="w-14">
-                            <button
-                              onClick={() => onEdit(purchase, isEdit)}
-                              className={
-                                'btn mr-2 ' +
-                                (isEdit ? 'btn-success ' : 'btn-secondary ') +
-                                (isEdit && updateLoading ? 'btn-loading' : '')
-                              }
-                            >
-                              {isEdit ? 'Done' : 'Edit'}
-                            </button>
-
-                            <button
-                              className="btn btn-secondary"
-                              onClick={() => {
-                                isEdit
-                                  ? setEditPurchase(undefined)
-                                  : onPurchaseItemRemove(purchase.item._id);
-                              }}
-                            >
-                              X
-                            </button>
-                          </td>
-                        </tr>
+                          </Table.Cell>
+                          <Table.Cell textAlign="end" fontWeight="semibold">
+                            {purchase.total}
+                          </Table.Cell>
+                          <Table.Cell>
+                            <HStack gap={2} justify="center">
+                              <Button
+                                size="xs"
+                                minW="16"
+                                colorPalette={isEdit ? 'green' : 'gray'}
+                                variant={isEdit ? 'solid' : 'outline'}
+                                loading={isEdit && updateLoading}
+                                onClick={() => onEdit(purchase, isEdit)}
+                              >
+                                {isEdit ? 'Done' : 'Edit'}
+                              </Button>
+                              <Button
+                                size="xs"
+                                minW="16"
+                                variant="ghost"
+                                colorPalette={isEdit ? 'gray' : 'red'}
+                                onClick={() => {
+                                  isEdit
+                                    ? setEditPurchase(undefined)
+                                    : onPurchaseItemRemove(purchase.item._id);
+                                }}
+                              >
+                                {isEdit ? 'Cancel' : 'Remove'}
+                              </Button>
+                            </HStack>
+                          </Table.Cell>
+                        </Table.Row>
                       );
                     })}
-                    <tr>
-                      <td colSpan={4}>
-                        <strong>TOTAL</strong>
-                      </td>
-                      <td className="w-10">
-                        <strong>{newPurchase?.total}</strong>
-                      </td>
-                      <td className="w-14"></td>
-                    </tr>
+                    <Table.Row
+                      bg="gray.50"
+                      borderTopWidth="2px"
+                      borderTopColor="gray.300"
+                    >
+                      <Table.Cell colSpan={4}>
+                        <Text
+                          fontWeight="bold"
+                          fontSize="xs"
+                          textTransform="uppercase"
+                          letterSpacing="wider"
+                          color="gray.600"
+                        >
+                          Total
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell textAlign="end" fontWeight="bold">
+                        {newPurchase?.total}
+                      </Table.Cell>
+                      <Table.Cell></Table.Cell>
+                    </Table.Row>
                   </React.Fragment>
                 )}
-            </tbody>
-          </table>
-        </div>
-        <div className="card-footer">
-          <div className="d-flex">
-            <Link href="/dashboard">
-              <button type="button" className={'btn btn-outline-danger'}>
+            </Table.Body>
+          </Table.Root>
+        </Table.ScrollArea>
+        <Card.Footer>
+          <HStack w="full">
+            <Button asChild variant="outline" colorPalette="red">
+              <Link href="/dashboard">
+                <Icon name="cancel" />
                 Cancel
-              </button>
-            </Link>
-            <button
-              id="shop-submit"
-              type="submit"
-              className={
-                'btn btn-primary ml-auto ' + (createLoading && 'btn-loading')
-              }
+              </Link>
+            </Button>
+            <Button
+              colorPalette="brand"
+              ml="auto"
+              loading={createLoading}
               onClick={onNewPurchaseCreate}
             >
+              <Icon name="done" light />
               Submit
-            </button>
-          </div>
-        </div>
-      </div>
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .w-15 {
-          width: 15%;
-        }
-        .link {
-          color: blue !important;
-          cursor: pointer;
-        }
-        .link:hover {
-          border-bottom: 1px solid blue;
-        }
-      `}</style>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-      `}</style>
+            </Button>
+          </HStack>
+        </Card.Footer>
+      </Card.Root>
     </React.Fragment>
   );
 };

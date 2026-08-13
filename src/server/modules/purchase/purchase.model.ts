@@ -3,7 +3,6 @@ import {
   prop,
   Ref,
   pre,
-  arrayProp,
 } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
@@ -60,7 +59,7 @@ export class Purchase {
   @Field(StringField)
   billNumber: string;
 
-  @arrayProp({ items: PurchaseItem, index: true })
+  @prop({ type: () => [PurchaseItem], index: true })
   @Field((_type) => [PurchaseItem])
   items: PurchaseItem[];
 

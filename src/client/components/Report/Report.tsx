@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import moment from 'moment-timezone';
 import DatePicker from '../common/DatePicker/DatePicker';
 import NewClosing from '../Closing/NewClosing';
+import { Flex, Box, Button } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 const Report: React.FC<{}> = ({}) => {
   const [startDate, setStartDate] = useState(moment());
@@ -13,8 +15,8 @@ const Report: React.FC<{}> = ({}) => {
   });
   return (
     <React.Fragment>
-      <div className="row">
-        <div className="col-md-4  ml-auto">
+      <Flex gap={4} mb={5} align="flex-end" wrap="wrap">
+        <Box flex="1" minW="200px">
           <DatePicker
             inputLabel="Select Start Date"
             maxDate={new Date()}
@@ -23,8 +25,8 @@ const Report: React.FC<{}> = ({}) => {
               setStartDate(moment(selectedDate));
             }}
           ></DatePicker>
-        </div>
-        <div className="col-md-4">
+        </Box>
+        <Box flex="1" minW="200px">
           <DatePicker
             inputLabel="Select End Date"
             maxDate={new Date()}
@@ -33,10 +35,9 @@ const Report: React.FC<{}> = ({}) => {
               setEndDate(moment(selectedDate));
             }}
           ></DatePicker>
-        </div>
-        <button
-          type="button"
-          className="btn btn-primary btn-adjust"
+        </Box>
+        <Button
+          colorPalette="brand"
           onClick={() => {
             setSubmittedDate({
               startDate,
@@ -44,20 +45,15 @@ const Report: React.FC<{}> = ({}) => {
             });
           }}
         >
-          <strong>Search</strong>
-        </button>
-      </div>
+          <Icon name="search" light />
+          Search
+        </Button>
+      </Flex>
       <NewClosing
         startDate={submittedDate.startDate.toDate()}
         endDate={submittedDate.endDate.toDate()}
         isView={true}
       />
-      <style jsx>{`
-        .btn-adjust {
-          height: 37px;
-          margin-top: 29px;
-        }
-      `}</style>
     </React.Fragment>
   );
 };

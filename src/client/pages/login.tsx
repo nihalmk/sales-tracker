@@ -8,9 +8,23 @@ import Loader from '../components/Loaders/Loader';
 import ErrorMessage from '../components/Errors/ErrorMessage';
 import { Logo } from '../components/Header/Logo';
 import { GET_USER } from '../graphql/query/user';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import Link from 'next/link';
 import { IconAttribute } from '../components/IconAttribute';
+import {
+  Box,
+  Flex,
+  Grid,
+  Card,
+  Heading,
+  Text,
+  Field,
+  Input,
+  Button,
+  Image,
+  Avatar,
+} from '@chakra-ui/react';
+import Icon from '../components/common/Icon';
 
 interface Props {}
 
@@ -60,129 +74,139 @@ export const Login: NextPage<Props> = function () {
     return <Loader />;
   }
   return (
-    <div className="container">
+    <Box minH="100vh" bg="gray.50">
       <Head>
         <title>Login</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="text-center mb-6">
-        <Logo setColor />
-      </div>
-      <div className="row">
-        <div className="col-md-8">
-          <div className="card">
-            <div className="card-body p-6">
-              <div className="card-title text-center pb-7">
-                <img src="/static/STName2.png" className={'ml-2'} alt="" />
-              </div>
-              <div className="card card-aside">
-                <a
-                  href="#"
-                  className="card-aside-column"
-                  style={{
-                    backgroundImage: 'url(/static/STLogo.svg)',
-                  }}
-                ></a>
-                <div className="card-body d-flex flex-column">
-                  <h4>
-                    <a href="#">Sales tracking made easy</a>
-                  </h4>
-                  <div className="text-muted">
+      <Flex minH="100vh" align="center" justify="center" p={{ base: 4, md: 8 }}>
+        <Grid
+          w="full"
+          maxW="5xl"
+          templateColumns={{ base: '1fr', md: '3fr 2fr' }}
+          gap={6}
+        >
+          <Card.Root
+            display={{ base: 'none', md: 'block' }}
+            variant="elevated"
+            borderRadius="l3"
+          >
+            <Card.Body p={10}>
+              <Flex justify="center" mb={8}>
+                <Image src="/static/STName2.png" alt="Sales Tracker" />
+              </Flex>
+              <Flex gap={4} mb={6}>
+                <Image
+                  src="/static/STLogo.svg"
+                  alt=""
+                  boxSize="16"
+                  bg="brand.50"
+                  borderRadius="l2"
+                  p={3}
+                />
+                <Box>
+                  <Heading size="md" mb={2}>
+                    Sales tracking made easy
+                  </Heading>
+                  <Text color="fg.muted">
                     Add your total stock, sales and purchases. Also track
-                    current and previous sales. Track your profit on each sale.
-                    Track your closing sales and tally the cash!
-                  </div>
-                  <div className="d-flex align-items-center pt-5 mt-auto">
-                    <div className="avatar avatar-md mr-3"></div>
-                    <div>
-                      <a href="#" className="text-default">
-                        Shop Tracker
-                      </a>
-                      <small className="d-block text-muted">
-                        Contact: shoptrackerforsales@gmail.com
-                      </small>
-                    </div>
-                    <div className="ml-auto text-muted">
-                      <a
-                        href="javascript:void(0)"
-                        className="icon d-none d-md-inline-block ml-3"
-                      >
-                        <i className="fe fe-heart mr-1"></i>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <small className="alert alert-info mt-3">
-                let us know your feedback on{' '}
-                <strong>shoptrackerforsales@gmail.com</strong>
-              </small>
-            </div>
-          </div>
-        </div>
-        <div className="col col-login ml-auto">
-          <form className="card" action="" method="post" onSubmit={onSubmit}>
-            <div className="card-body p-6">
-              <div className="card-title text-center">Sign in to your Shop</div>
-            </div>
-            <div className="card-body p-6">
-              <ErrorMessage error={error}></ErrorMessage>
-              <div className="form-group">
-                <label className="form-label">Email address</label>
-                <input
-                  name="email"
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  placeholder="Enter email"
-                  onChange={onEmailChange}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">
-                  Password
-                  {/* <a className="float-right small" href="/forgot">
-                    I forgot my password
-                  </a> */}
-                </label>
-                <input
-                  name="password"
-                  type="password"
-                  className="form-control"
-                  id="userPassword"
-                  placeholder="Password"
-                  onChange={onPasswordChange}
-                />
-              </div>
-              <Link href="/forgot">Forgot Password?</Link>
-              <div className="form-footer">
-                <button
-                  type="button"
-                  onClick={onSubmit}
-                  className={
-                    'btn btn-primary btn-block ' + (isLoading && 'btn-loading')
-                  }
-                >
-                  Log in
-                </button>
-                <Link href={Pages.REGISTER}>
-                  <button
-                    className={'btn btn-success btn-block mt-2'}
-                    type="button"
-                  >
-                    Sign Up
-                  </button>
-                </Link>
-                <button type="submit" hidden></button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-      <IconAttribute />
+                    current and previous sales. Track your profit on each
+                    sale. Track your closing sales and tally the cash!
+                  </Text>
+                </Box>
+              </Flex>
+              <Flex align="center" gap={3} pt={4} borderTop="1px solid" borderColor="border.muted">
+                <Avatar.Root>
+                  <Avatar.Fallback name="Shop Tracker" />
+                </Avatar.Root>
+                <Box>
+                  <Text fontWeight="semibold">Shop Tracker</Text>
+                  <Text fontSize="sm" color="fg.muted">
+                    Contact: shoptrackerforsales@gmail.com
+                  </Text>
+                </Box>
+              </Flex>
+              <Text fontSize="sm" color="brand.700" bg="brand.50" borderRadius="l2" p={3} mt={6}>
+                Let us know your feedback on{' '}
+                <Text as="span" fontWeight="semibold">
+                  shoptrackerforsales@gmail.com
+                </Text>
+              </Text>
+            </Card.Body>
+          </Card.Root>
 
-      <style jsx>{``}</style>
-    </div>
+          <Card.Root variant="elevated" borderRadius="l3">
+            <Card.Header pt={8} pb={4} textAlign="center">
+              <Flex justify="center" mb={4}>
+                <Logo setColor />
+              </Flex>
+              <Heading size="lg">Sign in to your Shop</Heading>
+            </Card.Header>
+            <Card.Body>
+              <ErrorMessage error={error}></ErrorMessage>
+              <form onSubmit={onSubmit}>
+                <Field.Root mb={4}>
+                  {/* @ts-expect-error Chakra v3's Ark UI-derived FieldLabelProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+                  <Field.Label>Email address</Field.Label>
+                  <Input
+                    name="email"
+                    type="email"
+                    id="email"
+                    placeholder="Enter email"
+                    onChange={onEmailChange}
+                    bg="white"
+                  />
+                </Field.Root>
+                <Field.Root mb={2}>
+                  {/* @ts-expect-error Chakra v3's Ark UI-derived FieldLabelProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+                  <Field.Label>Password</Field.Label>
+                  <Input
+                    name="password"
+                    type="password"
+                    id="userPassword"
+                    placeholder="Password"
+                    onChange={onPasswordChange}
+                    bg="white"
+                  />
+                </Field.Root>
+                <Link href="/forgot">
+                  <Text as="span" fontSize="sm" color="brand.600">
+                    Forgot Password?
+                  </Text>
+                </Link>
+                <Box mt={6}>
+                  <Button
+                    type="button"
+                    onClick={onSubmit}
+                    colorPalette="brand"
+                    w="full"
+                    loading={isLoading}
+                  >
+                    <Icon name="login" light />
+                    Log in
+                  </Button>
+                  <Link href={Pages.REGISTER} style={{ display: 'block' }}>
+                    <Button
+                      type="button"
+                      colorPalette="green"
+                      w="full"
+                      mt={3}
+                    >
+                      <Icon name="register" light />
+                      Sign Up
+                    </Button>
+                  </Link>
+                  <button type="submit" hidden></button>
+                </Box>
+              </form>
+            </Card.Body>
+          </Card.Root>
+        </Grid>
+      </Flex>
+      <Box px={{ base: 3, md: 6 }} pb={4}>
+        <IconAttribute />
+      </Box>
+    </Box>
   );
 };
 

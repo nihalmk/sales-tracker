@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDatePicker from 'react-datepicker';
+import { Field, Input, Box } from '@chakra-ui/react';
+
 interface Props {
   selected: Date;
   onChange: any;
@@ -9,17 +11,14 @@ interface Props {
 }
 
 const DatePicker: React.FunctionComponent<any> = (props: Props) => (
-  <div>
-    <div className="form-group label-margin">
-      {props.inputLabel ? (
-        <label className="form-label">{props.inputLabel}</label>
-      ) : (
-        ''
+  <Box>
+    <Field.Root>
+      {props.inputLabel && (
+        // @ts-expect-error Chakra v3's Ark UI-derived FieldLabelProps doesn't model `children` in its polymorphic types, though it renders them fine.
+        <Field.Label>{props.inputLabel}</Field.Label>
       )}
-
-      <div>
+      <Box w="full">
         <ReactDatePicker
-          className={'form-control form-control-no-padding'}
           selected={props.selected}
           onChange={props.onChange}
           peekNextMonth
@@ -29,35 +28,20 @@ const DatePicker: React.FunctionComponent<any> = (props: Props) => (
           dateFormat="dd.MM.yyyy"
           minDate={props.minDate}
           maxDate={props.maxDate}
+          customInput={<Input bg="white" />}
         />
-      </div>
-    </div>
+      </Box>
+    </Field.Root>
     <style jsx global>{`
-      .form-control.form-control-no-padding {
-        padding: 0.555em;
-        border-radius: 5px;
-      }
       .react-datepicker__input-container,
       .react-datepicker-wrapper {
         width: 100%;
-      }
-      .form-control:focus {
-        box-shadow: none;
-      }
-      .is-invalid {
-        border-color: #cd201f;
-      }
-      .label-margin {
-        marging-bottom: 4px;
-      }
-      .date-text {
-        padding-top: 3px;
       }
       .react-datepicker-popper {
         z-index: 9999 !important;
       }
     `}</style>
-  </div>
+  </Box>
 );
 
 export default DatePicker;

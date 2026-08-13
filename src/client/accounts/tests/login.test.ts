@@ -46,8 +46,8 @@ describe('Accounts Login', () => {
 
   it('should test for logout', async () => {
     await logout();
-    expect(mockLogout).toBeCalled();
-    expect(mockCookieRemove).toBeCalled();
+    expect(mockLogout).toHaveBeenCalled();
+    expect(mockCookieRemove).toHaveBeenCalled();
   });
 
   it('should validate token and refresh', async () => {
@@ -56,7 +56,7 @@ describe('Accounts Login', () => {
     });
     mockCookieGet.mockReturnValueOnce('accessToken2');
     await validateToken();
-    expect(mockCookieSet).toBeCalled();
+    expect(mockCookieSet).toHaveBeenCalled();
   });
 
   it('should validate token and not set if it is same token', async () => {
@@ -65,7 +65,7 @@ describe('Accounts Login', () => {
     });
     mockCookieGet.mockReturnValueOnce('accessToken2');
     await validateToken();
-    expect(mockCookieSet).not.toBeCalled();
+    expect(mockCookieSet).not.toHaveBeenCalled();
   });
 
   it('should logout if validate token does not return token', async () => {
@@ -74,16 +74,16 @@ describe('Accounts Login', () => {
     });
     mockCookieGet.mockReturnValueOnce('accessToken2');
     await validateToken();
-    expect(mockCookieRemove).toBeCalled();
-    expect(mockCookieGet).not.toBeCalled();
+    expect(mockCookieRemove).toHaveBeenCalled();
+    expect(mockCookieGet).not.toHaveBeenCalled();
   });
 
   it('should throw error is something went wrong', async () => {
     mockRefreshSession.mockRejectedValueOnce('Unable to refresh token');
     mockCookieGet.mockReturnValueOnce('accessToken2');
     await validateToken();
-    expect(mockCookieRemove).not.toBeCalled();
-    expect(mockCookieGet).not.toBeCalled();
-    expect(mockCookieSet).not.toBeCalled();
+    expect(mockCookieRemove).not.toHaveBeenCalled();
+    expect(mockCookieGet).not.toHaveBeenCalled();
+    expect(mockCookieSet).not.toHaveBeenCalled();
   });
 });

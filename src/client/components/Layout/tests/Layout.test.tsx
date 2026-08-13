@@ -1,7 +1,10 @@
-import 'jsdom-global/register';
+/**
+ * @jest-environment jsdom
+ */
+import { render } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../../../styles/theme';
 import { Layout } from '../Layout';
-import { mount } from 'enzyme';
-import { Page } from 'tabler-react';
 import { useRouter } from 'next/router';
 
 jest.mock('../../Header/Header', () => {
@@ -11,7 +14,10 @@ jest.mock('../../Header/Header', () => {
   };
 });
 
-jest.mock('next/router');
+jest.mock('next/router', () => ({
+  __esModule: true,
+  useRouter: jest.fn(),
+}));
 
 const mockUseRouter = (useRouter as unknown) as jest.Mock<typeof useRouter> &
   typeof useRouter;
@@ -26,13 +32,16 @@ describe('Layout', () => {
     });
   });
   it('Should check for component Content inside layout', () => {
-    const wrapper = mount(
-      <Layout hideHeader={false}>
-        <div>Content</div>
-      </Layout>,
+    const { container } = render(
+      <ChakraProvider value={system}>
+        <Layout hideHeader={false}>
+          <div>Content</div>
+        </Layout>
+      </ChakraProvider>,
     );
-    const Content = wrapper.find(Page.Content).first();
-    expect(Content.html()).toContain('Content');
+    expect(container.querySelector('.content')?.textContent).toContain(
+      'Content',
+    );
   });
 
   it('Should check for component Login inside layout', () => {
@@ -42,12 +51,15 @@ describe('Layout', () => {
         pathname: '/login',
       };
     });
-    const wrapper = mount(
-      <Layout hideHeader={false}>
-        <div>Login</div>
-      </Layout>,
+    const { container } = render(
+      <ChakraProvider value={system}>
+        <Layout hideHeader={false}>
+          <div>Login</div>
+        </Layout>
+      </ChakraProvider>,
     );
-    const Content = wrapper.find(Page.Content).first();
-    expect(Content.html()).toContain('Login');
+    expect(container.querySelector('.content')?.textContent).toContain(
+      'Login',
+    );
   });
 });

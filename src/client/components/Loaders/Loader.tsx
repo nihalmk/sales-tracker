@@ -1,16 +1,17 @@
 import React from 'react';
+import { Center, VStack, Spinner, Text } from '@chakra-ui/react';
 import { Logo } from '../Header/Logo';
 
 const Loader = () => (
-  <React.Fragment>
-    <div className={'dimmer active p-5'}>
-      <div className="loader">
-        <Logo setColor />
-      </div>
-      <div className="dimmer-content">Loading...</div>
-    </div>
-    <style jsx global>{``}</style>
-  </React.Fragment>
+  <Center minH="40vh" py={12}>
+    <VStack gap={4}>
+      <Logo setColor />
+      <Spinner size="lg" color="brand.600" />
+      <Text color="fg.muted" fontSize="sm">
+        Loading...
+      </Text>
+    </VStack>
+  </Center>
 );
 
 export default Loader;

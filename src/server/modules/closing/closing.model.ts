@@ -3,7 +3,6 @@ import {
   prop,
   Ref,
   pre,
-  arrayProp,
 } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
@@ -67,11 +66,11 @@ export class Closing {
   @Field((_type) => [Sale])
   sales: Ref<Sale>[];
 
-  @arrayProp({ items: SpentItems, index: true })
+  @prop({ type: () => [SpentItems], index: true })
   @Field((_type) => [SpentItems])
   spentItems: SpentItems[];
 
-  @arrayProp({ items: ReceivedItems, index: true })
+  @prop({ type: () => [ReceivedItems], index: true })
   @Field((_type) => [ReceivedItems])
   receivedItems: ReceivedItems[];
 

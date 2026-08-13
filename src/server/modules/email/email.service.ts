@@ -1,5 +1,5 @@
 import { Templates, CustomEmailTemplateType } from '../common/templates';
-import Mailgun from 'mailgun-js';
+import Mailgun from 'mailgun.js';
 import { User } from '../user/user.model';
 
 export interface MailContext {
@@ -34,29 +34,26 @@ export class Emailer {
       throw new Error(`'MAILGUN_DOMAIN' required for mailgun`);
     }
     if (!mailgun) {
-      mailgun = Mailgun({
-        apiKey: process.env.MAILGUN_API_KEY,
-        domain: process.env.MAILGUN_DOMAIN,
+      mailgun = new Mailgun(FormData).client({
+        username: 'api',
+        key: process.env.MAILGUN_API_KEY,
       });
     }
   }
 
   async sendEmail(mailContext: MailContext): Promise<void> {
-    var data = {
+    const data = {
       from: mailContext.from,
       to: mailContext.to,
       subject: mailContext.subject,
       text: mailContext.text,
       html: mailContext.html,
     };
-    return new Promise(function (resolve, reject) {
-      mailgun.messages().send(data, function (error: any, body: any) {
-        if (error) {
-          reject(`Unable to send mail: ${error.message}`);
-        }
-        resolve(body);
-      });
-    });
+    try {
+      await mailgun.messages.create(process.env.MAILGUN_DOMAIN, data);
+    } catch (error) {
+      throw new Error(`Unable to send mail: ${error.message}`);
+    }
   }
 }
 

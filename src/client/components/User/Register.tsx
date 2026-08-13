@@ -3,11 +3,13 @@ import _ from 'lodash';
 import Input from '../common/Inputs/FormInput';
 import Link from 'next/link';
 import { Pages } from '../../utils/pages';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/client';
 import { CREATE_NEW_USER } from '../../graphql/mutation/user';
 import ErrorMessage from '../Errors/ErrorMessage';
 import { useRouter } from 'next/router';
 import SuccessMessage from '../Alerts/SuccessMessage';
+import { Box, Card, Heading, Button, HStack, Stack } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 const Register: React.FC<{}> = () => {
   const router = useRouter();
@@ -151,15 +153,19 @@ const Register: React.FC<{}> = () => {
   };
 
   return (
-    <React.Fragment>
-      <div className={'card col col-login mx-auto'}>
+    <Box maxW="md" mx="auto">
+      <Card.Root variant="elevated" borderRadius="l3">
         <form onSubmit={onSubmit}>
-          <div className="card-header">
-            <h3 className="card-title h3-top">{'Register'}</h3>
-          </div>
-          <ErrorMessage error={error} />
-          <SuccessMessage message={message} />
-          <div className={'card-body'}>
+          <Card.Header>
+            <HStack gap={2}>
+              <Icon name="register" boxSize={6} />
+              <Heading size="lg">Register</Heading>
+            </HStack>
+          </Card.Header>
+          <Card.Body>
+            <ErrorMessage error={error} />
+            <SuccessMessage message={message} />
+            <Stack gap={4}>
             <Input
               value={newData.form.firstName.trim()}
               tabIndex={1}
@@ -237,65 +243,34 @@ const Register: React.FC<{}> = () => {
                   newData.form.password !== newData.form.confirmPassword)
               }
             />
-          </div>
-          <div className="card-footer text-right">
-            <div className="d-flex">
-              <Link href={Pages.INDEX}>
-                <a
-                  className={
-                    'btn btn-outline-danger ' + (mutationLoading && 'disabled')
-                  }
-                >
-                  {'Cancel'}
-                </a>
-              </Link>
-              <button
-                type="submit"
-                className={
-                  'btn btn-primary ml-auto ' +
-                  (mutationLoading && 'btn-loading')
-                }
+            </Stack>
+          </Card.Body>
+          <Card.Footer>
+            <HStack ml="auto" gap={3}>
+              <Button
+                asChild
+                variant="outline"
+                colorPalette="red"
                 disabled={mutationLoading}
               >
-                {'Register'}
-              </button>
-            </div>
-          </div>
+                <Link href={Pages.INDEX}>
+                  <Icon name="cancel" />
+                  Cancel
+                </Link>
+              </Button>
+              <Button
+                type="submit"
+                colorPalette="brand"
+                loading={mutationLoading}
+              >
+                <Icon name="register" light />
+                Register
+              </Button>
+            </HStack>
+          </Card.Footer>
         </form>
-      </div>
-      <style jsx global>{`
-        .col-lg-4-custom {
-          flex: none;
-          max-width: 50%;
-        }
-        .basic-single.form-control.form-control-without-padding {
-          padding: 0.05em !important;
-        }
-        .select__control {
-          border: 0;
-        }
-        .custom-select__control {
-          border: 0 !important;
-          width: auto !important;
-        }
-        .custom-select__indicator-separator {
-          display: none;
-        }
-        .hide {
-          display: none;
-        }
-        @media (max-width: 576px) {
-          .hide-col-1 {
-            display: none;
-          }
-        }
-        @media (max-width: 476px) {
-          .hide-col-2 {
-            display: none;
-          }
-        }
-      `}</style>
-    </React.Fragment>
+      </Card.Root>
+    </Box>
   );
 };
 

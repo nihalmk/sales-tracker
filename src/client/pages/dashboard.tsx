@@ -12,7 +12,7 @@ import Purchases from '../components/Purchase/Purchases';
 import AddPurchase from '../components/Purchase/AddPurchase';
 import NewClosing from '../components/Closing/NewClosing';
 import { GET_PREVIOUS_CLOSING } from '../graphql/query/closing';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_LAST_SALE } from '../graphql/query/sale';
 import { GET_LAST_PURCHASE } from '../graphql/query/purchase';
 import moment from 'moment-timezone';
@@ -24,6 +24,7 @@ import { Pages } from '../utils/pages';
 import OverLay from '../components/OverLay';
 import ConfirmationDialog from '../components/Alerts/ConfirmationDialog';
 import { useRouter } from 'next/router';
+import { Box, Heading, Text, Button, Alert } from '@chakra-ui/react';
 
 interface Props {}
 
@@ -189,7 +190,7 @@ const Home: NextPage<Props> = () => {
       case 'report':
         return <Report />;
       default:
-        return <div className="text-center">Not Available</div>;
+        return <Text textAlign="center">Not Available</Text>;
     }
   };
   const isLoading =
@@ -197,96 +198,105 @@ const Home: NextPage<Props> = () => {
 
   return (
     <Layout hideHeader={false}>
-      <div className="container">
-        <div className="d-none show-in-print">
-          <h3>{user?.shop.name}</h3>
-          <h4>
-            {user?.shop.address?.street} {user?.shop.address?.pincode}
-          </h4>
-          <h4>{user?.shop.type}</h4>
-          <h5>{user?.phone}</h5>
-        </div>
-        {user?.shop ? (
-          isLoading ? (
-            <React.Fragment>
-              <div className="text-center p-5">
-                Please wait while we load your shop details..
-              </div>
-              <Loader />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <Navigation />
-              {!isPaid && (
-                <Link href={Pages.ACCOUNTS}>
-                  <small className="btn btn-warning w-100 mt-3">
-                    Your trial period for 7 days has expired. Please purchase a
-                    paid account to proceed further with the sales.
-                    <br />
-                    You will no longer be able to see or add any sales or
-                    purchase data
-                  </small>
-                </Link>
-              )}
-              {isPaid &&
-                previousClosing?.getPreviousClosing !== null &&
-                moment(previousClosing?.getPreviousClosing?.date).isSame(
-                  moment(),
-                  'day',
-                ) && (
-                  <small className="btn btn-outline-danger w-100 mt-3">
-                    * You are closed for the day and the closing details are
-                    available on date:{' '}
-                    {moment(previousClosing?.getPreviousClosing?.date).format(
-                      'DD/MM/YYYY',
-                    )}{' '}
-                    on Report
-                  </small>
-                )}
-              {needsClosing && (
-                <small className="btn btn-outline-danger w-100 mt-3">
-                  * You need to close your Sales/Purchase for date{' '}
-                  <strong>
-                    {`(${moment(
-                      lastSale?.getLastSale?.createdAt ||
-                        lastPurchase?.getLastPurchase?.createdAt,
-                    ).format('DD/MM/YYYY')})`}
-                  </strong>{' '}
-                  before adding new Sales
-                </small>
-              )}
-              <div className="mt-5">{component()}</div>
-            </React.Fragment>
-          )
+      <Box display="none" className="show-in-print">
+        <Heading size="md">{user?.shop.name}</Heading>
+        <Text fontSize="lg">
+          {user?.shop.address?.street} {user?.shop.address?.pincode}
+        </Text>
+        <Text fontSize="lg">{user?.shop.type}</Text>
+        <Text>{user?.phone}</Text>
+      </Box>
+      {user?.shop ? (
+        isLoading ? (
+          <React.Fragment>
+            <Text textAlign="center" py={5} color="fg.muted">
+              Please wait while we load your shop details..
+            </Text>
+            <Loader />
+          </React.Fragment>
         ) : (
-          <div className="p-5">
-            <ErrorMessage
-              error={`You don't have any shop assigned to you. Please contact your admin and get assigned to a Shop`}
-            />
-            <Link href={Pages.INDEX}>
-              <button className="btn btn-primary">Create your own shop</button>
-            </Link>
-          </div>
-        )}
-        <OverLay show={expiredPopup !== 'cancelled' && !isPaid}>
-          <ConfirmationDialog
-            headerMessage={'Trial Expired!'}
-            success={(success) => {
-              if (success) {
-                router.push(Pages.ACCOUNTS);
-              } else {
-                setExpiredPopup('cancelled');
-              }
-            }}
-            message="Your trial period for 7 days has expired. Please purchase a paid account to proceed further with the sales"
+          <React.Fragment>
+            <Navigation />
+            {!isPaid && (
+              <Button
+                asChild
+                colorPalette="orange"
+                w="full"
+                mt={3}
+                h="auto"
+                py={3}
+                whiteSpace="normal"
+              >
+                <Link href={Pages.ACCOUNTS}>
+                  Your trial period for 7 days has expired. Please purchase a
+                  paid account to proceed further with the sales. You will no
+                  longer be able to see or add any sales or purchase data
+                </Link>
+              </Button>
+            )}
+            {isPaid &&
+              previousClosing?.getPreviousClosing !== null &&
+              moment(previousClosing?.getPreviousClosing?.date).isSame(
+                moment(),
+                'day',
+              ) && (
+                <Alert.Root status="warning" borderRadius="l2" mt={3}>
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Description>
+                      You are closed for the day and the closing details are
+                      available on date:{' '}
+                      {moment(
+                        previousClosing?.getPreviousClosing?.date,
+                      ).format('DD/MM/YYYY')}{' '}
+                      on Report
+                    </Alert.Description>
+                  </Alert.Content>
+                </Alert.Root>
+              )}
+            {needsClosing && (
+              <Alert.Root status="error" borderRadius="l2" mt={3}>
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Description>
+                    You need to close your Sales/Purchase for date{' '}
+                    <Text as="span" fontWeight="bold">
+                      {`(${moment(
+                        lastSale?.getLastSale?.createdAt ||
+                          lastPurchase?.getLastPurchase?.createdAt,
+                      ).format('DD/MM/YYYY')})`}
+                    </Text>{' '}
+                    before adding new Sales
+                  </Alert.Description>
+                </Alert.Content>
+              </Alert.Root>
+            )}
+            <Box mt={5}>{component()}</Box>
+          </React.Fragment>
+        )
+      ) : (
+        <Box py={5}>
+          <ErrorMessage
+            error={`You don't have any shop assigned to you. Please contact your admin and get assigned to a Shop`}
           />
-        </OverLay>
-        <style jsx global>{`
-          .page-content {
-            margin-top: 0;
-          }
-        `}</style>
-      </div>
+          <Button asChild colorPalette="brand" mt={3}>
+            <Link href={Pages.INDEX}>Create your own shop</Link>
+          </Button>
+        </Box>
+      )}
+      <OverLay show={expiredPopup !== 'cancelled' && !isPaid}>
+        <ConfirmationDialog
+          headerMessage={'Trial Expired!'}
+          success={(success) => {
+            if (success) {
+              router.push(Pages.ACCOUNTS);
+            } else {
+              setExpiredPopup('cancelled');
+            }
+          }}
+          message="Your trial period for 7 days has expired. Please purchase a paid account to proceed further with the sales"
+        />
+      </OverLay>
     </Layout>
   );
 };

@@ -1,4 +1,4 @@
-import { getModelForClass, prop, arrayProp, Ref } from '@typegoose/typegoose';
+import { getModelForClass, prop, Ref } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
 import { StringField } from '../../common/fields';
@@ -45,7 +45,7 @@ export class Shop {
   @Field(StringField)
   name: string;
 
-  @prop({ enum: String })
+  @prop()
   @Field(() => String)
   type: string;
 
@@ -57,7 +57,7 @@ export class Shop {
   @Field(() => Address, { nullable: true })
   address?: Address;
 
-  @arrayProp({ items: Branches, required: false })
+  @prop({ type: () => [Branches], required: false })
   @Field(() => [Branches], { nullable: true })
   branches?: Branches[];
 }

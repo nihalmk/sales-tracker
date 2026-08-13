@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_PURCHASE_BY_BILL_NUMBER } from '../../graphql/query/purchase';
-import _ from 'lodash';
 import { Purchase, PurchaseItem } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import { currency } from '../../utils/helpers';
+import {
+  Card,
+  SimpleGrid,
+  Table,
+  Button,
+  HStack,
+  Text,
+  IconButton,
+} from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   billNumber?: string;
@@ -32,7 +41,6 @@ const PurchaseCard: NextPage<Props> = function ({
     },
   );
 
-  // const [searchTerm, setSearchTerm] = useState('');
   const [purchase, setPurchase] = useState<Purchase>();
 
   useEffect(() => {
@@ -44,70 +52,76 @@ const PurchaseCard: NextPage<Props> = function ({
   }, [purchase]);
 
   return (
-    <React.Fragment>
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">
+    <Card.Root variant="outline" mb={4}>
+      <Card.Header>
+        <HStack justify="space-between" wrap="wrap">
+          <Text fontWeight="semibold">
             #{billNumber || purchase?.billNumber} |{' '}
             {moment(purchase?.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
-          </div>
-          <div className="card-options">
-            <strong className="loss mr-4">
+          </Text>
+          <HStack gap={3}>
+            <Text fontWeight="bold" color="red.600">
               {purchase?.total}
               {currency}
-            </strong>
-            <button
-              type="button"
-              className="btn btn-icon btn-secondary btn-sm"
+            </Text>
+            <IconButton
+              size="sm"
+              variant="outline"
+              colorPalette="gray"
+              aria-label={view ? 'Collapse' : 'Expand'}
               onClick={() => {
                 setView(!view);
               }}
             >
-              <strong className="bigger">{view ? '-' : '+'}</strong>
-            </button>
-          </div>
-        </div>
-        <div className={!view ? 'd-none' : ''}>
-          <div className="card-body">
-            <div className="row">
-              <div className="col-md-4">
+              {view ? '-' : '+'}
+            </IconButton>
+          </HStack>
+        </HStack>
+      </Card.Header>
+      {view && (
+        <React.Fragment>
+          <Card.Body>
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+              <Text>
                 <strong>Vendor: </strong> {purchase?.vendor}
-              </div>
-              <div className="col-md-4">
+              </Text>
+              <Text>
                 <strong>Contact: </strong> {purchase?.contact}
-              </div>
-              <div className="col-md-4">
+              </Text>
+              <Text>
                 <strong>Email: </strong> {purchase?.email}
-              </div>
-            </div>
-          </div>
+              </Text>
+            </SimpleGrid>
+          </Card.Body>
 
-          <div className="table-responsive">
-            <table className="table card-table table-hover table-outline">
-              <thead>
-                <tr>
-                  <th className="w-10">#ID</th>
-                  <th className="w-25">Product</th>
-                  <th>Purchase Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
-                  <th className="w-14">Action</th>
-                </tr>
-              </thead>
-              <tbody>
+          <Table.ScrollArea>
+            <Table.Root variant="outline" size="sm" striped interactive>
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeader>#ID</Table.ColumnHeader>
+                  <Table.ColumnHeader>Product</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Purchase Price</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Quantity</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Total</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {billNumber && purchaseLoading ? (
-                  <tr>
-                    <td className={'text-center'} colSpan={6}>
+                  <Table.Row>
+                    <Table.Cell textAlign="center" py={8} colSpan={6}>
                       <Loader />
-                    </td>
-                  </tr>
+                    </Table.Cell>
+                  </Table.Row>
                 ) : (
                   purchase?.items.length === 0 && (
-                    <tr>
-                      <td className={'text-center'} colSpan={6}>
-                        {'No Products added!'}
-                      </td>
-                    </tr>
+                    <Table.Row>
+                      <Table.Cell textAlign="center" py={8} colSpan={6}>
+                        <Text color="fg.muted" fontSize="sm">
+                          No products added
+                        </Text>
+                      </Table.Cell>
+                    </Table.Row>
                   )
                 )}
                 {!purchaseLoading && purchase?.items?.length !== 0 && (
@@ -116,70 +130,59 @@ const PurchaseCard: NextPage<Props> = function ({
                       (purchase: PurchaseItem, i: number) => {
                         const item = purchase.item;
                         return (
-                          <tr key={i}>
-                            <td>{item.shortId}</td>
-                            <td className="w-25">{item.name}</td>
-                            <td className="w-14">{purchase.cost}</td>
-                            <td className="w-14">{purchase.quantity}</td>
-                            <td>{purchase.total}</td>
-                            <td className="w-14">XXXX</td>
-                          </tr>
+                          <Table.Row key={i}>
+                            <Table.Cell color="fg.muted">{item.shortId}</Table.Cell>
+                            <Table.Cell fontWeight="medium">{item.name}</Table.Cell>
+                            <Table.Cell textAlign="end">{purchase.cost}</Table.Cell>
+                            <Table.Cell textAlign="end">{purchase.quantity}</Table.Cell>
+                            <Table.Cell textAlign="end" fontWeight="semibold">
+                              {purchase.total}
+                            </Table.Cell>
+                            <Table.Cell textAlign="center" color="fg.muted">
+                              —
+                            </Table.Cell>
+                          </Table.Row>
                         );
                       },
                     )}
-                    <tr>
-                      <td colSpan={4}>
-                        <strong>TOTAL</strong>
-                      </td>
-                      <td className="w-10">
-                        <strong>{purchase?.total}</strong>
-                      </td>
-                      <td className="w-14"></td>
-                    </tr>
+                    <Table.Row bg="gray.50" borderTopWidth="2px" borderTopColor="gray.300">
+                      <Table.Cell colSpan={4}>
+                        <Text
+                          fontWeight="bold"
+                          fontSize="xs"
+                          textTransform="uppercase"
+                          letterSpacing="wider"
+                          color="gray.600"
+                        >
+                          Total
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell textAlign="end" fontWeight="bold">
+                        {purchase?.total}
+                      </Table.Cell>
+                      <Table.Cell></Table.Cell>
+                    </Table.Row>
                   </React.Fragment>
                 )}
-              </tbody>
-            </table>
-          </div>
-          <div className="card-footer">
-            <div className="d-flex">
-              <button
-                id="shop-submit"
-                type="submit"
-                className={'btn btn-primary ml-auto hide-in-print'}
+              </Table.Body>
+            </Table.Root>
+          </Table.ScrollArea>
+          <Card.Footer>
+            <HStack w="full">
+              <Button
+                className="hide-in-print"
+                colorPalette="brand"
+                ml="auto"
                 disabled={true}
-                // onClick={onPurchaseEdit}
               >
+                <Icon name="edit" light />
                 Edit
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .w-15 {
-          width: 15%;
-        }
-        .link {
-          color: blue !important;
-          cursor: pointer;
-        }
-        .link:hover {
-          border-bottom: 1px solid blue;
-        }
-      `}</style>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-      `}</style>
-    </React.Fragment>
+              </Button>
+            </HStack>
+          </Card.Footer>
+        </React.Fragment>
+      )}
+    </Card.Root>
   );
 };
 

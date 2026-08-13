@@ -1,4 +1,4 @@
-import IORedis from 'ioredis';
+import { RedisOptions } from 'ioredis';
 // import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { logger } from '../../../common/logger';
 
@@ -9,12 +9,12 @@ const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
 
 logger.info(`Setting up redis for Graphql subscriptions...`);
 
-export const options: IORedis.RedisOptions = {
+export const options: RedisOptions = {
   path: REDIS_URL,
   host: REDIS_HOST,
   port: REDIS_PORT,
   password: REDIS_PASSWORD,
-  retryStrategy: (times) => Math.max(times * 100, 3000),
+  retryStrategy: (times: number) => Math.max(times * 100, 3000),
   keepAlive: 5000,
 };
 

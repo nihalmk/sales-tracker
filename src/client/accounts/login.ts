@@ -39,8 +39,7 @@ export const validateToken = async (): Promise<void> => {
   } catch (e) {
     // log the error.
     clientLogger.error(
-      'Error while refreshing session. Error - ',
-      JSON.stringify(e),
+      `Error while refreshing session. Error - ${JSON.stringify(e)}`,
     );
   }
 };

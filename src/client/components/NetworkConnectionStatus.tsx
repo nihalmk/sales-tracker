@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_NETWORK_STATUS, NetworkStatus } from '../graphql/query/network';
+import { Box, Heading } from '@chakra-ui/react';
 
 interface Props {}
 const NetworkConnectionStatus: React.FC<Props> = () => {
@@ -22,43 +23,26 @@ const NetworkConnectionStatus: React.FC<Props> = () => {
     };
   }, [networkStatus]);
   return (
-    <React.Fragment>
-      {
-        <div
-          className={`card position-bottom bg-${
-            status ? 'online' : 'offline'
-          } ${online && 'd-none'}`}
-        >
-          <div className="card-body text-center text-white">
-            <h4>
-              {status
-                ? 'Connected!'
-                : 'Unable to connect servers. Please check your internet connection!'}
-            </h4>
-          </div>
-        </div>
-      }
-      <style jsx global>{`
-        .d-none {
-          transition: 5s ease-out;
-        }
-        .text-white {
-          color: white;
-        }
-        .bg-offline {
-          background: #ff0100;
-        }
-        .bg-online {
-          background: #5fbb00;
-        }
-        .position-bottom {
-          position: absolute;
-          width: 35%;
-          bottom: 0;
-          z-index: 99999;
-        }
-      `}</style>
-    </React.Fragment>
+    <Box
+      display={online ? 'none' : 'block'}
+      position="fixed"
+      bottom={0}
+      left={0}
+      w={{ base: 'full', md: '35%' }}
+      zIndex="toast"
+      bg={status ? 'green.500' : 'red.500'}
+      color="white"
+      textAlign="center"
+      py={3}
+      px={4}
+      transition="opacity 5s ease-out"
+    >
+      <Heading size="sm">
+        {status
+          ? 'Connected!'
+          : 'Unable to connect servers. Please check your internet connection!'}
+      </Heading>
+    </Box>
   );
 };
 

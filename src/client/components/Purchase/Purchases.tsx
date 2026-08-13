@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_PURCHASES } from '../../graphql/query/purchase';
 import _ from 'lodash';
 import { Purchase } from '../../generated/graphql';
@@ -8,6 +8,7 @@ import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import PurchaseCard from './Purchase';
 import DatePicker from '../common/DatePicker/DatePicker';
+import { Box, Card, Flex, Text } from '@chakra-ui/react';
 
 interface Props {
   billNumber?: string;
@@ -68,19 +69,19 @@ const Purchases: NextPage<Props> = function ({
 
   const TotalSection = () => {
     return (
-      <div className={`col-md-2  ${hideExtraFields && 'ml-auto text-right'}`}>
-        <label className="form-label   ml-auto">{'Total'}</label>{' '}
-        <div className={'loss'}>-{getTotal()}₹</div>
-      </div>
+      <Box ml={hideExtraFields ? 'auto' : undefined} textAlign={hideExtraFields ? 'right' : undefined}>
+        <Text fontSize="sm" color="fg.muted">{'Total'}</Text>
+        <Text color="red.600" fontWeight="medium">-{getTotal()}₹</Text>
+      </Box>
     );
   };
   return (
     <React.Fragment>
-      <div className="">
-        <div className="row">
+      <Box>
+        <Flex align="flex-start" wrap="wrap" gap={4} mb={4}>
           <TotalSection />
           {!purchaseFromDate && (
-            <div className="col-md-4  ml-auto">
+            <Box ml="auto" minW="200px">
               <DatePicker
                 inputLabel="Select Date"
                 maxDate={new Date()}
@@ -89,9 +90,9 @@ const Purchases: NextPage<Props> = function ({
                   setDate(moment(selectedDate));
                 }}
               ></DatePicker>
-            </div>
+            </Box>
           )}
-        </div>
+        </Flex>
         {!hideExtraFields && (
           <React.Fragment>
             {purchaseLoading ? (
@@ -109,21 +110,15 @@ const Purchases: NextPage<Props> = function ({
                   );
                 })) || (
                 <React.Fragment>
-                  <div className="card text-center p-5">No purchases found</div>
+                  <Card.Root variant="outline" textAlign="center" py={10}>
+                    <Text color="fg.muted">No purchases found</Text>
+                  </Card.Root>
                 </React.Fragment>
               )
             )}
           </React.Fragment>
         )}
-      </div>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-      `}</style>
+      </Box>
     </React.Fragment>
   );
 };

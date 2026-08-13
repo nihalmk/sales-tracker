@@ -1,11 +1,19 @@
+/**
+ * @jest-environment jsdom
+ */
+import { render } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../../../styles/theme';
 import Loader from '../Loader';
-import { shallow } from 'enzyme';
-import { Logo } from '../../Header/Logo';
 
 describe('Loader', () => {
   it('Should check for component Loader display', () => {
-    const wrapper = shallow(<Loader />);
-    const LogoComponent = wrapper.find(Logo).first();
-    expect(LogoComponent.html()).toContain('DeliveryHeroLogo.svg');
+    const { container } = render(
+      <ChakraProvider value={system}>
+        <Loader />
+      </ChakraProvider>,
+    );
+    const logo = container.querySelector('img');
+    expect(logo?.getAttribute('src')).toContain('STLogo.svg');
   });
 });

@@ -1,112 +1,288 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Login Page Login page snapshot 1`] = `
-<div
-  className="jsx-2085888330 container"
->
-  <Head>
-    <title
-      className="jsx-2085888330"
-    >
-      Login
-    </title>
-    <link
-      className="jsx-2085888330"
-      href="/favicon.ico"
-      rel="icon"
-    />
-  </Head>
+<div>
   <div
-    className="jsx-2085888330 row"
+    class="css-1xvamu3"
   >
     <div
-      className="jsx-2085888330 col col-login mx-auto"
+      class="css-4dk8ms"
     >
       <div
-        className="jsx-2085888330 text-center mb-6"
+        class="css-1yvedla"
       >
-        <Logo
-          setColor={true}
-        />
+        <div
+          class="chakra-card__root css-1krasp4"
+        >
+          <div
+            class="chakra-card__body css-1p1fmwq"
+          >
+            <div
+              class="css-vgilzu"
+            >
+              <img
+                alt="Sales Tracker"
+                class="chakra-image css-1phd9a0"
+                src="/static/STName2.png"
+              />
+            </div>
+            <div
+              class="css-1gon50r"
+            >
+              <img
+                alt=""
+                class="chakra-image css-iiddnt"
+                src="/static/STLogo.svg"
+              />
+              <div>
+                <h2
+                  class="chakra-heading css-k5qncm"
+                >
+                  Sales tracking made easy
+                </h2>
+                <p
+                  class="css-1xrpz2b"
+                >
+                  Add your total stock, sales and purchases. Also track current and previous sales. Track your profit on each sale. Track your closing sales and tally the cash!
+                </p>
+              </div>
+            </div>
+            <div
+              class="css-5ipaq4"
+            >
+              <div
+                class="chakra-avatar__root css-1lyb3ep"
+                data-part="root"
+                data-scope="avatar"
+                dir="ltr"
+                id="avatar:_r_0_"
+              >
+                <span
+                  class="chakra-avatar__fallback css-1cuxwyn"
+                  data-part="fallback"
+                  data-scope="avatar"
+                  data-state="visible"
+                  dir="ltr"
+                  id="avatar:_r_0_:fallback"
+                >
+                  ST
+                </span>
+              </div>
+              <div>
+                <p
+                  class="css-10wrni"
+                >
+                  Shop Tracker
+                </p>
+                <p
+                  class="css-ap60qa"
+                >
+                  Contact: shoptrackerforsales@gmail.com
+                </p>
+              </div>
+            </div>
+            <p
+              class="css-ytn3gr"
+            >
+              Let us know your feedback on
+               
+              <span
+                class="css-10wrni"
+              >
+                shoptrackerforsales@gmail.com
+              </span>
+            </p>
+          </div>
+        </div>
+        <div
+          class="chakra-card__root css-dlseva"
+        >
+          <div
+            class="chakra-card__header css-br04hd"
+          >
+            <div
+              class="css-1rgmhmu"
+            >
+              <img
+                alt=""
+                class="chakra-image css-qhs958"
+                src="/static/STLogo.svg"
+              />
+            </div>
+            <h2
+              class="chakra-heading css-1868jki"
+            >
+              Sign in to your Shop
+            </h2>
+          </div>
+          <div
+            class="chakra-card__body css-11e8ur2"
+          >
+            <form>
+              <div
+                class="chakra-field__root css-d8iglh"
+                data-part="root"
+                data-scope="field"
+                id="field::_r_1_"
+                role="group"
+              >
+                <label
+                  class="chakra-field__label css-65zcwe"
+                  data-part="label"
+                  data-scope="field"
+                  for="_r_1_"
+                  id="field::_r_1_::label"
+                >
+                  Email address
+                </label>
+                <input
+                  class="chakra-input css-1yh82um"
+                  data-part="input"
+                  data-scope="field"
+                  id="email"
+                  name="email"
+                  placeholder="Enter email"
+                  type="email"
+                />
+              </div>
+              <div
+                class="chakra-field__root css-e4vyqh"
+                data-part="root"
+                data-scope="field"
+                id="field::_r_2_"
+                role="group"
+              >
+                <label
+                  class="chakra-field__label css-65zcwe"
+                  data-part="label"
+                  data-scope="field"
+                  for="_r_2_"
+                  id="field::_r_2_::label"
+                >
+                  Password
+                </label>
+                <input
+                  class="chakra-input css-1yh82um"
+                  data-part="input"
+                  data-scope="field"
+                  id="userPassword"
+                  name="password"
+                  placeholder="Password"
+                  type="password"
+                />
+              </div>
+              <a
+                href="/forgot"
+              >
+                <span
+                  class="css-64dxe7"
+                >
+                  Forgot Password?
+                </span>
+              </a>
+              <div
+                class="css-13j37q6"
+              >
+                <button
+                  class="chakra-button css-136zalh"
+                  type="button"
+                >
+                  <img
+                    alt=""
+                    class="chakra-image css-8kheo1"
+                    src="/static/icons/login.png"
+                  />
+                  Log in
+                </button>
+                <a
+                  href="/register"
+                  style="display: block;"
+                >
+                  <button
+                    class="chakra-button css-11wwym1"
+                    type="button"
+                  >
+                    <img
+                      alt=""
+                      class="chakra-image css-8kheo1"
+                      src="/static/icons/register.png"
+                    />
+                    Sign Up
+                  </button>
+                </a>
+                <button
+                  hidden=""
+                  type="submit"
+                />
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-      <form
-        action=""
-        className="jsx-2085888330 card"
-        method="post"
+    </div>
+    <div
+      class="css-1htwn2z"
+    >
+      <p
+        class="css-18fsuh9"
       >
-        <div
-          className="jsx-2085888330 card-body p-6"
+        Icons made by
+         
+        <a
+          class="chakra-link css-12uv807"
+          href="https://www.flaticon.com/authors/smashicons"
+          title="Smashicons"
         >
-          <div
-            className="jsx-2085888330 card-title text-center"
-          >
-            Sign in to your Kitchen
-          </div>
-        </div>
-        <div
-          className="jsx-2085888330 card-body p-6"
+          Smashicons
+        </a>
+         
+        and
+         
+        <a
+          class="chakra-link css-12uv807"
+          href="https://www.flaticon.com/authors/magnific"
+          title="Magnific"
         >
-          <ErrorMessage
-            error=""
-          />
-          <div
-            className="jsx-2085888330 form-group"
-          >
-            <label
-              className="jsx-2085888330 form-label"
-            >
-              Email address
-            </label>
-            <input
-              className="jsx-2085888330 form-control"
-              id="email"
-              name="email"
-              onChange={[Function]}
-              placeholder="Enter email"
-              type="email"
-            />
-          </div>
-          <div
-            className="jsx-2085888330 form-group"
-          >
-            <label
-              className="jsx-2085888330 form-label"
-            >
-              Password
-            </label>
-            <input
-              className="jsx-2085888330 form-control"
-              id="userPassword"
-              name="password"
-              onChange={[Function]}
-              placeholder="Password"
-              type="password"
-            />
-          </div>
-          <Link
-            href="/forgot"
-          >
-            Forgot Password?
-          </Link>
-          <div
-            className="jsx-2085888330 form-footer"
-          >
-            <button
-              className="jsx-2085888330 btn btn-primary btn-block false"
-              onClick={[Function]}
-              type="button"
-            >
-              Sign in
-            </button>
-          </div>
-        </div>
-      </form>
+          Magnific
+        </a>
+         
+        from
+         
+        <a
+          class="chakra-link css-12uv807"
+          href="https://www.flaticon.com/"
+          title="Flaticon"
+        >
+          www.flaticon.com
+        </a>
+      </p>
     </div>
   </div>
-  <JSXStyle
-    id="2085888330"
-  />
 </div>
 `;
 
-exports[`Login Page with user already logged in Login page snapshot 1`] = `<Loader />`;
+exports[`Login Page with user already logged in Login page snapshot 1`] = `
+<div>
+  <div
+    class="css-49w9tz"
+  >
+    <div
+      class="chakra-stack css-1cihsba"
+    >
+      <img
+        alt=""
+        class="chakra-image css-qhs958"
+        src="/static/STLogo.svg"
+      />
+      <span
+        class="chakra-spinner css-15a4rdf"
+      />
+      <p
+        class="css-ap60qa"
+      >
+        Loading...
+      </p>
+    </div>
+  </div>
+</div>
+`;

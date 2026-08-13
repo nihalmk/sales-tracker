@@ -1,13 +1,13 @@
 import * as React from 'react';
 import Head from 'next/head';
-import { Site, Page } from 'tabler-react';
+import { Box } from '@chakra-ui/react';
 import { Titles } from '../../utils/pages';
 import { useRouter } from 'next/router';
 import { Header } from '../Header/Header';
 import { IconAttribute } from '../IconAttribute';
 
 interface Props {
-  children?: object;
+  children?: React.ReactNode;
   hideHeader?: boolean;
 }
 
@@ -26,39 +26,29 @@ export const Layout: React.FC<Props> = ({ children, hideHeader }) => {
   }, [path]);
 
   return (
-    <Site>
+    <Box minH="100vh" bg="gray.50">
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Header hide={hideHeader}></Header>
-      <Page>
-        <Page.Content>{children}</Page.Content>
-      </Page>
-      <IconAttribute />
+      <Box maxW="7xl" mx="auto" px={{ base: 3, md: 6 }} py={5}>
+        <Box className="content">{children}</Box>
+      </Box>
+      <Box px={{ base: 3, md: 6 }}>
+        <IconAttribute />
+      </Box>
       <style jsx global>{`
-        .bg-blue-global {
-          background: #1a74c5;
-        }
-        .body {
-          background: #f7c5c7;
-        }
-        .profit {
-          color: green;
-        }
-        .loss {
-          color: red;
-        }
-        .card {
-          border: 1px solid rgba(0, 40, 100, 0.12);
-        }
-        @media (max-width: 768px) {
-          .hide-small-screen {
-            display: none;
+        @media print {
+          .hide-in-print {
+            display: none !important;
+          }
+          .show-in-print {
+            display: block !important;
           }
         }
       `}</style>
-    </Site>
+    </Box>
   );
 };

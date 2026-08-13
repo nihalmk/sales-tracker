@@ -1,7 +1,9 @@
-import 'jsdom-global/register';
-import React from 'react';
-import { shallow } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+/**
+ * @jest-environment jsdom
+ */
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../styles/theme';
 import { Reset } from '../pages/reset-password/[token]';
 import cookie from 'js-cookie';
 
@@ -24,87 +26,52 @@ jest.mock('../../accounts/client', () => ({
 }));
 
 describe('The reset password page', () => {
-  let wrapper: any, passwordTxt: any, confirmPasswordTxt: any;
-  beforeEach(() => {
-    wrapper = shallow(<Reset />);
-    passwordTxt = wrapper.find('#password').props();
-    confirmPasswordTxt = wrapper.find('#confirmPassword').props();
-  });
+  const renderReset = () =>
+    render(
+      <ChakraProvider value={system}>
+        <Reset />
+      </ChakraProvider>,
+    );
+  const getPasswordInput = (): HTMLInputElement =>
+    document.querySelector('#password');
+  const getConfirmPasswordInput = (): HTMLInputElement =>
+    document.querySelector('#confirmPassword');
 
-  it('renders as expected', async () => {
-    const snapshot = shallow(<Reset />);
-    expect(snapshot).toMatchSnapshot();
+  it('renders as expected', () => {
+    const { container } = renderReset();
+    expect(container).toMatchSnapshot();
   });
 
   it('does not allow submit if password is blank', () => {
-    const submitBtn = wrapper.find('button').first();
-    expect(submitBtn.html()).toContain('disabled');
+    renderReset();
+    const submitBtn = screen.getByRole('button', { name: 'Reset password' });
+    expect(submitBtn).toBeDisabled();
   });
 
-  it('does not allow submit if password and confirm password are different', async () => {
-    act(() => {
-      passwordTxt.onChange({
-        target: {
-          value: 'abc',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    wrapper.update();
-    act(() => {
-      confirmPasswordTxt.onChange({
-        target: {
-          value: 'xyz',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    wrapper.update();
-    const submitBtn = wrapper.find('button').first();
-    expect(submitBtn.html()).toContain('disabled');
+  it('does not allow submit if password and confirm password are different', () => {
+    renderReset();
+    fireEvent.change(getPasswordInput(), { target: { value: 'abc' } });
+    fireEvent.change(getConfirmPasswordInput(), { target: { value: 'xyz' } });
+    const submitBtn = screen.getByRole('button', { name: 'Reset password' });
+    expect(submitBtn).toBeDisabled();
   });
 
   it('allows submit if password and confirm password are the same', () => {
-    act(() => {
-      passwordTxt.onChange({
-        target: {
-          value: 'abc',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    wrapper.update();
-    act(() => {
-      confirmPasswordTxt.onChange({
-        target: {
-          value: 'abc',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    wrapper.update();
-    const submitButton = wrapper.find('button').first();
-    expect(submitButton.html()).not.toContain('disabled');
+    renderReset();
+    fireEvent.change(getPasswordInput(), { target: { value: 'abc' } });
+    fireEvent.change(getConfirmPasswordInput(), { target: { value: 'abc' } });
+    const submitBtn = screen.getByRole('button', { name: 'Reset password' });
+    expect(submitBtn).not.toBeDisabled();
   });
 
   it('sets token in cookie after a successful password reset', async () => {
     const cookieSet = jest.spyOn(cookie, 'set');
-    act(() => {
-      passwordTxt.onChange({
-        target: {
-          value: 'abc',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    wrapper.update();
-    act(() => {
-      confirmPasswordTxt.onChange({
-        target: {
-          value: 'abc',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    });
-    wrapper.update();
-    const submitButton = wrapper.find('button').first();
-    await act(async () => {
-      submitButton.simulate('click');
-    });
-    expect(cookieSet).toHaveBeenCalledWith('token', 'abcd', { expires: 1 });
+    renderReset();
+    fireEvent.change(getPasswordInput(), { target: { value: 'abc' } });
+    fireEvent.change(getConfirmPasswordInput(), { target: { value: 'abc' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Reset password' }));
+    await waitFor(() =>
+      expect(cookieSet).toHaveBeenCalledWith('token', 'abcd', { expires: 1 }),
+    );
   });
 });

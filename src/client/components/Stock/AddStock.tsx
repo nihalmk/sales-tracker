@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_ITEM, UPDATE_ITEM } from '../../graphql/mutation/items';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Input from '../common/Inputs/FormInput';
@@ -10,6 +10,17 @@ import _ from 'lodash';
 import { Items } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
+import {
+  Card,
+  Heading,
+  Text,
+  SimpleGrid,
+  GridItem,
+  Table,
+  Button,
+  HStack,
+} from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {}
 
@@ -160,24 +171,31 @@ const AddStock: NextPage<Props> = function () {
 
   return (
     <React.Fragment>
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">{'Stock'}</div>
-          <div className="ml-auto">
-            <strong>Total</strong>
-            <div className="profit">{getTotalStockAmount()}₹</div>
-          </div>
-        </div>
+      <Card.Root variant="elevated" borderRadius="l3" mb={5}>
+        <Card.Header>
+          <HStack justify="space-between">
+            <HStack gap={2}>
+              <Icon name="stock" boxSize={5} />
+              <Heading size="md">Stock</Heading>
+            </HStack>
+            <Text textAlign="right">
+              <Text as="span" fontWeight="semibold" mr={2}>
+                Total
+              </Text>
+              <Text as="span" color="green.600" fontWeight="medium">
+                {getTotalStockAmount()}₹
+              </Text>
+            </Text>
+          </HStack>
+        </Card.Header>
         <form onSubmit={onNewItemCreate}>
-          <div className="card-body">
-            <div className="p1 mb-2 text-muted">
-              <i>
-                * For Service Charges, add -1 stock with 0 cost, 0 list and
-                Service charges as sale price
-              </i>
-            </div>
-            <div className="row">
-              <div className="col-md-2">
+          <Card.Body>
+            <Text fontSize="sm" color="fg.muted" mb={3}>
+              * For Service Charges, add -1 stock with 0 cost, 0 list and
+              Service charges as sale price
+            </Text>
+            <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={1}
                   inputName="name"
@@ -196,8 +214,8 @@ const AddStock: NextPage<Props> = function () {
                   isInvalid={!!(submitted && !newItem?.name)}
                   value={newItem?.name || ''}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={2}
                   inputName="cost"
@@ -219,8 +237,8 @@ const AddStock: NextPage<Props> = function () {
                   isInvalid={!!(submitted && newItem?.price?.cost < 0)}
                   value={newItem?.price?.cost || 0}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={3}
                   inputName="list"
@@ -242,8 +260,8 @@ const AddStock: NextPage<Props> = function () {
                   isInvalid={!!(submitted && newItem?.price?.list < 0)}
                   value={newItem?.price?.list || 0}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={4}
                   inputName="sale"
@@ -265,8 +283,8 @@ const AddStock: NextPage<Props> = function () {
                   isInvalid={!!(submitted && newItem?.price?.sale < 0)}
                   value={newItem?.price?.sale || 0}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={5}
                   inputName="stock"
@@ -285,82 +303,83 @@ const AddStock: NextPage<Props> = function () {
                   isInvalid={!!(submitted && !newItem?.stock)}
                   value={newItem?.stock}
                 />
-              </div>
-              <div className="col-md-2">
-                <label className="form-label">Add</label>
-                <button
+              </GridItem>
+              <GridItem colSpan={{ base: 2, md: 2 }}>
+                <Button
                   id="item-submit"
                   type="submit"
-                  className={
-                    'btn btn-primary ml-auto ' +
-                    (createLoading && 'btn-loading')
-                  }
+                  colorPalette="brand"
+                  w="full"
+                  loading={createLoading}
                   onClick={onNewItemCreate}
                 >
+                  <Icon name="add" light />
                   Add New Item
-                </button>
-              </div>
-            </div>
+                </Button>
+              </GridItem>
+            </SimpleGrid>
             <button type="submit" hidden></button>
-          </div>
+          </Card.Body>
         </form>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
-        <div className="card-header">
-          <div className="card-options w-25">
-            <Input
-              tabIndex={9}
-              inputName="Search"
-              inputType="text"
-              max={20}
-              placeholderValue="Search Product by Name or ID"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const search = e.target.value;
-                setSearchTerm(search);
-              }}
-              disabled={createLoading || updateLoading}
-              value={searchTerm || ''}
-            />
-          </div>
-        </div>
+        <Card.Body pt={0} pb={4}>
+          <Input
+            tabIndex={9}
+            inputName="Search"
+            inputType="text"
+            max={20}
+            placeholderValue="Search Product by Name or ID"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              const search = e.target.value;
+              setSearchTerm(search);
+            }}
+            disabled={createLoading || updateLoading}
+            value={searchTerm || ''}
+          />
+        </Card.Body>
 
-        <div className="table-responsive">
-          <table className="table card-table table-hover table-outline">
-            <thead>
-              <tr>
-                <th className="w-10">#ID</th>
-                <th className="w-25">Product</th>
-                <th>Cost Price</th>
-                <th>MRP</th>
-                <th>Sale Price</th>
-                <th>Stock</th>
-                <th className="w-10">Action</th>
-              </tr>
-            </thead>
-            <tbody>
+        <Table.ScrollArea>
+          <Table.Root variant="outline" size="sm" striped interactive>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader>#ID</Table.ColumnHeader>
+                <Table.ColumnHeader>Product</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">Cost Price</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">MRP</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">Sale Price</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">Stock</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {itemsLoading ? (
-                <tr>
-                  <td className={'text-center'} colSpan={6}>
+                <Table.Row>
+                  <Table.Cell textAlign="center" py={8} colSpan={7}>
                     <Loader />
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               ) : (
                 items?.length === 0 && (
-                  <tr>
-                    <td className={'text-center'} colSpan={6}>
-                      {'No Items added!'}
-                    </td>
-                  </tr>
+                  <Table.Row>
+                    <Table.Cell textAlign="center" py={8} colSpan={7}>
+                      <Text color="fg.muted" fontSize="sm">
+                        No items added yet
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
                 )
               )}
               {!itemsLoading &&
                 items?.length != 0 &&
                 items?.map((item: Items, i: number) => {
                   const isEdit = editItem?._id === item._id;
+                  const isOutOfStock = item.stock === 0;
+                  const isLowStock = item.stock > 0 && item.stock <= 5;
                   return (
-                    <tr key={item._id + i}>
-                      <td>{item.shortId}</td>
-                      <td className="w-25">
+                    <Table.Row key={item._id + i}>
+                      <Table.Cell color="fg.muted">{item.shortId}</Table.Cell>
+                      <Table.Cell fontWeight="medium">
                         {isEdit ? (
                           <Input
                             tabIndex={10}
@@ -382,8 +401,8 @@ const AddStock: NextPage<Props> = function () {
                         ) : (
                           item.name
                         )}
-                      </td>
-                      <td className="w-14">
+                      </Table.Cell>
+                      <Table.Cell textAlign="end">
                         {isEdit ? (
                           <Input
                             tabIndex={11}
@@ -410,8 +429,8 @@ const AddStock: NextPage<Props> = function () {
                         ) : (
                           item.price?.cost
                         )}
-                      </td>
-                      <td className="w-14">
+                      </Table.Cell>
+                      <Table.Cell textAlign="end">
                         {isEdit ? (
                           <Input
                             tabIndex={12}
@@ -438,8 +457,8 @@ const AddStock: NextPage<Props> = function () {
                         ) : (
                           item.price?.list
                         )}
-                      </td>
-                      <td>
+                      </Table.Cell>
+                      <Table.Cell textAlign="end">
                         {isEdit ? (
                           <Input
                             tabIndex={13}
@@ -466,8 +485,8 @@ const AddStock: NextPage<Props> = function () {
                         ) : (
                           item.price?.sale
                         )}
-                      </td>
-                      <td>
+                      </Table.Cell>
+                      <Table.Cell textAlign="end">
                         {isEdit ? (
                           <Input
                             tabIndex={14}
@@ -487,64 +506,63 @@ const AddStock: NextPage<Props> = function () {
                             value={editItem?.stock || ''}
                           />
                         ) : (
-                          item.stock
-                        )}
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => {
-                            if (!isEdit) {
-                              setEditItem(item);
-                            } else {
-                              onItemEdit();
+                          <Text
+                            as="span"
+                            fontWeight={isOutOfStock || isLowStock ? 'semibold' : 'normal'}
+                            color={
+                              isOutOfStock
+                                ? 'red.600'
+                                : isLowStock
+                                ? 'orange.500'
+                                : undefined
                             }
-                          }}
-                          className={
-                            'btn mr-2 ' +
-                            (isEdit ? 'btn-success ' : 'btn-secondary ') +
-                            (isEdit && updateLoading ? 'btn-loading' : '')
-                          }
-                        >
-                          {isEdit ? 'Done' : 'Edit'}
-                        </button>
-                        {isEdit && (
-                          <a
-                            className="link"
+                          >
+                            {item.stock}
+                            {isOutOfStock && ' · Out of stock'}
+                            {isLowStock && ' · Low'}
+                          </Text>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>
+                        <HStack gap={2} justify="center">
+                          <Button
+                            size="xs"
+                            minW="16"
+                            colorPalette={isEdit ? 'green' : 'gray'}
+                            variant={isEdit ? 'solid' : 'outline'}
+                            loading={isEdit && updateLoading}
                             onClick={() => {
-                              setEditItem(undefined);
+                              if (!isEdit) {
+                                setEditItem(item);
+                              } else {
+                                onItemEdit();
+                              }
                             }}
                           >
-                            X
-                          </a>
-                        )}
-                      </td>
-                    </tr>
+                            {isEdit ? 'Done' : 'Edit'}
+                          </Button>
+                          {isEdit && (
+                            <Button
+                              size="xs"
+                              minW="16"
+                              variant="ghost"
+                              colorPalette="gray"
+                              onClick={() => {
+                                setEditItem(undefined);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </HStack>
+                      </Table.Cell>
+                    </Table.Row>
                   );
                 })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .link {
-          color: blue !important;
-          cursor: pointer;
-        }
-        .link:hover {
-          border-bottom: 1px solid blue;
-        }
-      `}</style>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-      `}</style>
+            </Table.Body>
+          </Table.Root>
+        </Table.ScrollArea>
+      </Card.Root>
     </React.Fragment>
   );
 };

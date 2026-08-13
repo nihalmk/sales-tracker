@@ -1,4 +1,12 @@
-import { Dropdown } from 'tabler-react';
+import {
+  Menu,
+  Portal,
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Button,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import UserContext from '../UserWrapper/UserContext';
 import React, { useContext, useEffect, useState } from 'react';
@@ -57,78 +65,74 @@ export const Header: React.FC<Props> = ({ hide }) => {
     });
   };
 
+  if (hide) {
+    return null;
+  }
+
   return (
-    <React.Fragment>
-      <div className={'site-header sticky-top ' + (hide ? 'hide-header' : '')}>
-        <div className="header bg-blue-global p-1">
-          <div className="container">
-            <div className="d-flex">
-              <Link href="/">
-                <a className="header-brand d-flex align-items-center">
-                  <Logo />
-                </a>
-              </Link>
-              <div className="logo-text d-flex flex-column justify-content-center">
-                <h3 className="header-name">
-                  {user?.shop?.name || 'Sales Tracker'}
-                </h3>
-              </div>
-              <div className="d-flex flex-row ml-auto">
-                <Dropdown
-                  isNavLink
-                  className="acc-dropdown d-flex"
-                  triggerContent={
-                    <>
-                      {user && (
-                        <span className="ml-2 d-none d-sm-block white">
-                          <span className="">
-                            <b>{user?.fullName}</b>
-                          </span>
-                          <small className="d-block">{user?.role}</small>
-                          <small>
-                            <strong className="float-right mb-2">
-                              {moment().format('DD/MM/YYYY')}
-                            </strong>
-                          </small>
-                        </span>
-                      )}
-                    </>
-                  }
-                  itemsObject={getItems()}
-                  position="bottom-start"
-                  arrow={true}
-                  arrowPosition="left"
-                  toggle={false}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <PopUpMessage description={message} show={!!message} />
-      </div>
-      <style jsx global>{`
-        .dropdown-item {
-          cursor: pointer;
-        }
-        .header-name {
-          color: #ffff;
-          margin: 0;
-          margin-top: 15px;
-        }
-        .white {
-          color: #ffff;
-        }
-        .hide-header {
-          display: none;
-        }
-        @media (min-width: 1600px) {
-          .header .container {
-            max-width: unset;
-            padding-left: 25px;
-            padding-right: 25px;
-          }
-        }
-      `}</style>
-    </React.Fragment>
+    <Box position="sticky" top={0} zIndex="docked">
+      <Flex bg="brand.700" px={{ base: 3, xl: 6 }} py={2} align="center">
+        <Link href="/">
+          <Flex align="center">
+            <Logo />
+          </Flex>
+        </Link>
+        <Flex direction="column" justify="center" ml={3}>
+          <Heading as="h3" size="md" color="white" m={0}>
+            {user?.shop?.name || 'Sales Tracker'}
+          </Heading>
+        </Flex>
+        <Flex ml="auto">
+          <Menu.Root positioning={{ placement: 'bottom-start' }}>
+            {/* @ts-expect-error Chakra v3's Ark UI-derived MenuTriggerProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+            <Menu.Trigger asChild>
+              <Button
+                variant="ghost"
+                color="white"
+                p={7}
+                _hover={{ bg: 'brand.600' }}
+              >
+                {user && (
+                  <Box
+                    display={{ base: 'none', sm: 'block' }}
+                    ml={2}
+                    textAlign="left"
+                  >
+                    <Text fontWeight="bold" fontSize="sm">
+                      {user?.fullName}
+                    </Text>
+                    <Text fontSize="xs">{user?.role}</Text>
+                    <Text fontSize="xs" fontWeight="semibold">
+                      {moment().format('DD/MM/YYYY')}
+                    </Text>
+                  </Box>
+                )}
+              </Button>
+            </Menu.Trigger>
+            <Portal>
+              {/* @ts-expect-error Chakra v3's Ark UI-derived MenuPositionerProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+              <Menu.Positioner>
+                {/* @ts-expect-error Chakra v3's Ark UI-derived MenuContentProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+                <Menu.Content>
+                  <Menu.Arrow />
+                  {getItems().map((item) => (
+                    // @ts-expect-error Chakra v3's Ark UI-derived MenuItemProps doesn't model `children` in its polymorphic types, though it renders them fine.
+                    <Menu.Item
+                      key={item.value as string}
+                      value={item.value as string}
+                      onClick={item.onClick as () => void}
+                      cursor="pointer"
+                    >
+                      {item.value as string}
+                    </Menu.Item>
+                  ))}
+                </Menu.Content>
+              </Menu.Positioner>
+            </Portal>
+          </Menu.Root>
+        </Flex>
+      </Flex>
+      <PopUpMessage description={message} show={!!message} />
+    </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'tabler-react';
+import { Alert } from '@chakra-ui/react';
 
 interface Props {
   message: string;
@@ -8,9 +8,12 @@ interface Props {
 const SuccessMessage: React.FC<Props> = ({ message, className = '' }) => (
   <React.Fragment>
     {message && (
-      <Alert className={`${className} alert-align`} type="success">
-        {message}
-      </Alert>
+      <Alert.Root className={`${className} alert-align`} status="success">
+        <Alert.Indicator />
+        <Alert.Content>
+          <Alert.Description>{message}</Alert.Description>
+        </Alert.Content>
+      </Alert.Root>
     )}
     <style jsx global>{``}</style>
   </React.Fragment>

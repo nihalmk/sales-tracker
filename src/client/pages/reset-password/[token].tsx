@@ -4,6 +4,17 @@ import { Logo } from '../../components/Header/Logo';
 import { accountsPassword } from '../../../accounts/client';
 import { useRouter } from 'next/router';
 import cookie from 'js-cookie';
+import {
+  Box,
+  Card,
+  Flex,
+  Heading,
+  Text,
+  Field,
+  Input,
+  Button,
+} from '@chakra-ui/react';
+import Icon from '../../components/common/Icon';
 
 interface Props {}
 
@@ -36,55 +47,62 @@ export const Reset: NextPage<Props> = () => {
   };
 
   return (
-    <div className="col col-login mx-auto">
-      <div className="text-center mb-6">
-        <Logo setColor />
-      </div>
-      <div className="card">
-        <div className="card-body">
-          <div className="card-title text-center">Reset Password</div>
-        </div>
-        <div className="card-body p-6">
-          <p>
-            Enter your new password below to reset the password of your account.
-          </p>
-          <div className="form-group">
-            <label className="form-label">New Password</label>
-            <input
-              name="password"
-              type="password"
-              className="form-control"
-              id="password"
-              placeholder="Password"
-              onChange={onPasswordChange}
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Confirm New Password</label>
-            <input
-              name="confirmPassword"
-              type="password"
-              className="form-control"
-              id="confirmPassword"
-              placeholder="Password"
-              onChange={onConfirmPasswordChange}
-            />
-          </div>
-          <div className="form-footer">
-            <button
+    <Flex minH="100vh" bg="gray.50" align="center" justify="center" p={4}>
+      <Box maxW="md" w="full">
+        <Flex justify="center" mb={6}>
+          <Logo setColor />
+        </Flex>
+        <Card.Root variant="elevated" borderRadius="l3">
+          <Card.Header textAlign="center">
+            <Flex justify="center" mb={2}>
+              <Icon name="resetPassword" boxSize={8} />
+            </Flex>
+            <Heading size="lg">Reset Password</Heading>
+          </Card.Header>
+          <Card.Body>
+            <Text color="fg.muted" mb={4}>
+              Enter your new password below to reset the password of your
+              account.
+            </Text>
+            <Field.Root mb={4}>
+              {/* @ts-expect-error Chakra v3's Ark UI-derived FieldLabelProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+              <Field.Label>New Password</Field.Label>
+              <Input
+                name="password"
+                type="password"
+                id="password"
+                placeholder="Password"
+                onChange={onPasswordChange}
+                bg="white"
+              />
+            </Field.Root>
+            <Field.Root mb={4}>
+              {/* @ts-expect-error Chakra v3's Ark UI-derived FieldLabelProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
+              <Field.Label>Confirm New Password</Field.Label>
+              <Input
+                name="confirmPassword"
+                type="password"
+                id="confirmPassword"
+                placeholder="Password"
+                onChange={onConfirmPasswordChange}
+                bg="white"
+              />
+            </Field.Root>
+            <Button
               type="button"
               onClick={changePassword}
-              className={
-                'btn btn-primary btn-block ' + (isLoading ? 'btn-loading' : '')
-              }
+              colorPalette="brand"
+              w="full"
+              loading={isLoading}
               disabled={password === '' || password !== confirmPassword}
             >
+              <Icon name="done" light />
               Reset password
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Button>
+          </Card.Body>
+        </Card.Root>
+      </Box>
+    </Flex>
   );
 };
 

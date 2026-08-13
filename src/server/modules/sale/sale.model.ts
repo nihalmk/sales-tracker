@@ -1,4 +1,4 @@
-import { getModelForClass, prop, Ref, pre, arrayProp } from '@typegoose/typegoose';
+import { getModelForClass, prop, Ref, pre } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
 import { StringField, NumberField, BooleanField, DateField } from '../../common/fields';
@@ -48,7 +48,7 @@ export class Sale {
   @Field(StringField)
   billNumber: string;
 
-  @arrayProp({ items: SaleItem, index: true })
+  @prop({ type: () => [SaleItem], index: true })
   @Field((_type) => [SaleItem])
   items: SaleItem[];
 

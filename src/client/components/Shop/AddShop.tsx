@@ -1,6 +1,6 @@
 import { useState, ChangeEvent, useContext, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_SHOP } from '../../graphql/mutation/shop';
 import { LabelValueObj } from '../common/SelectBoxes/SelectBox';
 import Input from '../common/Inputs/FormInput';
@@ -14,6 +14,8 @@ import { Shop } from '../../generated/graphql';
 import UserContext from '../UserWrapper/UserContext';
 import { GET_SHOP_TYPE } from '../../graphql/query/shop';
 import CreatableSelect from '../common/SelectBoxes/CreatableSelect';
+import { Card, Heading, SimpleGrid, Stack, Button, HStack } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {}
 
@@ -70,29 +72,17 @@ const AddShop: NextPage<Props> = function () {
   };
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <div className="card-title">{'New Shop'}</div>
-        <div className="card-options">
-          {/* {isUserAdmin(user) && (
-            <Link href={Pages.SHOPS}>
-              <button
-                className="button-head btn btn-secondary"
-                color="secondary"
-              >
-                <span className="icon">
-                  <FontAwesomeIcon icon={faEye}></FontAwesomeIcon>
-                </span>{' '}
-                Shops
-              </button>
-            </Link>
-          )} */}
-        </div>
-      </div>
+    <Card.Root variant="elevated" borderRadius="l3">
+      <Card.Header>
+        <HStack gap={2}>
+          <Icon name="shop" boxSize={5} />
+          <Heading size="md">New Shop</Heading>
+        </HStack>
+      </Card.Header>
       <form onSubmit={onSubmit}>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-6">
+        <Card.Body>
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+            <Stack gap={4}>
               <Input
                 tabIndex={1}
                 inputName="name"
@@ -130,8 +120,8 @@ const AddShop: NextPage<Props> = function () {
                 isInvalid={!!(submitted && !shopState?.address?.street)}
                 value={shopState?.address?.street || ''}
               />
-            </div>
-            <div className="col-md-6">
+            </Stack>
+            <Stack gap={4}>
               <CreatableSelect
                 tabIndex={2}
                 selectLabel="Type"
@@ -172,33 +162,33 @@ const AddShop: NextPage<Props> = function () {
                 isInvalid={!!(submitted && !shopState?.address?.pincode)}
                 value={shopState?.address?.pincode || ''}
               />
-            </div>
-          </div>
+            </Stack>
+          </SimpleGrid>
           <button type="submit" hidden></button>
-        </div>
+        </Card.Body>
       </form>
-      <div className="card-footer">
+      <Card.Footer flexDir="column" alignItems="stretch" gap={3}>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
-        <div className="d-flex">
-          <Link href="/shop">
-            <button type="button" className={'btn btn-outline-danger'}>
+        <HStack w="full">
+          <Button asChild variant="outline" colorPalette="red">
+            <Link href="/shop">
+              <Icon name="cancel" />
               Cancel
-            </button>
-          </Link>
-          <button
-            id="shop-submit"
-            type="submit"
-            className={
-              'btn btn-primary ml-auto ' + (loadingCreate && 'btn-loading')
-            }
+            </Link>
+          </Button>
+          <Button
+            colorPalette="brand"
+            ml="auto"
+            loading={loadingCreate}
             onClick={onSubmit}
           >
+            <Icon name="done" light />
             Submit
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </HStack>
+      </Card.Footer>
+    </Card.Root>
   );
 };
 

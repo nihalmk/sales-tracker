@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
+    "rootDir": ".",
     "outDir": "./dist/src/",
     "sourceMap": true,
     "noImplicitAny": true,
@@ -14,6 +15,8 @@
     "noEmit": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "types": ["jest", "node", "@testing-library/jest-dom"],
     "resolveJsonModule": true,
     "isolatedModules": true,
     "emitDecoratorMetadata": true,

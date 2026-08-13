@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from '@apollo/client';
 
 export const CREATE_SHOP = gql`
   mutation createShop($name: String!, $type: String!, $address: AddressInput!) {

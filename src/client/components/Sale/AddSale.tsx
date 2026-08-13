@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_SALE, UPDATE_SALE } from '../../graphql/mutation/sale';
 import { GET_SALE_BY_BILL_NUMBER } from '../../graphql/query/sale';
 import Input from '../common/Inputs/FormInput';
@@ -15,6 +15,18 @@ import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
 import Sales from './Sales';
 import moment from 'moment-timezone';
+import {
+  Box,
+  Card,
+  Heading,
+  SimpleGrid,
+  GridItem,
+  Table,
+  Button,
+  HStack,
+  Text,
+} from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   billNumber?: string;
@@ -23,12 +35,10 @@ interface Props {
 const AddSale: NextPage<Props> = function ({ billNumber }) {
   const productSelectRef = useRef<any>(null);
 
-  const [submitCreateSale, { loading: createLoading }] = useMutation(
-    CREATE_SALE,
-  );
-  const [submitUpdateSale, { loading: updateLoading }] = useMutation(
-    UPDATE_SALE,
-  );
+  const [submitCreateSale, { loading: createLoading }] =
+    useMutation(CREATE_SALE);
+  const [submitUpdateSale, { loading: updateLoading }] =
+    useMutation(UPDATE_SALE);
 
   const {
     loading: saleLoading,
@@ -74,7 +84,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         sortedItems.map((i) => {
           if (i.stock > 0 || i.stock === -1) {
             return {
-              label: `${i.shortId} | ${i.name} ${
+              label: `#${i.shortId} | ${i.name} ${
                 i.stock > 0 ? `(${i.price.cost}₹)` : ''
               }`,
               value: i._id,
@@ -124,7 +134,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       return;
     }
     const saleItems = _.cloneDeep(items).map((i) => {
-      const saleItem = (i as unknown) as SaleItemInput;
+      const saleItem = i as unknown as SaleItemInput;
       saleItem.item = i.item._id;
       return saleItem;
     });
@@ -179,7 +189,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       return;
     }
     const saleItems = _.cloneDeep(items).map((i) => {
-      const saleItem = (i as unknown) as SaleItemInput;
+      const saleItem = i as unknown as SaleItemInput;
       saleItem.item = i.item._id;
       return saleItem;
     });
@@ -263,72 +273,73 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   };
   return (
     <React.Fragment>
-      <div className="hide-in-print card">
-        <div className="card-header">
-          <div className="card-title">{'New Sale'}</div>
-          <div className="card-options"></div>
-        </div>
+      <Card.Root
+        className="hide-in-print"
+        variant="elevated"
+        borderRadius="l3"
+        mb={5}
+      >
+        <Card.Header>
+          <HStack gap={2}>
+            <Icon name="newSale" boxSize={5} />
+            <Heading size="md">New Sale</Heading>
+          </HStack>
+        </Card.Header>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
-        <div className="card-body pb-0">
-          <div className="row">
-            <div className="col-md-4">
-              <Input
-                tabIndex={1}
-                inputName="Customer"
-                inputLabel="Customer"
-                inputType="text"
-                max={20}
-                placeholderValue="Customer Name"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const customer = e.target.value;
-                  setNewSale((currentState) => ({
-                    ...currentState,
-                    customer,
-                  }));
-                }}
-                autoFocus={true}
-                value={newSale?.customer || ''}
-              />
-            </div>
-            <div className="col-md-4">
-              <Input
-                tabIndex={2}
-                inputName="Contact"
-                inputLabel="Contact Number"
-                inputType="text"
-                max={20}
-                placeholderValue="Contact Number"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const contact = e.target.value;
-                  setNewSale((currentState) => ({
-                    ...currentState,
-                    contact,
-                  }));
-                }}
-                value={newSale?.contact || ''}
-              />
-            </div>
-            <div className="col-md-4">
-              <Input
-                tabIndex={3}
-                inputName="email"
-                inputLabel="Email"
-                inputType="text"
-                max={50}
-                placeholderValue="Email Id"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const email = e.target.value;
-                  setNewSale((currentState) => ({
-                    ...currentState,
-                    email,
-                  }));
-                }}
-                value={newSale?.email || ''}
-              />
-            </div>
-          </div>
-        </div>
+        <Card.Body pb={0}>
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+            <Input
+              tabIndex={1}
+              inputName="Customer"
+              inputLabel="Customer"
+              inputType="text"
+              max={20}
+              placeholderValue="Customer Name"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const customer = e.target.value;
+                setNewSale((currentState) => ({
+                  ...currentState,
+                  customer,
+                }));
+              }}
+              autoFocus={true}
+              value={newSale?.customer || ''}
+            />
+            <Input
+              tabIndex={2}
+              inputName="Contact"
+              inputLabel="Contact Number"
+              inputType="text"
+              max={20}
+              placeholderValue="Contact Number"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const contact = e.target.value;
+                setNewSale((currentState) => ({
+                  ...currentState,
+                  contact,
+                }));
+              }}
+              value={newSale?.contact || ''}
+            />
+            <Input
+              tabIndex={3}
+              inputName="email"
+              inputLabel="Email"
+              inputType="text"
+              max={50}
+              placeholderValue="Email Id"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const email = e.target.value;
+                setNewSale((currentState) => ({
+                  ...currentState,
+                  email,
+                }));
+              }}
+              value={newSale?.email || ''}
+            />
+          </SimpleGrid>
+        </Card.Body>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -356,9 +367,9 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             productSelectRef?.current?.focus();
           }}
         >
-          <div className="card-body pt-0">
-            <div className="row">
-              <div className="col-md-6">
+          <Card.Body pt={0}>
+            <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
+              <GridItem colSpan={{ base: 2, md: 5 }}>
                 <SelectBox
                   tabIndex={4}
                   selectLabel="Product"
@@ -380,15 +391,14 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     });
                   }}
                   selectDefault={itemsSelection?.find(
-                    (i) =>
-                      i.value === ((newSaleItem?.item as unknown) as string),
+                    (i) => i.value === (newSaleItem?.item as unknown as string),
                   )}
                   isInvalid={!!(newItemSubmitted && !newItem)}
                   noOptionsMessage={'Not in Stock'}
                   innerRef={productSelectRef}
                 ></SelectBox>
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={5}
                   inputName="Sale"
@@ -408,8 +418,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newSaleItem?.cost)}
                   value={newSaleItem?.cost || ''}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={6}
                   inputName="quantity"
@@ -437,8 +447,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newSaleItem?.quantity)}
                   value={newSaleItem?.quantity || ''}
                 />
-              </div>
-              <div className="col-md-2">
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 1 }}>
                 <Input
                   tabIndex={7}
                   inputName="total"
@@ -457,67 +467,57 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   isInvalid={!!(newItemSubmitted && !newSaleItem?.total)}
                   value={newSaleItem?.total || ''}
                 />
-              </div>
-              <div className="col-md-2 ml-auto">
-                <button
+              </GridItem>
+              <GridItem colSpan={{ base: 2, md: 2 }}>
+                <Button
                   id="sale-submit"
                   type="submit"
-                  className={
-                    'btn btn-primary ml-auto w-100 ' +
-                    (createLoading && 'btn-loading')
-                  }
+                  colorPalette="brand"
+                  w="full"
+                  loading={createLoading}
                 >
+                  <Icon name="add" light />
                   Add New Item
-                </button>
-              </div>
-            </div>
-            {/* <button type="submit" hidden></button> */}
-          </div>
+                </Button>
+              </GridItem>
+            </SimpleGrid>
+          </Card.Body>
         </form>
-        {/* <div className="card-header">
-          <div className="card-options w-25">
-            <Input
-              tabIndex={9}
-              inputName="Search"
-              inputType="text"
-              max={20}
-              placeholderValue="Search Product by Name or ID"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const search = e.target.value;
-                setSearchTerm(search);
-              }}
-              disabled={createLoading || updateLoading}
-              value={searchTerm || ''}
-            />
-          </div>
-        </div> */}
 
-        <div className="table-responsive">
-          <table className="table card-table table-hover table-outline">
-            <thead>
-              <tr>
-                <th className="w-10">#ID</th>
-                <th className="w-25">Product</th>
-                <th>Sale Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th className="w-14">Action</th>
-              </tr>
-            </thead>
-            <tbody>
+        <Table.ScrollArea>
+          <Table.Root variant="outline" size="sm" striped interactive>
+            <Table.Header>
+              <Table.Row>
+                <Table.ColumnHeader>#ID</Table.ColumnHeader>
+                <Table.ColumnHeader>Product</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Sale Price
+                </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">
+                  Quantity
+                </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">Total</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">
+                  Action
+                </Table.ColumnHeader>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {(billNumber && saleLoading) || createLoading ? (
-                <tr>
-                  <td className={'text-center'} colSpan={6}>
+                <Table.Row>
+                  <Table.Cell textAlign="center" py={8} colSpan={6}>
                     <Loader />
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               ) : (
                 saleItems?.length === 0 && (
-                  <tr>
-                    <td className={'text-center'} colSpan={6}>
-                      {'No Products added!'}
-                    </td>
-                  </tr>
+                  <Table.Row>
+                    <Table.Cell textAlign="center" py={8} colSpan={6}>
+                      <Text color="fg.muted" fontSize="sm">
+                        No products added yet
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
                 )
               )}
               {!createLoading && !saleLoading && saleItems?.length !== 0 && (
@@ -528,11 +528,11 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     const isProfit = profit > 0;
                     const item = sale.item;
                     return (
-                      <tr key={i}>
-                        <td>{item.shortId}</td>
-                        <td className="w-25">{item.name}</td>
-                        <td
-                          className="w-14"
+                      <Table.Row key={i}>
+                        <Table.Cell color="fg.muted">{item.shortId}</Table.Cell>
+                        <Table.Cell fontWeight="medium">{item.name}</Table.Cell>
+                        <Table.Cell
+                          textAlign="end"
                           onSubmit={(e) => {
                             e.preventDefault();
                             onEdit(sale, isEdit);
@@ -560,8 +560,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                           ) : (
                             sale.cost
                           )}
-                        </td>
-                        <td className="w-14">
+                        </Table.Cell>
+                        <Table.Cell textAlign="end">
                           {isEdit ? (
                             <Input
                               tabIndex={12}
@@ -594,127 +594,124 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                           ) : (
                             sale.quantity
                           )}
-                        </td>
-                        <td>
+                        </Table.Cell>
+                        <Table.Cell textAlign="end" fontWeight="semibold">
                           {sale.total}
                           {showProfit ? (
-                            <div className={isProfit ? 'profit' : 'loss'}>
+                            <Box
+                              as="span"
+                              ml={2}
+                              color={isProfit ? 'green.600' : 'red.600'}
+                              fontWeight="medium"
+                            >
                               {isProfit && '+'}
                               {profit}
-                            </div>
+                            </Box>
                           ) : (
                             ''
                           )}
-                        </td>
-                        <td className="w-14">
-                          <button
-                            onClick={() => onEdit(sale, isEdit)}
-                            className={
-                              'btn mr-2 ' +
-                              (isEdit ? 'btn-success ' : 'btn-secondary ') +
-                              (isEdit && updateLoading ? 'btn-loading' : '')
-                            }
-                          >
-                            {isEdit ? 'Done' : 'Edit'}
-                          </button>
-
-                          <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                              isEdit
-                                ? setEditSale(undefined)
-                                : onSaleItemRemove(sale.item._id);
-                            }}
-                          >
-                            X
-                          </button>
-                        </td>
-                      </tr>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <HStack gap={2} justify="center">
+                            <Button
+                              size="xs"
+                              minW="16"
+                              colorPalette={isEdit ? 'green' : 'gray'}
+                              variant={isEdit ? 'solid' : 'outline'}
+                              loading={isEdit && updateLoading}
+                              onClick={() => onEdit(sale, isEdit)}
+                            >
+                              {isEdit ? 'Done' : 'Edit'}
+                            </Button>
+                            <Button
+                              size="xs"
+                              minW="16"
+                              variant="ghost"
+                              colorPalette={isEdit ? 'gray' : 'red'}
+                              onClick={() => {
+                                isEdit
+                                  ? setEditSale(undefined)
+                                  : onSaleItemRemove(sale.item._id);
+                              }}
+                            >
+                              {isEdit ? 'Cancel' : 'Remove'}
+                            </Button>
+                          </HStack>
+                        </Table.Cell>
+                      </Table.Row>
                     );
                   })}
-                  <tr>
-                    <td colSpan={4}>
-                      <strong>TOTAL</strong>
-                    </td>
-                    <td className="w-10">
-                      <strong>{newSale?.total}</strong>
-                    </td>
-                    <td className="w-14">
+                  <Table.Row
+                    bg="gray.50"
+                    borderTopWidth="2px"
+                    borderTopColor="gray.300"
+                  >
+                    <Table.Cell colSpan={4}>
+                      <Text
+                        fontWeight="bold"
+                        fontSize="xs"
+                        textTransform="uppercase"
+                        letterSpacing="wider"
+                        color="gray.600"
+                      >
+                        Total
+                      </Text>
+                    </Table.Cell>
+                    <Table.Cell textAlign="end" fontWeight="bold">
+                      {newSale?.total}
+                    </Table.Cell>
+                    <Table.Cell>
                       {showProfit && (
-                        <React.Fragment>
-                          <div
-                            className={
-                              getProfitOrLoss()[0] < 0 ? 'loss' : 'profit'
-                            }
-                          >
-                            {getProfitOrLoss()[0] > 0 ? '+' : ''}
-                            {getProfitOrLoss()[0]}
-                          </div>
-                          {/* <div className="loss">-{getProfitOrLoss()[1]}</div> */}
-                        </React.Fragment>
+                        <Box
+                          as="span"
+                          color={
+                            getProfitOrLoss()[0] < 0 ? 'red.600' : 'green.600'
+                          }
+                          fontWeight="bold"
+                        >
+                          {getProfitOrLoss()[0] > 0 ? '+' : ''}
+                          {getProfitOrLoss()[0]}
+                        </Box>
                       )}
-                    </td>
-                  </tr>
+                    </Table.Cell>
+                  </Table.Row>
                 </React.Fragment>
               )}
-            </tbody>
-          </table>
-        </div>
-        <div className="card-footer">
-          <div className="d-flex">
-            <Link href="/dashboard">
-              <button type="button" className={'btn btn-outline-danger'}>
+            </Table.Body>
+          </Table.Root>
+        </Table.ScrollArea>
+        <Card.Footer>
+          <HStack w="full">
+            <Button asChild variant="outline" colorPalette="red">
+              <Link href="/dashboard">
+                <Icon name="cancel" />
                 Cancel
-              </button>
-            </Link>
-            <button
-              id="shop-submit"
-              type="button"
-              className={
-                'btn btn-secondary ml-auto ' + (createLoading && 'btn-loading')
-              }
+              </Link>
+            </Button>
+            <Button
+              colorPalette="gray"
+              variant="outline"
+              ml="auto"
               onClick={() => setShowProfit(!showProfit)}
             >
               {showProfit ? 'Hide P/L' : 'P/L'}
-            </button>
-            <button
-              id="shop-submit"
-              type="submit"
-              className={
-                'btn btn-primary ml-2 ' + (createLoading && 'btn-loading')
-              }
+            </Button>
+            <Button
+              colorPalette="brand"
+              loading={createLoading}
               onClick={onNewSaleCreate}
             >
+              <Icon name="done" light />
               Submit
-            </button>
-          </div>
-        </div>
-      </div>
-      <h3 className="hide-in-print">Today's Sales</h3>
+            </Button>
+          </HStack>
+        </Card.Footer>
+      </Card.Root>
+      <HStack className="hide-in-print" mb={3} gap={2}>
+        <Icon name="sales" boxSize={5} />
+        <Heading size="md">Today's Sales</Heading>
+      </HStack>
       {createLoading ? <Loader /> : <Sales saleDateFrom={moment().toDate()} />}
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .w-15 {
-          width: 15%;
-        }
-        .link {
-          color: blue !important;
-          cursor: pointer;
-        }
-        .link:hover {
-          border-bottom: 1px solid blue;
-        }
-      `}</style>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-      `}</style>
     </React.Fragment>
   );
 };

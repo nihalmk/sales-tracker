@@ -1,22 +1,19 @@
 import React from 'react';
-import Head from 'next/head';
-import { ApolloProvider } from '@apollo/react-hooks';
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache, NormalizedCacheObject } from 'apollo-cache-inmemory';
+import { ApolloProvider } from '@apollo/client';
+import { ApolloClient } from '@apollo/client';
+import { InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { AppInitialProps } from 'next/app';
 import { NextPageContext } from 'next';
-import { onError } from 'apollo-link-error';
-import { HttpLink } from 'apollo-link-http';
-import { ApolloLink, split } from 'apollo-link';
+import { onError } from '@apollo/client/link/error';
+import { HttpLink } from '@apollo/client';
+import { ApolloLink, split } from '@apollo/client';
 import fetch from 'isomorphic-unfetch';
 import cookie from 'js-cookie';
-import { setContext } from 'apollo-link-context';
-import { WebSocketLink } from 'apollo-link-ws';
-import { getMainDefinition } from 'apollo-utilities';
+import { setContext } from '@apollo/client/link/context';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { getMainDefinition } from '@apollo/client/utilities';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
-import { withClientState } from 'apollo-link-state';
-import { UPDATE_NETWORK_STATUS } from '../graphql/query/network';
-import { ClientResolvers, ClientStateDefaults } from './clientResolvers';
+import { networkStatusVar } from './networkStatus';
 
 let globalApolloClient: ApolloClient<NormalizedCacheObject> = null;
 
@@ -93,7 +90,9 @@ export function withApollo(
         if (ssr) {
           try {
             // Run all GraphQL queries
-            const { getDataFromTree } = await import('@apollo/react-ssr');
+            const { getDataFromTree } = await import(
+              '@apollo/client/react/ssr'
+            );
             await getDataFromTree(
               <AppTree
                 pageProps={{
@@ -108,10 +107,6 @@ export function withApollo(
             // https://www.apollographql.com/docs/react/api/react-apollo.html#graphql-query-data-error
             console.error('Error while running `getDataFromTree`', error);
           }
-
-          // getDataFromTree does not call componentWillUnmount
-          // head side effect therefore need to be cleared manually
-          Head.rewind();
         }
       }
 
@@ -155,8 +150,24 @@ function initApolloClient(initialState: NormalizedCacheObject) {
 function createApolloClient(
   initialState: NormalizedCacheObject = {},
 ): ApolloClient<NormalizedCacheObject> {
-  const ssrMode = typeof window === 'undefined';
-  const cache = new InMemoryCache().restore(initialState);
+  const isBrowser = typeof window !== 'undefined';
+  const ssrMode = !isBrowser;
+  const cache = new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          networkStatus: {
+            read() {
+              return {
+                __typename: 'NetworkStatus',
+                ...networkStatusVar(),
+              };
+            },
+          },
+        },
+      },
+    },
+  }).restore(initialState);
 
   const authLink = setContext((_, { headers }) => {
     // get the authentication token from local storage if it exists
@@ -179,7 +190,7 @@ function createApolloClient(
   } else if (webSocketUri.indexOf('http://') > -1) {
     webSocketUri = process.env.GRAPHQL_SERVER.replace(/http/, 'ws');
   }
-  const subscriptionClient = process.browser
+  const subscriptionClient = isBrowser
     ? new SubscriptionClient(webSocketUri, {
         reconnect: true,
         lazy: true,
@@ -188,13 +199,7 @@ function createApolloClient(
         }),
       })
     : null;
-  const wsLink = process.browser ? new WebSocketLink(subscriptionClient) : null;
-
-  const stateLink = withClientState({
-    cache,
-    resolvers: ClientResolvers,
-    defaults: ClientStateDefaults,
-  });
+  const wsLink = isBrowser ? new WebSocketLink(subscriptionClient) : null;
 
   const httpLink = new HttpLink({
     uri: process.env.GRAPHQL_SERVER || 'http://localhost:3000/graphql',
@@ -204,7 +209,7 @@ function createApolloClient(
 
   // using the ability to split links, you can send data to each link
   // depending on what kind of operation is being sent
-  const link = process.browser
+  const link = isBrowser
     ? split(
         // split based on operation type
         ({ query }) => {
@@ -231,7 +236,6 @@ function createApolloClient(
           //logoutUser();
         }
       }),
-      stateLink,
       authLink,
       link,
     ]),
@@ -244,14 +248,10 @@ function createApolloClient(
     reconnected: boolean,
     isPaid?: boolean,
   ) => {
-    client.mutate({
-      mutation: UPDATE_NETWORK_STATUS,
-      variables: {
-        isConnected: status,
-        reconnected: reconnected,
-        isPaid: isPaid,
-      },
-      fetchPolicy: 'no-cache',
+    networkStatusVar({
+      isConnected: status,
+      reconnected,
+      isPaid,
     });
   };
 

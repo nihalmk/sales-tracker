@@ -19,7 +19,7 @@ const Home: NextPage<Props> = () => {
   const router = useRouter();
   useEffect(() => {
     if (shop) {
-      clientLogger.log('redirecting to dashboard..');
+      clientLogger.info('redirecting to dashboard..');
       router.push(Pages.DASHBOARD);
     }
   }, [shop]);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_SALES } from '../../graphql/query/sale';
 import _ from 'lodash';
 import { Sale } from '../../generated/graphql';
@@ -9,6 +9,7 @@ import moment from 'moment-timezone';
 import SaleCard from './Sale';
 import DatePicker from '../common/DatePicker/DatePicker';
 import { currency } from '../../utils/helpers';
+import { Box, Card, Flex, Text } from '@chakra-ui/react';
 
 interface Props {
   billNumber?: string;
@@ -71,28 +72,28 @@ const Sales: NextPage<Props> = function ({
 
   const TotalSection = () => {
     return (
-      <div className={`col-md-2 ${hideExtraFields && 'ml-auto text-right'}`}>
-        <label className="form-label">{'Total'}</label>{' '}
-        <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
+      <Box ml={hideExtraFields ? 'auto' : undefined} textAlign={hideExtraFields ? 'right' : undefined}>
+        <Text fontSize="sm" color="fg.muted">{'Total'}</Text>
+        <Text color={getTotalProfit() > 0 ? 'green.600' : 'red.600'} fontWeight="medium">
           {total}
           {currency}
-        </div>
-        <label className="form-label">{'Profile/Loss'}</label>{' '}
-        <div className={getTotalProfit() > 0 ? 'profit' : 'loss'}>
+        </Text>
+        <Text fontSize="sm" color="fg.muted" mt={1}>{'Profile/Loss'}</Text>
+        <Text color={getTotalProfit() > 0 ? 'green.600' : 'red.600'} fontWeight="medium">
           {getTotalProfit() > 0 && '+'}
           {getTotalProfit()}
           {currency}
-        </div>
-      </div>
+        </Text>
+      </Box>
     );
   };
   return (
     <React.Fragment>
-      <div className="">
-        <div className="hide-in-print row">
+      <Box>
+        <Flex className="hide-in-print" align="flex-start" wrap="wrap" gap={4} mb={4}>
           <TotalSection />
           {!saleDateFrom && (
-            <div className="hide-in-print col-md-4  ml-auto">
+            <Box className="hide-in-print" ml="auto" minW="200px">
               <DatePicker
                 inputLabel="Select Date"
                 maxDate={new Date()}
@@ -101,9 +102,9 @@ const Sales: NextPage<Props> = function ({
                   setDate(moment(selectedDate));
                 }}
               ></DatePicker>
-            </div>
+            </Box>
           )}
-        </div>
+        </Flex>
         {!hideExtraFields && (
           <React.Fragment>
             {saleLoading ? (
@@ -121,21 +122,15 @@ const Sales: NextPage<Props> = function ({
                   );
                 })) || (
                 <React.Fragment>
-                  <div className="card text-center p-5">No sales found</div>
+                  <Card.Root variant="outline" textAlign="center" py={10}>
+                    <Text color="fg.muted">No sales found</Text>
+                  </Card.Root>
                 </React.Fragment>
               )
             )}
           </React.Fragment>
         )}
-      </div>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-      `}</style>
+      </Box>
     </React.Fragment>
   );
 };

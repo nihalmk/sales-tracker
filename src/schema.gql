@@ -315,13 +315,13 @@ type Query {
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
   getPurchaseByVendorName(vendor: String!): [Purchase!]!
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
-  getPurchasesForUser(date: DateRange!): [Purchase!]!
   getPurchaseWithoutClosing: [Purchase!]
+  getPurchasesForUser(date: DateRange!): [Purchase!]!
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!
-  getSalesForUser(date: DateRange!): [Sale!]!
   getSaleWithoutClosing: [Sale!]
+  getSalesForUser(date: DateRange!): [Sale!]!
   getShopForUser: Shop
   getShopTypes: [LabelValueObj!]
   getUserById(id: ID!): User

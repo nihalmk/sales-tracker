@@ -41,7 +41,7 @@ export const addRoutes = async (app: Koa) => {
     ctx.respond = true;
   });
 
-  router.get('*', async (ctx) => {
+  router.get('/{*splat}', async (ctx) => {
     await handler(ctx.req, ctx.res);
     ctx.respond = false;
   });

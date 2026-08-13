@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Button } from '@chakra-ui/react';
+import Icon from './Icon';
 
 interface Props {
   selectedPrintId?: string;
@@ -13,12 +15,11 @@ const Print: React.FC<Props> = ({
   const [isPrinting, setIsPrinting] = useState(false);
   return (
     <React.Fragment>
-      <button
+      <Button
         type="button"
-        className={`${className} hide-in-print btn btn-primary ' ${
-          isPrinting ? 'btn-loading' : ''
-        }
-        `}
+        className={`${className || ''} hide-in-print`}
+        colorPalette="brand"
+        loading={isPrinting}
         onClick={() => {
           setPrintStatus(selectedPrintId);
           setTimeout(() => {
@@ -29,8 +30,9 @@ const Print: React.FC<Props> = ({
           }, 0);
         }}
       >
+        <Icon name="print" light />
         Print
-      </button>
+      </Button>
       <style jsx global>
         {`
           @media print {

@@ -5,7 +5,7 @@ import React, {
   // useContext
 } from 'react';
 import { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/client';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
 import _ from 'lodash';
@@ -29,6 +29,8 @@ import { NavItems } from '../Navigation/Navigation';
 import UserContext from '../UserWrapper/UserContext';
 import Print from '../common/Print';
 // import UserContext from '../UserWrapper/UserContext';
+import { Box, Card, Heading, Text, Button, HStack } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   closingId?: string;
@@ -184,7 +186,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   if (previousClosingLoading || closingsLoading) {
     return (
       <React.Fragment>
-        <div className="text-center p-4">Getting closing data...</div>
+        <Text textAlign="center" py={4} color="fg.muted">Getting closing data...</Text>
         <Loader />
       </React.Fragment>
     );
@@ -192,9 +194,9 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   if (isView && !newClosing) {
     return (
       <React.Fragment>
-        <div className="card">
-          <div className="text-center p-4">No closing found</div>
-        </div>
+        <Card.Root variant="outline">
+          <Text textAlign="center" py={4}>No closing found</Text>
+        </Card.Root>
       </React.Fragment>
     );
   }
@@ -218,53 +220,67 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
 
   return (
     <React.Fragment>
-      <div className="card">
-        <div className="card-header">
-          <div className="card-title">
-            {isView ? 'Report | ' : 'New Closing | '}
-            {today.format('DD/MM/YYYY')}{' '}
-            {endDate && `- ${moment(endDate).format('DD/MM/YYYY')}`}
-          </div>
-          <div className="card-options">
+      <Card.Root variant="elevated" borderRadius="l3" mb={5}>
+        <Card.Header>
+          <HStack justify="space-between" wrap="wrap">
+            <HStack gap={2}>
+              <Icon name={isView ? 'report' : 'closing'} boxSize={5} />
+              <Heading size="md">
+                {isView ? 'Report | ' : 'New Closing | '}
+                {today.format('DD/MM/YYYY')}{' '}
+                {endDate && `- ${moment(endDate).format('DD/MM/YYYY')}`}
+              </Heading>
+            </HStack>
             {!isView && (
-              <React.Fragment>
-                <span className="mr-2">
-                  Previous (
-                  {moment(
-                    prevClosing?.date || moment(today).subtract(1, 'days'),
-                  ).format('DD/MM/YYYY')}
-                  ):
-                </span>
-                <span className="profit">
+              <Text>
+                Previous (
+                {moment(
+                  prevClosing?.date || moment(today).subtract(1, 'days'),
+                ).format('DD/MM/YYYY')}
+                ):{' '}
+                <Text as="span" color="green.600" fontWeight="medium">
                   {prevClosing?.inHandTotal || 0}
                   {currency}
-                </span>
-              </React.Fragment>
+                </Text>
+              </Text>
             )}
-          </div>
-        </div>
+          </HStack>
+        </Card.Header>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
-        <div className="card-body pb-0">
-          <div className="mb-3">
-            {!isView && !prevClosing?.inHandTotal && (
-              <small className="btn btn-outline-danger w-100">
-                * Add Total in hand on <strong>Received</strong> section for
-                first time closing
-              </small>
-            )}
-          </div>
-          <h4>Sales</h4>
-          <button
-            type="button"
-            className="btn btn-icon btn-primary btn-sm w-100 hide-in-print"
+        <Card.Body pb={0}>
+          {!isView && !prevClosing?.inHandTotal && (
+            <Text
+              className="hide-in-print"
+              color="red.600"
+              borderWidth="1px"
+              borderColor="red.300"
+              borderRadius="l2"
+              px={3}
+              py={2}
+              mb={3}
+            >
+              * Add Total in hand on <strong>Received</strong> section for
+              first time closing
+            </Text>
+          )}
+          <HStack gap={2} mb={2}>
+            <Icon name="sales" boxSize={4} />
+            <Heading size="sm">Sales</Heading>
+          </HStack>
+          <Button
+            className="hide-in-print"
+            colorPalette="brand"
+            size="sm"
+            w="full"
+            mb={3}
             onClick={() => {
               setSalesView(!salesView);
             }}
           >
             {(salesView ? 'Hide' : 'View') + ' Sales'}
-          </button>
-          <div className="card-body pb-0">
+          </Button>
+          <Box mb={4}>
             <Sales
               hideExtraFields={!salesView}
               saleDateFrom={today.toDate()}
@@ -278,18 +294,24 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
                 setSalesTotal(total);
               }}
             />
-          </div>
-          <h4>Purchases</h4>
-          <button
-            type="button"
-            className="btn btn-icon btn-primary btn-sm w-100 hide-in-print"
+          </Box>
+          <HStack gap={2} mb={2}>
+            <Icon name="purchases" boxSize={4} />
+            <Heading size="sm">Purchases</Heading>
+          </HStack>
+          <Button
+            className="hide-in-print"
+            colorPalette="brand"
+            size="sm"
+            w="full"
+            mb={3}
             onClick={() => {
               setPurchasesView(!purchasesView);
             }}
           >
             {(purchasesView ? 'Hide' : 'View') + ' Purchases'}
-          </button>
-          <div className="card-body pb-0">
+          </Button>
+          <Box mb={4}>
             <Purchases
               hideExtraFields={!purchasesView}
               purchaseFromDate={today.toDate()}
@@ -304,25 +326,33 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
                 setPurchaseTotal(total);
               }}
             />
-          </div>
-          <h4>Expenses</h4>
-          <small className="text-muted">
+          </Box>
+          <HStack gap={2} mb={2}>
+            <Icon name="expenses" boxSize={4} />
+            <Heading size="sm">Expenses</Heading>
+          </HStack>
+          <Text fontSize="sm" color="fg.muted" mb={2}>
             * Include borrowed money to deduct money received from sales
-          </small>
-          <div className="card p-0" id={newClosing?.date}>
-            <div className={'p-2 loss  ml-auto'}>
-              {spentTotal}
-              {currency}
-            </div>
-            <button
-              type="button"
-              className="btn btn-icon btn-primary btn-sm hide-in-print"
-              onClick={() => {
-                setSpentView(!spentView);
-              }}
-            >
-              {(spentView ? 'Hide' : 'View') + ' Spent Items'}
-            </button>
+          </Text>
+          <Card.Root variant="outline" p={0} mb={4} id={newClosing?.date}>
+            <HStack justify="flex-end" p={2}>
+              <Text color="red.600" fontWeight="medium">
+                {spentTotal}
+                {currency}
+              </Text>
+            </HStack>
+            <Box px={2} pb={2}>
+              <Button
+                className="hide-in-print"
+                colorPalette="brand"
+                size="sm"
+                onClick={() => {
+                  setSpentView(!spentView);
+                }}
+              >
+                {(spentView ? 'Hide' : 'View') + ' Spent Items'}
+              </Button>
+            </Box>
             {spentView && (
               <Spent
                 callback={(spentItems) => {
@@ -341,22 +371,30 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
                 id={newClosing?.date}
               />
             )}
-          </div>
-          <h4 className="pt-3">Received</h4>
-          <div className="card p-0" id={newClosing?.date}>
-            <div className={'p-2 profit ml-auto'}>
-              {receivedTotal}
-              {currency}
-            </div>
-            <button
-              type="button"
-              className="btn btn-icon btn-primary btn-sm hide-in-print "
-              onClick={() => {
-                setRecievedView(!receivedView);
-              }}
-            >
-              {(receivedView ? 'Hide' : 'View') + ' Received Items'}
-            </button>
+          </Card.Root>
+          <HStack gap={2} mb={2}>
+            <Icon name="received" boxSize={4} />
+            <Heading size="sm">Received</Heading>
+          </HStack>
+          <Card.Root variant="outline" p={0} mb={4} id={newClosing?.date}>
+            <HStack justify="flex-end" p={2}>
+              <Text color="green.600" fontWeight="medium">
+                {receivedTotal}
+                {currency}
+              </Text>
+            </HStack>
+            <Box px={2} pb={2}>
+              <Button
+                className="hide-in-print"
+                colorPalette="brand"
+                size="sm"
+                onClick={() => {
+                  setRecievedView(!receivedView);
+                }}
+              >
+                {(receivedView ? 'Hide' : 'View') + ' Received Items'}
+              </Button>
+            </Box>
             {receivedView && (
               <Received
                 callback={(receivedItems) => {
@@ -376,65 +414,49 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
                 id={newClosing?.date}
               />
             )}
-          </div>
+          </Card.Root>
           {!isView && (
-            <div className="card mt-3 mb-3 p-2">
-              <div className="row bigger">
-                <strong className="col-md-9">
+            <Card.Root variant="outline" mb={4} p={3}>
+              <HStack justify="space-between">
+                <Text fontSize="lg" fontWeight="bold">
                   {isView
                     ? 'Net Balance (Sales Total + Received Total - Purchases Total - Expenses Total)'
                     : 'Closing Balance'}
-                </strong>
-                <strong className="col-md-3 profit">
+                </Text>
+                <Text fontSize="lg" fontWeight="bold" color="green.600">
                   {isView ? getNetTotal() || 0 : getTotal()[0].toFixed(2)}
                   {currency}
-                </strong>
-              </div>
-            </div>
+                </Text>
+              </HStack>
+            </Card.Root>
           )}
-          {/* {isView && (
-            <div className="card mt-3 mb-3 p-2">
-              <div className="row bigger">
-                <strong className="col-md-9">
-                  In Hand at{' '}
-                  {moment(inHandTotalAtLastDate().date).format('DD/MM/YYYY')}
-                </strong>
-                <strong className="col-md-3 profit">
-                  {inHandTotalAtLastDate().inHandTotal}
-                  {currency}
-                </strong>
-              </div>
-            </div>
-          )} */}
-        </div>
-        <div className="card-footer">
-          <div className="d-flex">
-            <Link href="/dashboard">
-              <button
-                type="button"
-                className={'btn btn-outline-danger hide-in-print'}
-              >
+        </Card.Body>
+        <Card.Footer>
+          <HStack w="full">
+            <Button asChild className="hide-in-print" variant="outline" colorPalette="red">
+              <Link href="/dashboard">
+                <Icon name="cancel" />
                 Cancel
-              </button>
-            </Link>
-            <Print setPrintStatus={() => {}} className="ml-auto" />
-            <button
-              id="shop-submit"
-              type="submit"
-              className={
-                'btn btn-primary ml-3 hide-in-print ' +
-                (createLoading && 'btn-loading')
-              }
+              </Link>
+            </Button>
+            <Box ml="auto">
+              <Print setPrintStatus={() => {}} />
+            </Box>
+            <Button
+              className="hide-in-print"
+              colorPalette="brand"
+              loading={createLoading}
               disabled={isView}
               onClick={() => {
                 !isView && setClosingConfirmation(true);
               }}
             >
+              <Icon name="done" light />
               Submit
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </HStack>
+        </Card.Footer>
+      </Card.Root>
       <OverLay show={!!closingConfirmation}>
         <ConfirmationDialog
           success={(success) => {
@@ -450,11 +472,6 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
           }`}
         />
       </OverLay>
-      <style jsx>{`
-        .bigger {
-          font-size: 23px;
-        }
-      `}</style>
     </React.Fragment>
   );
 };

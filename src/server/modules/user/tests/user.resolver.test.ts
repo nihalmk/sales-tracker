@@ -59,9 +59,9 @@ describe('User Resolver', () => {
   });
 
   it('should create a new user', async () => {
-    mockUserService.mock.instances[0].updateUser = jest.fn();
+    mockUserService.mock.instances[0].updateUserRegistration = jest.fn();
     await resolver.createNewUser(userInput as CreateUserInput);
-    expect(mockUserService.mock.instances[0].updateUser).toBeCalledWith(
+    expect(mockUserService.mock.instances[0].updateUserRegistration).toHaveBeenCalledWith(
       mockUser._id,
       userInput,
     );

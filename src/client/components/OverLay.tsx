@@ -1,45 +1,37 @@
 import React from 'react';
+import { Box } from '@chakra-ui/react';
+
 interface Props {
-  children?: object;
+  children?: React.ReactNode;
   className?: string;
   show?: boolean;
 }
 const OverLay: React.FC<Props> = ({ children, className, show }) => {
+  if (!show) {
+    return null;
+  }
   return (
-    <>
-      {show && (
-        <div id="layout" key="layout" className={'container-overlay'}>
-          <div className={`overlay-content${className ? ` ${className}` : ''}`}>
-            {children}
-          </div>
-        </div>
-      )}
-      <style jsx global>
-        {`
-          .container-overlay {
-            display: block;
-            position: fixed; /* Stay in place */
-            z-index: 2010; /* Sit on top */
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
-          }
-          .overlay-content {
-            background-color: #fefefe;
-            border-radius: 3px;
-            margin: auto;
-            margin-bottom: 20px;
-            border: 1px solid #888;
-            width: 65%;
-          }
-        `}
-      </style>
-    </>
+    <Box
+      position="fixed"
+      inset={0}
+      zIndex="overlay"
+      pt="100px"
+      overflow="auto"
+      bg="blackAlpha.500"
+    >
+      <Box
+        className={className}
+        bg="bg.panel"
+        borderRadius="l2"
+        mx="auto"
+        mb={5}
+        border="1px solid"
+        borderColor="border"
+        w="65%"
+      >
+        {children}
+      </Box>
+    </Box>
   );
 };
 

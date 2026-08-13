@@ -1,5 +1,5 @@
 import UserContext from './UserContext';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_USER } from '../../graphql/query/user';
 import { useRouter } from 'next/router';
 import { Pages } from '../../utils/pages';
@@ -58,7 +58,7 @@ export const UserWrapper: React.FC<Props> = ({ Component, pageProps }) => {
       currentUser.error ||
       (currentUser.data && currentUser.data.me === null)
     ) {
-      clientLogger.log('Error', currentUser.error?.message);
+      clientLogger.error(currentUser.error?.message);
       if (router.pathname !== Pages.LOGIN) {
         router.push(Pages.LOGIN);
       }

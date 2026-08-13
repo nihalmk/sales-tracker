@@ -1,6 +1,5 @@
 import React, { SyntheticEvent } from 'react';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { Field, Input as ChakraInput, InputGroup } from '@chakra-ui/react';
 
 interface Props {
   inputLabel?: string;
@@ -20,27 +19,17 @@ interface Props {
   prependIcon?: any;
   autoFocus?: boolean;
   append?: string;
-  innerRef?: any
+  innerRef?: any;
 }
 
 const Input: React.FunctionComponent<Props> = (props) => (
-  <div className="form-group">
+  <Field.Root invalid={props.isInvalid}>
     {props.inputLabel && (
-      <label className="form-label">{props.inputLabel}</label>
+      // @ts-expect-error Chakra v3's Ark UI-derived FieldLabelProps doesn't model `children` in its polymorphic types, though it renders them fine.
+      <Field.Label>{props.inputLabel}</Field.Label>
     )}
-    <div className={props.prependIcon ? 'input-group' : ''}>
-      {props.prependIcon && (
-        <span className="input-group-prepend">
-          <span className="input-group-text">
-            {/* <FontAwesomeIcon
-              icon={props.prependIcon}
-              style={{ color: '#9aa0ac' }}
-            ></FontAwesomeIcon> */}
-          </span>
-        </span>
-      )}
-
-      <input
+    <InputGroup endElement={props.append}>
+      <ChakraInput
         autoComplete={
           props.inputType === 'password'
             ? 'new-password'
@@ -49,12 +38,7 @@ const Input: React.FunctionComponent<Props> = (props) => (
         tabIndex={props.tabIndex}
         type={props.inputType}
         name={props.inputName}
-        className={
-          'form-control ' +
-          (props.isInvalid ? 'is-invalid ' : '') +
-          'pt-678 ' +
-          props.className
-        }
+        className={props.className}
         placeholder={props.placeholderValue}
         onChange={props.onChange}
         value={props.value}
@@ -64,19 +48,10 @@ const Input: React.FunctionComponent<Props> = (props) => (
         step={props.step}
         autoFocus={props.autoFocus}
         ref={props.innerRef}
+        bg="white"
       />
-      {props.append && (
-        <span className="input-group-append">
-          <span className="input-group-text">{props.append}</span>
-        </span>
-      )}
-    </div>
-    <style jsx>{`
-      .form-control {
-        line-height: 1.75;
-      }
-    `}</style>
-  </div>
+    </InputGroup>
+  </Field.Root>
 );
 
 export default Input;

@@ -1,33 +1,50 @@
-import 'jsdom-global/register';
+/**
+ * @jest-environment jsdom
+ */
+import { render, screen, fireEvent } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../../../styles/theme';
 import ConfirmationDialog from '../ConfirmationDialog';
-import { shallow, mount } from 'enzyme';
-import { Alert } from 'tabler-react';
 
-const mockSuccessCallback = jest.fn();
 describe('ConfirmationDialog', () => {
   it('Should check for component message displayed', () => {
-    const wrapper = shallow(
-      <ConfirmationDialog message={'Confirm'} success={mockSuccessCallback} />,
+    const mockSuccessCallback = jest.fn();
+    render(
+      <ChakraProvider value={system}>
+        <ConfirmationDialog
+          message={'Confirm'}
+          success={mockSuccessCallback}
+        />
+      </ChakraProvider>,
     );
-    const messageAlert = wrapper.find(Alert).first();
-    expect(messageAlert.html()).toContain('Confirm');
+    expect(screen.getByText('Confirm')).toBeInTheDocument();
   });
 
   it('Should callback with success when confirmed', () => {
-    const wrapper = mount(
-      <ConfirmationDialog message={'Confirm'} success={mockSuccessCallback} />,
+    const mockSuccessCallback = jest.fn();
+    render(
+      <ChakraProvider value={system}>
+        <ConfirmationDialog
+          message={'Confirm'}
+          success={mockSuccessCallback}
+        />
+      </ChakraProvider>,
     );
-    const cancelButton = wrapper.find('button').at(1);
-    cancelButton.simulate('click');
-    expect(mockSuccessCallback).toBeCalledWith(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(mockSuccessCallback).toHaveBeenCalledWith(true);
   });
 
   it('Should callback with failure when cancelled', () => {
-    const wrapper = mount(
-      <ConfirmationDialog message={'Confirm'} success={mockSuccessCallback} />,
+    const mockSuccessCallback = jest.fn();
+    render(
+      <ChakraProvider value={system}>
+        <ConfirmationDialog
+          message={'Confirm'}
+          success={mockSuccessCallback}
+        />
+      </ChakraProvider>,
     );
-    const cancelButton = wrapper.find('button').at(0);
-    cancelButton.simulate('click');
-    expect(mockSuccessCallback).toBeCalledWith(false);
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(mockSuccessCallback).toHaveBeenCalledWith(false);
   });
 });

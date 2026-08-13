@@ -9,14 +9,22 @@ import { ApolloServer } from 'apollo-server-koa';
 import * as path from 'path';
 import { setUpAccounts } from '../accounts/setup';
 import { connect } from 'mongoose';
-import { mergeSchemas, makeExecutableSchema } from 'graphql-tools';
-import { buildSchema } from 'type-graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
+import { buildTypeDefsAndResolvers } from 'type-graphql';
 import { addRoutes } from './routes';
 import compression from 'compression';
 import { authChecker } from './common/authChecker';
 // import { graphqlPubsub as pubSub } from './modules/graphqlPubsub/pubsub.service';
 
 const koaConnect = require('koa-connect');
+
+// @accounts/mongo-password (a nested dependency of @accounts/mongo) still calls
+// the old `ObjectID` alias that the mongodb driver dropped in favor of `ObjectId`.
+// Restore it on the single shared mongodb module instance.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mongodbPkg = require('mongodb');
+mongodbPkg.ObjectID = mongodbPkg.ObjectId;
 
 const startUp = async () => {
   const PORT = process.env.PORT || 3000;
@@ -41,11 +49,7 @@ const startUp = async () => {
     app.use(helmet());
     app.use(koaConnect(compression()));
 
-    const mongooseConnection = await connect(mongoURI, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useUnifiedTopology: true,
-    });
+    const mongooseConnection = await connect(mongoURI);
 
     logger.info(`Connection to MongoDB successful`);
 
@@ -53,7 +57,10 @@ const startUp = async () => {
 
     const { accountsGraphQL } = setUpAccounts(mongooseConnection.connection);
 
-    const typeGraphqlSchema = await buildSchema({
+    const {
+      typeDefs: typeGraphqlTypeDefs,
+      resolvers: typeGraphqlResolvers,
+    } = await buildTypeDefsAndResolvers({
       resolvers: [
         __dirname + '/modules/**/*.resolver.ts',
         __dirname + '/modules/**/*.resolver.js',
@@ -65,12 +72,12 @@ const startUp = async () => {
     });
 
     const schema = makeExecutableSchema({
-      typeDefs: accountsGraphQL.typeDefs,
-      resolvers: accountsGraphQL.resolvers,
-      schemaDirectives: {
-        ...accountsGraphQL.schemaDirectives,
-      },
-      resolverValidationOptions: { requireResolversForResolveType: false },
+      typeDefs: mergeTypeDefs([accountsGraphQL.typeDefs, typeGraphqlTypeDefs]),
+      resolvers: mergeResolvers([
+        accountsGraphQL.resolvers,
+        typeGraphqlResolvers,
+      ]),
+      resolverValidationOptions: { requireResolversForResolveType: 'ignore' },
     });
 
     logger.info('Initalizing Apollo graphQLServer.');
@@ -78,9 +85,7 @@ const startUp = async () => {
     let isProduction = process.env.NODE_ENV === 'production';
 
     const graphQLServer = new ApolloServer({
-      schema: mergeSchemas({
-        schemas: [schema, typeGraphqlSchema],
-      }),
+      schema,
       context: async ({ ctx, connection }) => {
         if (connection) {
           return connection.context;
@@ -91,9 +96,6 @@ const startUp = async () => {
           ctx = { ...ctx, ...userContext };
         }
         return ctx;
-      },
-      playground: {
-        endpoint: isProduction ? undefined : '/graphql',
       },
       introspection: !isProduction,
       // subscriptions: {
@@ -121,13 +123,13 @@ const startUp = async () => {
       // },
     });
 
+    await graphQLServer.start();
     graphQLServer.applyMiddleware({ app });
     app.use(koaLogger.getMiddleware());
 
     await addRoutes(app);
     logger.info(`🚀 Server listening on ${PORT}`);
-    const httpServer = app.listen(PORT);
-    graphQLServer.installSubscriptionHandlers(httpServer);
+    app.listen(PORT);
 
     if (process.env.NODE_ENV !== 'development') {
       let url = `http://localhost:${PORT}`;
@@ -141,9 +143,9 @@ const startUp = async () => {
     }
     app.on('error', (error) => {
       if (error.code === 'EPIPE') {
-        logger.warn('Koa app-level EPIPE error.', { error });
+        logger.warn({ error }, 'Koa app-level EPIPE error.');
       } else {
-        logger.error('Koa app-level error', { error });
+        logger.error({ error }, 'Koa app-level error');
       }
     });
   } catch (e) {

@@ -1,5 +1,5 @@
 import { ObjectType, Field } from 'type-graphql';
-import { prop, arrayProp } from '@typegoose/typegoose';
+import { prop } from '@typegoose/typegoose';
 import {
   StringField,
   NumberField,
@@ -236,7 +236,7 @@ export class Item {
   @Field(StringField)
   customer_notes: string;
 
-  @arrayProp({ items: Option })
+  @prop({ type: () => [Option] })
   @Field(() => [Option])
   options: Option[];
 
@@ -263,7 +263,7 @@ export class OrderInfo {
   @Field(() => Tax)
   tax: Tax;
 
-  @arrayProp({ items: Item })
+  @prop({ type: () => [Item] })
   @Field(() => [Item])
   items: Item[];
 }

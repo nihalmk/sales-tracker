@@ -2,11 +2,11 @@ const TEST_REGEX = '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$';
 process.env.NO_LOG = 'true';
 
 module.exports = {
-  setupFiles: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testRegex: TEST_REGEX,
   testEnvironment: 'node',
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
     '^.+\\.tsx$': 'babel-jest',
   },
   testPathIgnorePatterns: [
@@ -24,11 +24,6 @@ module.exports = {
       '<rootDir>/client/__mocks__/fileMock.ts',
     '\\.(css|scss|less)$': '<rootDir>/client/__mocks__/styleMock.ts',
   },
-  globals: {
-    'ts-jest': {
-      tsConfig: '<rootDir>/tsconfig.json',
-    },
-  },
   coverageThreshold: {
     global: {
       statements: 80,
@@ -38,5 +33,4 @@ module.exports = {
     },
   },
   coverageReporters: ['html', 'text', 'text-summary'],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
 };

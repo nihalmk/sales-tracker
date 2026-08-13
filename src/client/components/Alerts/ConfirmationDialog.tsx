@@ -1,7 +1,5 @@
 import React from 'react';
-import { Card, Alert } from 'tabler-react';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faExclamationTriangle } from '@fortawesome/pro-light-svg-icons';
+import { Card, Alert, Button, HStack } from '@chakra-ui/react';
 
 interface Props {
   message: string;
@@ -16,37 +14,40 @@ const ConfirmationDialog: React.FC<Props> = ({
   success,
 }) => {
   return (
-    <React.Fragment>
-      <Card className="mb-0">
-        <Card.Header>
-          <Card.Title>{headerMessage || 'Are you Sure?'}</Card.Title>
-        </Card.Header>
-        <Card.Body>
-          {message && (
-            <Alert className={`${className} alert-align`} type="warning">
-              {message}
-            </Alert>
-          )}
-        </Card.Body>
-        <Card.Footer>
-          <button
+    <Card.Root mb={0} variant="elevated">
+      <Card.Header>
+        <Card.Title>{headerMessage || 'Are you Sure?'}</Card.Title>
+      </Card.Header>
+      <Card.Body>
+        {message && (
+          <Alert.Root className={className} status="warning" borderRadius="l2">
+            <Alert.Indicator />
+            <Alert.Content>
+              <Alert.Description>{message}</Alert.Description>
+            </Alert.Content>
+          </Alert.Root>
+        )}
+      </Card.Body>
+      <Card.Footer>
+        <HStack ml="auto" gap={3}>
+          <Button
             type="button"
-            className={'btn btn-outline-danger'}
+            variant="outline"
+            colorPalette="red"
             onClick={() => success(false)}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className={'btn btn-primary ml-auto float-right'}
+            colorPalette="brand"
             onClick={() => success(true)}
           >
             Continue
-          </button>
-        </Card.Footer>
-      </Card>
-      <style jsx global>{``}</style>
-    </React.Fragment>
+          </Button>
+        </HStack>
+      </Card.Footer>
+    </Card.Root>
   );
 };
 

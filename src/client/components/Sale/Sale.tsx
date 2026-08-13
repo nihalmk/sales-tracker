@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { GET_SALE_BY_BILL_NUMBER } from '../../graphql/query/sale';
-import _ from 'lodash';
 import { Sale, SaleItem } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import { currency } from '../../utils/helpers';
-
-// let html2canvas: any;
-// let jsPDF: any;
+import {
+  Card,
+  SimpleGrid,
+  Table,
+  Button,
+  HStack,
+  Text,
+  IconButton,
+} from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   billNumber?: string;
@@ -37,7 +43,6 @@ const SaleCard: NextPage<Props> = function ({
     },
   );
 
-  // const [searchTerm, setSearchTerm] = useState('');
   const [sale, setSale] = useState<Sale>();
 
   useEffect(() => {
@@ -51,75 +56,81 @@ const SaleCard: NextPage<Props> = function ({
   const currentBillNumber = billNumber || sale?.billNumber;
 
   return (
-    <React.Fragment>
-      <div
-        className={
-          'card ' + (selectedPrint !== currentBillNumber ? 'hide-in-print' : '')
-        }
-        id={`sale-${currentBillNumber}`}
-      >
-        <div className="card-header">
-          <div className="card-title">
+    <Card.Root
+      className={selectedPrint !== currentBillNumber ? 'hide-in-print' : ''}
+      id={`sale-${currentBillNumber}`}
+      variant="outline"
+      mb={4}
+    >
+      <Card.Header>
+        <HStack justify="space-between" wrap="wrap">
+          <Text fontWeight="semibold">
             #{currentBillNumber} |{' '}
             {moment(sale?.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
-          </div>
-          <div className="hide-in-print card-options">
-            <strong className="profit mr-4">
+          </Text>
+          <HStack className="hide-in-print" gap={3}>
+            <Text fontWeight="bold" color="green.600">
               {sale?.total}
               {currency}
-            </strong>
-            <button
-              type="button"
-              className="btn btn-icon btn-secondary btn-sm"
+            </Text>
+            <IconButton
+              size="sm"
+              variant="outline"
+              colorPalette="gray"
+              aria-label={view ? 'Collapse' : 'Expand'}
               onClick={() => {
                 setView(!view);
               }}
             >
-              <strong className="bigger">{view ? '-' : '+'}</strong>
-            </button>
-          </div>
-        </div>
-        <div className={!view ? 'd-none' : ''}>
-          <div className={'card-body'}>
-            <div className="row">
-              <div className="col-md-4">
+              {view ? '-' : '+'}
+            </IconButton>
+          </HStack>
+        </HStack>
+      </Card.Header>
+      {view && (
+        <React.Fragment>
+          <Card.Body>
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+              <Text>
                 <strong>Customer: </strong> {sale?.customer}
-              </div>
-              <div className="col-md-4">
+              </Text>
+              <Text>
                 <strong>Contact: </strong> {sale?.contact}
-              </div>
-              <div className="col-md-4">
+              </Text>
+              <Text>
                 <strong>Email: </strong> {sale?.email}
-              </div>
-            </div>
-          </div>
+              </Text>
+            </SimpleGrid>
+          </Card.Body>
 
-          <div className="table-responsive">
-            <table className="table card-table table-hover table-outline">
-              <thead>
-                <tr>
-                  <th className="w-10">#ID</th>
-                  <th className="w-25">Product</th>
-                  <th>Sale Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
-                  <th className="w-14">Action</th>
-                </tr>
-              </thead>
-              <tbody>
+          <Table.ScrollArea>
+            <Table.Root variant="outline" size="sm" striped interactive>
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeader>#ID</Table.ColumnHeader>
+                  <Table.ColumnHeader>Product</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Sale Price</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Quantity</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">Total</Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {billNumber && saleLoading ? (
-                  <tr>
-                    <td className={'text-center'} colSpan={6}>
+                  <Table.Row>
+                    <Table.Cell textAlign="center" py={8} colSpan={6}>
                       <Loader />
-                    </td>
-                  </tr>
+                    </Table.Cell>
+                  </Table.Row>
                 ) : (
                   sale?.items.length === 0 && (
-                    <tr>
-                      <td className={'text-center'} colSpan={6}>
-                        {'No Products added!'}
-                      </td>
-                    </tr>
+                    <Table.Row>
+                      <Table.Cell textAlign="center" py={8} colSpan={6}>
+                        <Text color="fg.muted" fontSize="sm">
+                          No products added
+                        </Text>
+                      </Table.Cell>
+                    </Table.Row>
                   )
                 )}
                 {!saleLoading && sale?.items?.length !== 0 && (
@@ -127,39 +138,49 @@ const SaleCard: NextPage<Props> = function ({
                     {sale?.items?.map((sale: SaleItem, i: number) => {
                       const item = sale.item;
                       return (
-                        <tr key={i}>
-                          <td>{item.shortId}</td>
-                          <td className="w-25">{item.name}</td>
-                          <td className="w-14">{sale.cost}</td>
-                          <td className="w-14">{sale.quantity}</td>
-                          <td>{sale.total}</td>
-                          <td className="w-14">XXXX</td>
-                        </tr>
+                        <Table.Row key={i}>
+                          <Table.Cell color="fg.muted">{item.shortId}</Table.Cell>
+                          <Table.Cell fontWeight="medium">{item.name}</Table.Cell>
+                          <Table.Cell textAlign="end">{sale.cost}</Table.Cell>
+                          <Table.Cell textAlign="end">{sale.quantity}</Table.Cell>
+                          <Table.Cell textAlign="end" fontWeight="semibold">
+                            {sale.total}
+                          </Table.Cell>
+                          <Table.Cell textAlign="center" color="fg.muted">
+                            —
+                          </Table.Cell>
+                        </Table.Row>
                       );
                     })}
-                    <tr>
-                      <td colSpan={4}>
-                        <strong>TOTAL</strong>
-                      </td>
-                      <td className="w-10">
-                        <strong>{sale?.total}</strong>
-                      </td>
-                      <td className="w-14"></td>
-                    </tr>
+                    <Table.Row bg="gray.50" borderTopWidth="2px" borderTopColor="gray.300">
+                      <Table.Cell colSpan={4}>
+                        <Text
+                          fontWeight="bold"
+                          fontSize="xs"
+                          textTransform="uppercase"
+                          letterSpacing="wider"
+                          color="gray.600"
+                        >
+                          Total
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell textAlign="end" fontWeight="bold">
+                        {sale?.total}
+                      </Table.Cell>
+                      <Table.Cell></Table.Cell>
+                    </Table.Row>
                   </React.Fragment>
                 )}
-              </tbody>
-            </table>
-          </div>
-          <div className="card-footer">
-            <div className="d-flex">
+              </Table.Body>
+            </Table.Root>
+          </Table.ScrollArea>
+          <Card.Footer>
+            <HStack w="full">
               {currentBillNumber && (
-                <button
-                  type="button"
-                  className={
-                    'hide-in-print btn btn-primary ' +
-                    (isPrinting ? 'btn-loading' : '')
-                  }
+                <Button
+                  className="hide-in-print"
+                  colorPalette="brand"
+                  loading={isPrinting}
                   onClick={() => {
                     setSelectedPrint(currentBillNumber);
                     setTimeout(() => {
@@ -170,70 +191,24 @@ const SaleCard: NextPage<Props> = function ({
                     }, 0);
                   }}
                 >
+                  <Icon name="print" light />
                   Print
-                </button>
+                </Button>
               )}
-              <button
-                id="shop-submit"
-                type="submit"
-                className={'hide-in-print btn btn-primary ml-auto '}
+              <Button
+                className="hide-in-print"
+                colorPalette="brand"
+                ml="auto"
                 disabled={true}
-                // onClick={onSaleEdit}
               >
+                <Icon name="edit" light />
                 Edit
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .w-15 {
-          width: 15%;
-        }
-        .link {
-          color: blue !important;
-          cursor: pointer;
-        }
-        .link:hover {
-          border-bottom: 1px solid blue;
-        }
-        .bigger {
-          transform: scale(1.1);
-        }
-      `}</style>
-      <style jsx global>{`
-        .w-14 {
-          width: 14%;
-        }
-        .card-options .form-group {
-          width: 100%;
-        }
-        @media print {
-          .hide-in-print,
-          .container-overlay {
-            display: none !important;
-          }
-          .show-in-print {
-            display: block !important;
-          }
-          .card-header {
-            display: flex;
-          }
-          .card {
-            border: 1px solid rgba(0, 40, 100, 0.12);
-          }
-          .col-md-12,
-          .form-group,
-          .selectgroup,
-          .form-label {
-            page-break-inside: avoid !important;
-          }
-        }
-      `}</style>
-    </React.Fragment>
+              </Button>
+            </HStack>
+          </Card.Footer>
+        </React.Fragment>
+      )}
+    </Card.Root>
   );
 };
 

@@ -1,11 +1,18 @@
+/**
+ * @jest-environment jsdom
+ */
+import { render, screen } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../../../styles/theme';
 import ErrorMessage from '../ErrorMessage';
-import { shallow } from 'enzyme';
-import { Alert } from 'tabler-react';
 
 describe('ErrorMessage', () => {
   it('Should check for component ErrorMessage display', () => {
-    const wrapper = shallow(<ErrorMessage error={'Error Message'} />);
-    const messageAlert = wrapper.find(Alert).first();
-    expect(messageAlert.html()).toContain('Error Message');
+    render(
+      <ChakraProvider value={system}>
+        <ErrorMessage error={'Error Message'} />
+      </ChakraProvider>,
+    );
+    expect(screen.getByText('Error Message')).toBeInTheDocument();
   });
 });

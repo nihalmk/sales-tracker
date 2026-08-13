@@ -1,8 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
 import App from 'next/app';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../styles/theme';
 import { withApollo } from '../apollo/client';
-import 'tabler-react/dist/Tabler.css';
+import '@fontsource-variable/inter/wght.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import UserWrapper from '../components/UserWrapper/UserWrapper';
 // import { config } from '@fortawesome/fontawesome-svg-core';
@@ -31,7 +33,7 @@ class MyApp extends App {
     };
 
     return (
-      <React.Fragment>
+      <ChakraProvider value={system}>
         <Head>
           <title>Shop Tracker</title>
           <link rel="icon" href="/static/favicon.ico" />
@@ -54,7 +56,7 @@ class MyApp extends App {
             padding-bottom: 2px !important;
           }
         `}</style>
-      </React.Fragment>
+      </ChakraProvider>
     );
   }
 }

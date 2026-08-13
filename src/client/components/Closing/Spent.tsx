@@ -3,6 +3,8 @@ import { NextPage } from 'next';
 import _ from 'lodash';
 import { SpentItemsInput } from '../../generated/graphql';
 import Input from '../common/Inputs/FormInput';
+import { Table, Button, SimpleGrid, GridItem, Text } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   spentItemsList?: SpentItemsInput[];
@@ -32,55 +34,61 @@ export const Spent: NextPage<Props> = function ({
 
   return (
     <React.Fragment>
-      <div className="table-responsive" id={id}>
-        <table className="table card-table table-hover table-outline">
-          <thead>
-            <tr>
-              <th>Spent On</th>
-              <th className="w-25">Amount</th>
-              <th className="w-10">Action</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Table.ScrollArea id={id}>
+        <Table.Root variant="outline" size="sm" striped interactive>
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeader>Spent On</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="end">Amount</Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
             {spentItems.length === 0 && (
-              <tr>
-                <td className={'text-center'} colSpan={6}>
-                  {'No additional money spent!'}
-                </td>
-              </tr>
+              <Table.Row>
+                <Table.Cell textAlign="center" py={6} colSpan={3}>
+                  <Text color="fg.muted" fontSize="sm">
+                    No money spent yet
+                  </Text>
+                </Table.Cell>
+              </Table.Row>
             )}
             {spentItems && spentItems?.length !== 0 && (
               <React.Fragment>
                 {spentItems?.map((spent: SpentItemsInput, i: number) => {
                   return (
-                    <tr key={i}>
-                      <td>{spent.spentOn}</td>
-                      <td>{spent.amount}</td>
-                      <td>
+                    <Table.Row key={i}>
+                      <Table.Cell>{spent.spentOn}</Table.Cell>
+                      <Table.Cell textAlign="end" fontWeight="semibold" color="red.600">
+                        {spent.amount}
+                      </Table.Cell>
+                      <Table.Cell textAlign="center">
                         {!isView ? (
-                          <button
-                            type="button"
-                            className="btn btn-icon btn-secondary btn-sm"
+                          <Button
+                            size="xs"
+                            minW="16"
+                            variant="ghost"
+                            colorPalette="red"
                             onClick={() => {
                               const tempSpentItems = [...spentItems];
                               tempSpentItems.splice(i, 1);
                               setSpentItems(tempSpentItems);
                             }}
                           >
-                            <strong className="bigger">X</strong>
-                          </button>
+                            Remove
+                          </Button>
                         ) : (
-                          '-'
+                          <Text color="fg.muted">—</Text>
                         )}
-                      </td>
-                    </tr>
+                      </Table.Cell>
+                    </Table.Row>
                   );
                 })}
               </React.Fragment>
             )}
-          </tbody>
-        </table>
-      </div>
+          </Table.Body>
+        </Table.Root>
+      </Table.ScrollArea>
       {!isView && (
         <form
           onSubmit={(e) => {
@@ -95,8 +103,8 @@ export const Spent: NextPage<Props> = function ({
             formFocus?.current?.focus();
           }}
         >
-          <div className="row pl-2 pr-2 hide-in-print">
-            <div className="col-md-6">
+          <SimpleGrid className="hide-in-print" columns={{ base: 2, md: 12 }} gap={3} p={2} alignItems="end">
+            <GridItem colSpan={{ base: 2, md: 6 }}>
               <Input
                 tabIndex={2}
                 inputName="Spent On"
@@ -115,8 +123,8 @@ export const Spent: NextPage<Props> = function ({
                 value={newSpentItem?.spentOn || ''}
                 innerRef={formFocus}
               />
-            </div>
-            <div className="col-md-3">
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 3 }}>
               <Input
                 tabIndex={3}
                 inputName="Amount"
@@ -134,28 +142,16 @@ export const Spent: NextPage<Props> = function ({
                 isInvalid={submitted && !newSpentItem?.amount}
                 value={newSpentItem?.amount || ''}
               />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Add</label>
-              <button
-                id="spenton-submit"
-                type="submit"
-                className={'btn btn-primary ml-auto'}
-              >
-                + Add
-              </button>
-            </div>
-          </div>
+            </GridItem>
+            <GridItem colSpan={{ base: 1, md: 3 }}>
+              <Button id="spenton-submit" type="submit" colorPalette="brand" w="full">
+                <Icon name="add" light />
+                Add
+              </Button>
+            </GridItem>
+          </SimpleGrid>
         </form>
       )}
-      <style jsx>{`
-        .w-10 {
-          width: 10%;
-        }
-        .w-25 {
-          width: 25%;
-        }
-      `}</style>
     </React.Fragment>
   );
 };

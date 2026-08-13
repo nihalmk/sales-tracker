@@ -1,15 +1,12 @@
-import 'jsdom-global/register';
-import React from 'react';
-import { mount, shallow, ReactWrapper } from 'enzyme';
-import { act } from 'react-dom/test-utils';
+/**
+ * @jest-environment jsdom
+ */
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../styles/theme';
 import { Login } from '../pages/login';
 import { login } from '../accounts/login';
 import { user } from '../__stubs__/login.data';
-import { createSerializer } from 'enzyme-to-json';
-import Loader from '../components/Loaders/Loader';
-import ErrorMessage from '../components/Errors/ErrorMessage';
-
-expect.addSnapshotSerializer(createSerializer({ mode: 'deep' }) as any);
 
 let mockUser: any;
 
@@ -27,25 +24,34 @@ jest.mock('next/router', () => {
   };
 });
 
-jest.mock('@apollo/react-hooks', () => ({
-  __esModule: true,
-  useQuery: (query: any): any => {
-    if (!query) {
-      return { data: {}, loading: false, error: true };
-    }
-    const mockQueryName = query.definitions[0].name.value;
-    switch (mockQueryName) {
-      case 'Me':
-        return mockUserData;
-      default: {
-        return { data: null, error: true };
+jest.mock('@apollo/client', () => {
+  const actual = jest.requireActual('@apollo/client');
+  return {
+    ...actual,
+    useQuery: (query: any): any => {
+      if (!query) {
+        return { data: {}, loading: false, error: true };
       }
-    }
-  },
-}));
+      const mockQueryName = query.definitions[0].name.value;
+      switch (mockQueryName) {
+        case 'Me':
+          return mockUserData;
+        default: {
+          return { data: null, error: true };
+        }
+      }
+    },
+  };
+});
 
-let wrapper: ReactWrapper;
 const mockLogin = (login as unknown) as jest.Mock<typeof login> & typeof login;
+
+const renderLogin = () =>
+  render(
+    <ChakraProvider value={system}>
+      <Login />
+    </ChakraProvider>,
+  );
 
 describe('Login Page', () => {
   beforeAll(() => {
@@ -59,80 +65,54 @@ describe('Login Page', () => {
   beforeEach(() => {
     mockLogin.mockClear();
   });
+
   it('Login page snapshot', () => {
-    const snap = shallow(<Login />);
-    expect(snap).toMatchSnapshot();
+    const { container } = renderLogin();
+    expect(container).toMatchSnapshot();
   });
 
-  it('Login Page should be loaded and submitted for login', () => {
-    wrapper = mount(<Login />);
-    const email = wrapper.find('#email').first().props();
-    const password = wrapper.find('#userPassword').first().props();
-    const loginButton = wrapper.find('button').first();
-    act(() => {
-      email.onChange({
-        target: {
-          value: 'email@email.com',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-      password.onChange({
-        target: {
-          value: 'password',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
+  it('Login Page should be loaded and submitted for login', async () => {
+    renderLogin();
+    fireEvent.change(screen.getByPlaceholderText('Enter email'), {
+      target: { value: 'email@email.com' },
     });
-    wrapper.update();
-    act(() => {
-      loginButton.simulate('click');
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+      target: { value: 'password' },
     });
-    expect(mockLogin).toBeCalledWith('email@email.com', 'password');
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    await waitFor(() =>
+      expect(mockLogin).toHaveBeenCalledWith('email@email.com', 'password'),
+    );
   });
 
-  it('Login Page should be loaded and should throw error for validation', () => {
-    wrapper = mount(<Login />);
-    const email = wrapper.find('#email').first().props();
-    const loginButton = wrapper.find('button').first();
-    act(() => {
-      email.onChange({
-        target: {
-          value: 'email@email.com',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
+  it('Login Page should be loaded and should throw error for validation', async () => {
+    renderLogin();
+    fireEvent.change(screen.getByPlaceholderText('Enter email'), {
+      target: { value: 'email@email.com' },
     });
-    wrapper.update();
-    act(() => {
-      loginButton.simulate('click');
-    });
-    expect(mockLogin).not.toBeCalledWith('email@email.com', 'password');
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    await waitFor(() =>
+      expect(
+        screen.getByText('Email/Password required'),
+      ).toBeInTheDocument(),
+    );
+    expect(mockLogin).not.toHaveBeenCalledWith('email@email.com', 'password');
   });
 
   it('Login Page should be loaded and should throw error on login', async () => {
-    wrapper = mount(<Login />);
-    const email = wrapper.find('#email').first().props();
-    const password = wrapper.find('#userPassword').first().props();
-    const loginButton = wrapper.find('button').first();
     mockLogin.mockRejectedValueOnce(new Error('Invalid Credentials') as never);
-    act(() => {
-      email.onChange({
-        target: {
-          value: 'email@email.com',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-      password.onChange({
-        target: {
-          value: 'password',
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
+    renderLogin();
+    fireEvent.change(screen.getByPlaceholderText('Enter email'), {
+      target: { value: 'email@email.com' },
     });
-    wrapper.update();
-    await act(async () => {
-      loginButton.simulate('click');
-      await Promise.resolve();
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
+      target: { value: 'password' },
     });
-    wrapper.update();
-    const error = wrapper.find(ErrorMessage).first();
-    expect(mockLogin).toBeCalledWith('email@email.com', 'password');
-    expect(error.html()).toContain('Invalid Credentials');
+    fireEvent.click(screen.getByRole('button', { name: 'Log in' }));
+    await waitFor(() =>
+      expect(screen.getByText('Invalid Credentials')).toBeInTheDocument(),
+    );
+    expect(mockLogin).toHaveBeenCalledWith('email@email.com', 'password');
   });
 });
 
@@ -146,19 +126,14 @@ describe('Login Page with user already logged in', () => {
   });
 
   it('Login page snapshot', () => {
-    const snap = shallow(<Login />);
-    expect(snap).toMatchSnapshot();
+    const { container } = renderLogin();
+    expect(container).toMatchSnapshot();
   });
 
   it('Login Page should not be shown', () => {
-    wrapper = mount(<Login />);
-    const email = wrapper.find('#email').first();
-    const password = wrapper.find('#userPassword').first();
-    const loginButton = wrapper.find('button');
-    const loader = wrapper.find(Loader);
-    expect(email).toEqual({});
-    expect(password).toEqual({});
-    expect(loginButton).toEqual({});
-    expect(loader).toBeTruthy();
+    renderLogin();
+    expect(screen.queryByPlaceholderText('Enter email')).toBeNull();
+    expect(screen.queryByPlaceholderText('Password')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Log in' })).toBeNull();
   });
 });

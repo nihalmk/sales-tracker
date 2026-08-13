@@ -3,7 +3,7 @@ import { CreatePurchaseInput, UpdatePurchaseInput } from './purchase.input';
 import { CTX } from '../../interfaces/common';
 import { UserService } from '../user/user.service';
 import _ from 'lodash';
-import { Items } from '../items/items.model';
+import { ItemsModel } from '../items/items.model';
 import { ItemsService } from '../items/items.service';
 import { ObjectId } from 'mongodb';
 import { DateRange } from '../common/Types/InputTypes';
@@ -32,7 +32,7 @@ export class PurchaseService {
       .populate('shop')
       .populate({
         path: 'items.item',
-        model: Items,
+        model: ItemsModel,
       });
   }
 
@@ -45,7 +45,7 @@ export class PurchaseService {
       .populate('shop')
       .populate({
         path: 'items.item',
-        model: Items,
+        model: ItemsModel,
       });
   }
 
@@ -58,7 +58,7 @@ export class PurchaseService {
       .populate('shop')
       .populate({
         path: 'items.item',
-        model: Items,
+        model: ItemsModel,
       });
   }
 
@@ -74,7 +74,7 @@ export class PurchaseService {
       .populate('shop')
       .populate({
         path: 'items.item',
-        model: Items,
+        model: ItemsModel,
       });
   }
 

@@ -29,8 +29,8 @@ describe('User Service', () => {
   it('should update user by id', async () => {
     const id = new ObjectId('5cf8cb6ed09b120f4275e68d');
     UserModel.findOneAndUpdate = jest.fn();
-    await service.updateUser(id, userInput as CreateUserInput);
-    expect(UserModel.findOneAndUpdate).toBeCalledWith(
+    await service.updateUserRegistration(id, userInput as CreateUserInput);
+    expect(UserModel.findOneAndUpdate).toHaveBeenCalledWith(
       {
         _id: id,
       },
@@ -48,8 +48,8 @@ describe('User Service', () => {
   it('should update user by id with Runner role if roles empty', async () => {
     const id = new ObjectId('5cf8cb6ed09b120f4275e68d');
     UserModel.findOneAndUpdate = jest.fn();
-    await service.updateUser(id, userInput2 as CreateUserInput);
-    expect(UserModel.findOneAndUpdate).toBeCalledWith(
+    await service.updateUserRegistration(id, userInput2 as CreateUserInput);
+    expect(UserModel.findOneAndUpdate).toHaveBeenCalledWith(
       {
         _id: id,
       },
