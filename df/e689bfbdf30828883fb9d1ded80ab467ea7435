@@ -1,0 +1,26 @@
+src/client/next-env.d.ts
+  s_5b771625359126::t_666af68080e9d3 3-4
+src/schema.gql
+  s_5b771625359126::t_572280bb601d96 29-31,117-119,151-153,160-162,169-171,192-194,227-229,240-244,252-258,263-269,293-295,314-316,339-341,406-408
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "dfe689bfbdf30828883fb9d1ded80ab467ea7435",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
