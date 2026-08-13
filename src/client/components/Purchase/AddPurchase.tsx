@@ -63,13 +63,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [submitted, setSubmitted] = useState(false);
   const [newItemSubmitted, setNewItemSubmitted] = useState(false);
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
-  const [purchase, setPurchase] = useState<Purchase[]>();
-  useEffect(() => {
-    setPurchase(purchaseData?.getPurchaseByBillNumber?.[0]);
-  }, [purchaseData]);
 
   const [newPurchase, setNewPurchase] = useState<Purchase>();
 
@@ -163,7 +158,6 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   const onNewPurchaseCreate = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
     const { vendor, contact, email, items, total } = newPurchase || {};
-    setSubmitted(true);
     if (_.isEmpty(items)) {
       setError('Please enter values for all fields');
       setTimeout(() => {
@@ -189,7 +183,6 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
       setMessage('New purchase added successfully');
       setNewPurchase(undefined);
       setPurchaseItems([]);
-      setSubmitted(false);
       setTimeout(() => {
         setMessage('');
       }, 5000);

@@ -58,15 +58,9 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [submitted, setSubmitted] = useState(false);
   const [newItemSubmitted, setNewItemSubmitted] = useState(false);
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const [showProfit, setShowProfit] = useState(false);
-  const [sale, setSale] = useState<Sale[]>();
-
-  useEffect(() => {
-    setSale(saleData?.getSaleByBillNumber?.[0]);
-  }, [saleData]);
 
   const [newSale, setNewSale] = useState<Sale>();
 
@@ -172,7 +166,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     const loss = profit < 0 ? Math.abs(profit) : 0;
     const discount =
       _.sum(items.map((i) => i.discount)) + (newSale.discount || 0);
-    setSubmitted(true);
     if (_.isEmpty(items)) {
       setError('Please enter values for all fields');
       setTimeout(() => {
@@ -201,7 +194,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       setMessage('New sale added successfully');
       setNewSale(undefined);
       setSaleItems([]);
-      setSubmitted(false);
       setNewItemSubmitted(false);
       setTimeout(() => {
         setMessage('');
