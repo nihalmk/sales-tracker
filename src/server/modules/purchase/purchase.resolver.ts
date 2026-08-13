@@ -26,9 +26,17 @@ export default class PurchaseResolver {
     page?: number,
     @Arg('limit', (_returns) => Number, { nullable: true, defaultValue: 0 })
     limit?: number,
+    @Arg('itemName', (_returns) => String, { nullable: true })
+    itemName?: string,
   ): Promise<PaginatedPurchases> {
     const purchaseService = new PurchaseService(ctx);
-    return await purchaseService.getPurchases(date, vendor, page, limit);
+    return await purchaseService.getPurchases(
+      date,
+      vendor,
+      page,
+      limit,
+      itemName,
+    );
   }
 
   @Query((_returns) => [PurchaseVendor])

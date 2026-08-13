@@ -116,6 +116,7 @@ const ContactSelect: React.FC<Props> = ({
       onChange={handleChange}
       placeholder={placeholder}
       value={selected}
+      isClearable
     />
   );
 };

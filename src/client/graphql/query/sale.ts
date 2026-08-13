@@ -38,12 +38,14 @@ export const GET_SALES = gql`
     $customer: String
     $page: Float
     $limit: Float
+    $itemName: String
   ) {
     getSalesForUser(
       date: $date
       customer: $customer
       page: $page
       limit: $limit
+      itemName: $itemName
     ) {
       items ${sale}
       totalCount

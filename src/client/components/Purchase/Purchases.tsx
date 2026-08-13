@@ -9,6 +9,7 @@ import moment from 'moment-timezone';
 import PurchaseCard from './Purchase';
 import DatePicker from '../common/DatePicker/DatePicker';
 import ContactSelect from '../common/SelectBoxes/ContactSelect';
+import ItemSelect from '../common/SelectBoxes/ItemSelect';
 import { Box, Card, Flex, Text, Button, HStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 
@@ -37,16 +38,19 @@ const Purchases: NextPage<Props> = function ({
     purchaseToDate ? moment(purchaseToDate) : moment(),
   );
   const [pendingVendor, setPendingVendor] = useState('');
+  const [pendingItemName, setPendingItemName] = useState('');
 
   const [dateFrom, setDateFrom] = useState(pendingDateFrom);
   const [dateTo, setDateTo] = useState(pendingDateTo);
   const [vendorFilter, setVendorFilter] = useState('');
+  const [itemNameFilter, setItemNameFilter] = useState('');
   const [page, setPage] = useState(1);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);
     setDateTo(pendingDateTo);
     setVendorFilter(pendingVendor);
+    setItemNameFilter(pendingItemName);
     setPage(1);
   };
 
@@ -74,6 +78,7 @@ const Purchases: NextPage<Props> = function ({
           to: dateTo.clone().endOf('day').toDate(),
         },
         vendor: vendorFilter || undefined,
+        itemName: itemNameFilter || undefined,
         page: purchaseFromDate ? undefined : page,
         limit: purchaseFromDate ? undefined : PAGE_SIZE,
       },
@@ -119,13 +124,21 @@ const Purchases: NextPage<Props> = function ({
           <TotalSection />
           {!purchaseFromDate && (
             <Flex ml="auto" gap={3} wrap="wrap" align="flex-end">
-              <Box minW="180px">
+              <Box w="220px" flexShrink={0}>
                 <ContactSelect
                   label="Vendor"
                   placeholder="Filter by vendor"
                   entities={vendorEntities}
                   value={pendingVendor}
                   onSelect={(entity) => setPendingVendor(entity?.name || '')}
+                />
+              </Box>
+              <Box w="220px" flexShrink={0}>
+                <ItemSelect
+                  label="Item"
+                  placeholder="Filter by item"
+                  value={pendingItemName}
+                  onSelect={(name) => setPendingItemName(name || '')}
                 />
               </Box>
               <Box minW="150px">

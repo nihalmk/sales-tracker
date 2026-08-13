@@ -26,9 +26,11 @@ export default class SaleResolver {
     page?: number,
     @Arg('limit', (_returns) => Number, { nullable: true, defaultValue: 0 })
     limit?: number,
+    @Arg('itemName', (_returns) => String, { nullable: true })
+    itemName?: string,
   ): Promise<PaginatedSales> {
     const saleService = new SaleService(ctx);
-    return await saleService.getSales(date, customer, page, limit);
+    return await saleService.getSales(date, customer, page, limit, itemName);
   }
 
   @Query((_returns) => Sale, { nullable: true })

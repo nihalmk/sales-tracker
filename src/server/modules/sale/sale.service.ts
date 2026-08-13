@@ -16,6 +16,12 @@ import { DateRange } from '../common/Types/InputTypes';
 // back whatever it received.
 export const NO_CUSTOMER_NAME = 'No name added';
 
+// Case-insensitive exact match — anchored so "Ravi" doesn't also match
+// "Ravikumar", and the input is escaped so regex metacharacters in a real
+// name (e.g. "A.B. Traders") are matched literally, not as regex syntax.
+const exactCaseInsensitive = (value: string) =>
+  new RegExp(`^${_.escapeRegExp(value)}$`, 'i');
+
 export class SaleService {
   readonly model: typeof SaleModel;
   readonly ctx: CTX;
@@ -76,6 +82,7 @@ export class SaleService {
     customer?: string,
     page = 1,
     limit = 0,
+    itemName?: string,
   ): Promise<PaginatedSales> {
     const filter: Record<string, unknown> = {
       shop: this.ctx.user.shop,
@@ -87,7 +94,17 @@ export class SaleService {
     if (customer === NO_CUSTOMER_NAME) {
       filter.customer = { $in: [null, ''] };
     } else if (customer) {
-      filter.customer = customer;
+      filter.customer = exactCaseInsensitive(customer);
+    }
+    if (itemName) {
+      // A product name can map to several Items docs over time (a new one
+      // is created whenever purchase cost changes), so match every item
+      // sharing this name, not just one specific document.
+      const matchingItemIds = await ItemsModel.find({
+        shop: this.ctx.user.shop,
+        name: exactCaseInsensitive(itemName),
+      }).distinct('_id');
+      filter['items.item'] = { $in: matchingItemIds };
     }
 
     let query = this.model

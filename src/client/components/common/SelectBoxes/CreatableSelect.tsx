@@ -17,6 +17,7 @@ interface Props {
   tabIndex?: number;
   customOption?: (val: LabelValueObj) => React.ReactElement | null;
   placeholder?: string;
+  isClearable?: boolean;
 }
 const CreatableSelect: React.FC<Props> = ({
   onChange,
@@ -29,6 +30,7 @@ const CreatableSelect: React.FC<Props> = ({
   tabIndex,
   customOption,
   placeholder,
+  isClearable,
 }) => {
   return (
     <Field.Root invalid={isInvalid}>
@@ -44,6 +46,7 @@ const CreatableSelect: React.FC<Props> = ({
         value={value}
         isDisabled={isDisabled}
         classNamePrefix="select"
+        isClearable={isClearable}
         formatOptionLabel={customOption}
         placeholder={placeholder}
         styles={brandSelectStyles(isInvalid)}

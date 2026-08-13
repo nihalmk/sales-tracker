@@ -34,12 +34,14 @@ export const GET_PURCHASES = gql`
     $vendor: String
     $page: Float
     $limit: Float
+    $itemName: String
   ) {
     getPurchasesForUser(
       date: $date
       vendor: $vendor
       page: $page
       limit: $limit
+      itemName: $itemName
     ) {
       items ${purchase}
       totalCount
