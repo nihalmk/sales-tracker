@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "bdcf53943fd818f4524a49f365616d528b1e881e",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
