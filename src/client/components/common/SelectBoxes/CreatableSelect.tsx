@@ -12,9 +12,11 @@ interface Props {
   isInvalid?: boolean;
   formClass?: boolean;
   isDisabled?: boolean;
-  value?: LabelValueObj;
+  value?: LabelValueObj | null;
   isMulti?: boolean;
   tabIndex?: number;
+  customOption?: (val: LabelValueObj) => React.ReactElement | null;
+  placeholder?: string;
 }
 const CreatableSelect: React.FC<Props> = ({
   onChange,
@@ -25,6 +27,8 @@ const CreatableSelect: React.FC<Props> = ({
   value,
   isMulti,
   tabIndex,
+  customOption,
+  placeholder,
 }) => {
   return (
     <Field.Root invalid={isInvalid}>
@@ -40,6 +44,8 @@ const CreatableSelect: React.FC<Props> = ({
         value={value}
         isDisabled={isDisabled}
         classNamePrefix="select"
+        formatOptionLabel={customOption}
+        placeholder={placeholder}
         styles={brandSelectStyles(isInvalid)}
       />
       {isInvalid && (

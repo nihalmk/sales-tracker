@@ -22,7 +22,6 @@ export const addRoutes = async (app: Koa) => {
   });
 
   router.get('/dbbackup', async (ctx) => {
-    console.log(__dirname);
     try {
       const options = {
         uri: process.env.MONGO_URI,

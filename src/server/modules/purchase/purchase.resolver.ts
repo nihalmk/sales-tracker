@@ -1,7 +1,7 @@
 import { Resolver, Query, Authorized, Ctx, Arg, Mutation } from 'type-graphql';
 import { CTX } from '../../interfaces/common';
 import { PurchaseService } from './purchase.service';
-import { Purchase } from './purchase.model';
+import { Purchase, PurchaseVendor, PaginatedPurchases } from './purchase.model';
 import { CreatePurchaseInput, UpdatePurchaseInput } from './purchase.input';
 import { DateRange } from '../common/Types/InputTypes';
 
@@ -15,14 +15,34 @@ export default class PurchaseResolver {
   // Queries
   // Get the purchase for the logged in user from ctx.user
 
-  @Query((_returns) => [Purchase])
+  @Query((_returns) => PaginatedPurchases)
   @Authorized()
   async getPurchasesForUser(
     @Ctx() ctx: CTX,
     @Arg('date', (_returns) => DateRange) date: DateRange,
-  ): Promise<Purchase[]> {
+    @Arg('vendor', (_returns) => String, { nullable: true })
+    vendor?: string,
+    @Arg('page', (_returns) => Number, { nullable: true, defaultValue: 1 })
+    page?: number,
+    @Arg('limit', (_returns) => Number, { nullable: true, defaultValue: 0 })
+    limit?: number,
+  ): Promise<PaginatedPurchases> {
     const purchaseService = new PurchaseService(ctx);
-    return await purchaseService.getPurchases(date);
+    return await purchaseService.getPurchases(date, vendor, page, limit);
+  }
+
+  @Query((_returns) => [PurchaseVendor])
+  @Authorized()
+  async getVendors(
+    @Ctx() ctx: CTX,
+    @Arg('includeUnnamed', (_returns) => Boolean, {
+      nullable: true,
+      defaultValue: false,
+    })
+    includeUnnamed?: boolean,
+  ): Promise<PurchaseVendor[]> {
+    const purchaseService = new PurchaseService(ctx);
+    return await purchaseService.getVendors(includeUnnamed);
   }
 
   @Query((_returns) => Purchase, { nullable: true })

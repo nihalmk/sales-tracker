@@ -26,18 +26,6 @@ input BranchesInput {
   name: String!
 }
 
-type Channel {
-  type: String!
-  version: String!
-}
-
-type Charges {
-  discount_fee: Float!
-  joker_fee: Float!
-  payment_fee: Float!
-  service_fee: Float!
-}
-
 """The Closings model"""
 type Closing {
   _id: ID!
@@ -53,12 +41,6 @@ type Closing {
   spentItems: [SpentItems!]!
   spentTotal: Float!
   updatedAt: DateTime!
-}
-
-type Commission {
-  amount: Float!
-  commissionable_value: Float!
-  rate: Float!
 }
 
 input CreateClosingInput {
@@ -120,13 +102,6 @@ input CreateUserInput {
   shop: ID
 }
 
-type Customer {
-  channel: Channel!
-  customer_id: String!
-  payment: Payment!
-  profile: Profile!
-}
-
 input DateRange {
   from: DateTime!
   to: DateTime!
@@ -136,22 +111,6 @@ input DateRange {
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
-
-type Delivery {
-  delivery_fee: Float!
-  location: Location
-  provider: String!
-  tax: Tax!
-  tip: Float!
-}
-
-type Item {
-  customer_notes: String!
-  id: String!
-  name: String!
-  options: [Option!]!
-  quantity: Float!
-}
 
 """The Items model"""
 type Items {
@@ -171,20 +130,6 @@ type LabelValueObj {
   value: String!
 }
 
-type Location {
-  address_text: String!
-  building: String!
-  city: String!
-  description: String!
-  district: String!
-  id: String!
-  label: String!
-  latitude: Float!
-  longitude: Float!
-  postal_code: String!
-  street: String!
-}
-
 type Mutation {
   createClosing(closing: CreateClosingInput!): Closing
   createItem(item: CreateItemsInput!): Items
@@ -199,54 +144,27 @@ type Mutation {
   updateSale(sale: UpdateSaleInput!): Sale
 }
 
-type Option {
-  customer_notes: String!
-  id: String!
-  name: String!
-  quantity: Float!
-  type: String!
+"""A page of Items plus totals for the whole set"""
+type PaginatedItems {
+  items: [Items!]!
+  totalCount: Float!
+  totalStockAmount: Float!
 }
 
-type OrderContent {
-  brand_name: String!
-  business_type: String!
-  commission: Commission!
-  corporate: Boolean!
-  country_code: String!
-  currency: String!
-  customer: Customer!
-  delivery: Delivery!
-  global_entity_id: String!
-  locale: String!
-  order: OrderInfo!
-  order_id: String!
-  preorder: Boolean!
-  promised_customer_timestamp: String!
-  test_order: Boolean!
-  timestamp: String!
-  vendor: VendorInfo!
+"""A page of Purchases plus totals for the whole range"""
+type PaginatedPurchases {
+  items: [Purchase!]!
+  totalAmount: Float!
+  totalCount: Float!
 }
 
-type OrderInfo {
-  deposit: Float!
-  items: [Item!]!
-  minimum_order_value: Float!
-  order_value: Float!
-  tax: Tax!
-}
-
-type Payment {
-  coupon: Float!
-  discount: Float!
-  loyalty_point_balance: Float!
-  minimum_order_value_fee: Float!
-  paid: Boolean!
-  payment_method: String!
-  service_fee: Float!
-  total_order_value: Float!
-  total_tax: Float!
-  transaction_number: String!
-  wallet_balance: Float!
+"""A page of Sales plus totals for the whole range"""
+type PaginatedSales {
+  items: [Sale!]!
+  totalAmount: Float!
+  totalCount: Float!
+  totalLoss: Float!
+  totalProfit: Float!
 }
 
 type Price {
@@ -259,17 +177,6 @@ input PriceInput {
   cost: Float!
   list: Float!
   sale: Float!
-}
-
-type Profile {
-  email: String!
-  first_name: String!
-  guest: Boolean!
-  id: String!
-  last_name: String!
-  locale: String!
-  name: String!
-  phone: String!
 }
 
 """The Purchase model"""
@@ -305,10 +212,18 @@ input PurchaseItemInput {
   total: Float!
 }
 
+"""A vendor derived from past purchases history"""
+type PurchaseVendor {
+  contact: String
+  email: String
+  vendor: String!
+}
+
 type Query {
   getClosingByClosingId(closingId: String!): [Closing!]!
   getClosingForUser(date: DateRange!): [Closing!]!
-  getItemsForUser: [Items!]!
+  getCustomers(includeUnnamed: Boolean = false): [SaleCustomer!]!
+  getItemsForUser(limit: Float = 0, page: Float = 1, search: String): PaginatedItems!
   getLastPurchase: Purchase
   getLastSale: Sale
   getPreviousClosing: Closing
@@ -316,15 +231,16 @@ type Query {
   getPurchaseByVendorName(vendor: String!): [Purchase!]!
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
   getPurchaseWithoutClosing: [Purchase!]
-  getPurchasesForUser(date: DateRange!): [Purchase!]!
+  getPurchasesForUser(date: DateRange!, limit: Float = 0, page: Float = 1, vendor: String): PaginatedPurchases!
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!
   getSaleWithoutClosing: [Sale!]
-  getSalesForUser(date: DateRange!): [Sale!]!
+  getSalesForUser(customer: String, date: DateRange!, limit: Float = 0, page: Float = 1): PaginatedSales!
   getShopForUser: Shop
   getShopTypes: [LabelValueObj!]
   getUserById(id: ID!): User
+  getVendors(includeUnnamed: Boolean = false): [PurchaseVendor!]!
   me: User
 }
 
@@ -363,6 +279,13 @@ type Sale {
   updatedAt: DateTime!
 }
 
+"""A customer derived from past sales history"""
+type SaleCustomer {
+  contact: String
+  customer: String!
+  email: String
+}
+
 type SaleItem {
   cost: Float!
   discount: Float!
@@ -397,12 +320,6 @@ type SpentItems {
 input SpentItemsInput {
   amount: Float!
   spentOn: String!
-}
-
-type Tax {
-  amount: Float!
-  net_amount: Float!
-  tax_rate_percent: Float!
 }
 
 input UpdateClosingInput {
@@ -464,10 +381,4 @@ type User {
   roles: [Roles!]!
   shop: Shop
   updatedAt: DateTime!
-}
-
-type VendorInfo {
-  charges: Charges
-  id: String!
-  name: String!
 }

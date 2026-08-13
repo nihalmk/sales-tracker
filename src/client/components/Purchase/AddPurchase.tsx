@@ -5,7 +5,10 @@ import {
   CREATE_PURCHASE,
   UPDATE_PURCHASE,
 } from '../../graphql/mutation/purchase';
-import { GET_PURCHASE_BY_BILL_NUMBER } from '../../graphql/query/purchase';
+import {
+  GET_PURCHASE_BY_BILL_NUMBER,
+  GET_VENDORS,
+} from '../../graphql/query/purchase';
 import Input from '../common/Inputs/FormInput';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
@@ -19,6 +22,7 @@ import {
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import ContactSelect from '../common/SelectBoxes/ContactSelect';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
 import {
@@ -63,7 +67,6 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   const [newItemSubmitted, setNewItemSubmitted] = useState(false);
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const [purchase, setPurchase] = useState<Purchase[]>();
-  console.log(submitted, purchase);
   useEffect(() => {
     setPurchase(purchaseData?.getPurchaseByBillNumber?.[0]);
   }, [purchaseData]);
@@ -76,12 +79,56 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
     fetchPolicy: 'no-cache',
   });
 
+  const { data: vendorsData } = useQuery(GET_VENDORS, {
+    fetchPolicy: 'no-cache',
+  });
+
+  const vendorEntities = (vendorsData?.getVendors || []).map(
+    (v: { vendor: string; contact?: string; email?: string }) => ({
+      name: v.vendor,
+      contact: v.contact,
+      email: v.email,
+    }),
+  );
+
+  const onVendorSelect = (
+    entity: {
+      name: string;
+      contact?: string;
+      email?: string;
+      isNew?: boolean;
+    } | null,
+  ) => {
+    if (!entity) {
+      setNewPurchase((currentState) => ({ ...currentState, vendor: '' }));
+      return;
+    }
+    // A brand new name with no matching vendor — leave contact/email as the
+    // user already entered them.
+    if (entity.isNew) {
+      setNewPurchase((currentState) => ({
+        ...currentState,
+        vendor: entity.name,
+      }));
+      return;
+    }
+    setNewPurchase((currentState) => ({
+      ...currentState,
+      vendor: entity.name,
+      contact: entity.contact || '',
+      email: entity.email || '',
+    }));
+  };
+
   const [items, setItems] = useState<Items[]>();
 
   const [itemsSelection, setItemsSelection] = useState<LabelValueObj[]>();
 
   useEffect(() => {
-    const sortedItems = _.sortBy(itemsData?.getItemsForUser, 'name') as Items[];
+    const sortedItems = _.sortBy(
+      itemsData?.getItemsForUser?.items,
+      'name',
+    ) as Items[];
     setItemsSelection(
       _.compact(
         sortedItems.map((i) => {
@@ -246,22 +293,13 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         <ErrorMessage error={error} />
         <Card.Body pb={2}>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-            <Input
+            <ContactSelect
               tabIndex={1}
-              inputName="Vendor"
-              inputLabel="Vendor"
-              inputType="text"
-              max={20}
-              placeholderValue="Vendor Name"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const vendor = e.target.value;
-                setNewPurchase((currentState) => ({
-                  ...currentState,
-                  vendor,
-                }));
-              }}
-              autoFocus={true}
-              value={newPurchase?.vendor || ''}
+              label="Vendor"
+              placeholder="Vendor Name"
+              entities={vendorEntities}
+              value={newPurchase?.vendor}
+              onSelect={onVendorSelect}
             />
             <Input
               tabIndex={2}

@@ -8,7 +8,7 @@ import {
 } from 'type-graphql';
 import { CTX } from '../../interfaces/common';
 import { ItemsService } from './items.service';
-import { Items } from './items.model';
+import { Items, PaginatedItems } from './items.model';
 import { CreateItemsInput, UpdateItemsInput } from './items.input';
 
 /**
@@ -21,11 +21,19 @@ export default class ItemsResolver {
   // Queries
   // Get the items for the logged in user from ctx.user
 
-  @Query((_returns) => [Items])
+  @Query((_returns) => PaginatedItems)
   @Authorized()
-  async getItemsForUser(@Ctx() ctx: CTX): Promise<Items[]> {
+  async getItemsForUser(
+    @Ctx() ctx: CTX,
+    @Arg('search', (_returns) => String, { nullable: true })
+    search?: string,
+    @Arg('page', (_returns) => Number, { nullable: true, defaultValue: 1 })
+    page?: number,
+    @Arg('limit', (_returns) => Number, { nullable: true, defaultValue: 0 })
+    limit?: number,
+  ): Promise<PaginatedItems> {
     const itemsService = new ItemsService(ctx);
-    return await itemsService.getItems();
+    return await itemsService.getItems(search, page, limit);
   }
 
   // Mutations

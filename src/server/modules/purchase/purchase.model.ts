@@ -100,3 +100,34 @@ export class Purchase {
 export const PurchaseModel = getModelForClass(Purchase, {
   schemaOptions: { timestamps: true },
 });
+
+// Not a persisted collection — derived from distinct vendor/contact/email
+// combinations already recorded on past Purchases, for autofill on new ones.
+@ObjectType({ description: 'A vendor derived from past purchases history' })
+export class PurchaseVendor {
+  @Field(StringField)
+  vendor: string;
+
+  @Field(StringField, { nullable: true })
+  contact?: string;
+
+  @Field(StringField, { nullable: true })
+  email?: string;
+}
+
+// totalAmount is aggregated across every Purchase matching the query's
+// filters, not just the current page — so it stays correct for the whole
+// selected range regardless of which page is in view.
+@ObjectType({
+  description: 'A page of Purchases plus totals for the whole range',
+})
+export class PaginatedPurchases {
+  @Field((_type) => [Purchase])
+  items: Purchase[];
+
+  @Field(NumberField)
+  totalCount: number;
+
+  @Field(NumberField)
+  totalAmount: number;
+}

@@ -68,6 +68,16 @@ const Home: NextPage<Props> = () => {
 
   const router = useRouter();
 
+  // Deep-linking (e.g. ?selected=stock) should win over the tab this effect
+  // would otherwise force, as long as the requested tab is actually enabled
+  // for the branch being taken below.
+  const pickMenu = (defaultMenu: string, allowed: string[]) => {
+    // router.query.selected holds a NavItems *value* (e.g. 'stock'), not a
+    // key ('STOCK') — check it directly against the allowed values.
+    const requested = router.query.selected as string;
+    return requested && allowed.includes(requested) ? requested : defaultMenu;
+  };
+
   useEffect(() => {
     // Closed for today
     if (isPaid) {
@@ -81,7 +91,17 @@ const Home: NextPage<Props> = () => {
           closing: true,
           report: true,
         });
-        setSelectedMenu(NavItems.SALE);
+        setSelectedMenu(
+          pickMenu(NavItems.SALE, [
+            NavItems.SALE,
+            NavItems.STOCK,
+            NavItems.PURCHASE,
+            NavItems.PURCHASES,
+            NavItems.SALES,
+            NavItems.CLOSING,
+            NavItems.REPORT,
+          ]),
+        );
         setNeedsClosing(false);
       };
       if (
@@ -100,7 +120,14 @@ const Home: NextPage<Props> = () => {
           closing: false,
           report: true,
         });
-        setSelectedMenu(NavItems.SALES);
+        setSelectedMenu(
+          pickMenu(NavItems.SALES, [
+            NavItems.STOCK,
+            NavItems.PURCHASES,
+            NavItems.SALES,
+            NavItems.REPORT,
+          ]),
+        );
         return;
       } else {
         proceedSale();
@@ -119,7 +146,9 @@ const Home: NextPage<Props> = () => {
           closing: true,
           report: true,
         });
-        setSelectedMenu(NavItems.CLOSING);
+        setSelectedMenu(
+          pickMenu(NavItems.CLOSING, [NavItems.CLOSING, NavItems.REPORT]),
+        );
         setNeedsClosing(true);
       };
 

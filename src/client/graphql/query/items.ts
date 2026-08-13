@@ -18,7 +18,11 @@ export const itemsResponse = `{
 }`;
 
 export const GET_ITEMS = gql`
-  query getItemsForUser {
-    getItemsForUser ${itemsResponse}
+  query getItemsForUser($search: String, $page: Float, $limit: Float) {
+    getItemsForUser(search: $search, page: $page, limit: $limit) {
+      items ${itemsResponse}
+      totalCount
+      totalStockAmount
+    }
   }
 `;

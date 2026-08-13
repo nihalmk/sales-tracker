@@ -6,7 +6,6 @@ import { GET_ITEMS } from '../../graphql/query/items';
 import Input from '../common/Inputs/FormInput';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
-import _ from 'lodash';
 import { Items } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
@@ -22,6 +21,10 @@ import {
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 
+const PAGE_SIZE = 10;
+const SEARCH_DEBOUNCE_MS = 1000;
+const SEARCH_MIN_LENGTH = 2;
+
 interface Props {}
 
 const AddStock: NextPage<Props> = function () {
@@ -30,38 +33,46 @@ const AddStock: NextPage<Props> = function () {
   const [submitUpdateItem, { loading: updateLoading }] =
     useMutation(UPDATE_ITEM);
 
+  // searchTerm tracks the input as typed, so the field itself stays
+  // responsive. appliedSearch only updates 2s after typing stops, and only
+  // once there are at least 2 characters — that's what actually drives the
+  // query, so short/mid-word keystrokes don't fire a search each time.
+  const [searchTerm, setSearchTerm] = useState('');
+  const [appliedSearch, setAppliedSearch] = useState('');
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAppliedSearch(
+        searchTerm.length >= SEARCH_MIN_LENGTH ? searchTerm : '',
+      );
+      setPage(1);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const {
     loading: itemsLoading,
     data: itemsData,
     refetch: refetchItems,
   } = useQuery(GET_ITEMS, {
+    variables: {
+      search: appliedSearch || undefined,
+      page,
+      limit: PAGE_SIZE,
+    },
     fetchPolicy: 'no-cache',
   });
+
+  const items: Items[] = itemsData?.getItemsForUser?.items || [];
+  const totalCount = itemsData?.getItemsForUser?.totalCount || 0;
+  const totalStockAmount = itemsData?.getItemsForUser?.totalStockAmount || 0;
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [items, setItems] = useState<Items[]>();
-
-  useEffect(() => {
-    if (searchTerm) {
-      setItems(
-        _.sortBy(
-          itemsData?.getItemsForUser?.filter((p: Items) => {
-            return (
-              p.name.match(new RegExp(searchTerm, 'gi')) ||
-              p.shortId.match(new RegExp(searchTerm, 'gi'))
-            );
-          }),
-          'name',
-        ),
-      );
-    } else {
-      setItems(_.sortBy(itemsData?.getItemsForUser, 'name'));
-    }
-  }, [searchTerm, itemsData]);
 
   const [newItem, setNewItem] = useState<Items>();
 
@@ -163,10 +174,6 @@ const AddStock: NextPage<Props> = function () {
     }
   };
 
-  const getTotalStockAmount = () => {
-    return _.sum(items?.map((i) => i.price?.cost * i.stock));
-  };
-
   return (
     <React.Fragment>
       <Card.Root variant="elevated" borderRadius="l3" mb={5}>
@@ -181,7 +188,7 @@ const AddStock: NextPage<Props> = function () {
                 Total
               </Text>
               <Text as="span" color="green.600" fontWeight="medium">
-                {getTotalStockAmount()}₹
+                {totalStockAmount}₹
               </Text>
             </Text>
           </HStack>
@@ -568,6 +575,31 @@ const AddStock: NextPage<Props> = function () {
             </Table.Body>
           </Table.Root>
         </Table.ScrollArea>
+        {totalCount > PAGE_SIZE && (
+          <Card.Body pt={0}>
+            <HStack justify="center" gap={4}>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                Previous
+              </Button>
+              <Text fontSize="sm" color="fg.muted">
+                Page {page} of {totalPages}
+              </Text>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </HStack>
+          </Card.Body>
+        )}
       </Card.Root>
     </React.Fragment>
   );

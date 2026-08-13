@@ -2,7 +2,10 @@ import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_SALE, UPDATE_SALE } from '../../graphql/mutation/sale';
-import { GET_SALE_BY_BILL_NUMBER } from '../../graphql/query/sale';
+import {
+  GET_SALE_BY_BILL_NUMBER,
+  GET_CUSTOMERS,
+} from '../../graphql/query/sale';
 import Input from '../common/Inputs/FormInput';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
@@ -11,6 +14,7 @@ import { Sale, SaleItem, Items, SaleItemInput } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import ContactSelect from '../common/SelectBoxes/ContactSelect';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
 import Sales from './Sales';
@@ -59,7 +63,6 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
   const [showProfit, setShowProfit] = useState(false);
   const [sale, setSale] = useState<Sale[]>();
-  console.log(submitted, sale);
 
   useEffect(() => {
     setSale(saleData?.getSaleByBillNumber?.[0]);
@@ -73,12 +76,53 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     fetchPolicy: 'no-cache',
   });
 
+  const { data: customersData } = useQuery(GET_CUSTOMERS, {
+    fetchPolicy: 'no-cache',
+  });
+
+  const customerEntities = (customersData?.getCustomers || []).map(
+    (c: { customer: string; contact?: string; email?: string }) => ({
+      name: c.customer,
+      contact: c.contact,
+      email: c.email,
+    }),
+  );
+
+  const onCustomerSelect = (
+    entity: {
+      name: string;
+      contact?: string;
+      email?: string;
+      isNew?: boolean;
+    } | null,
+  ) => {
+    if (!entity) {
+      setNewSale((currentState) => ({ ...currentState, customer: '' }));
+      return;
+    }
+    // A brand new name with no matching customer — leave contact/email as
+    // the user already entered them.
+    if (entity.isNew) {
+      setNewSale((currentState) => ({ ...currentState, customer: entity.name }));
+      return;
+    }
+    setNewSale((currentState) => ({
+      ...currentState,
+      customer: entity.name,
+      contact: entity.contact || '',
+      email: entity.email || '',
+    }));
+  };
+
   const [items, setItems] = useState<Items[]>();
 
   const [itemsSelection, setItemsSelection] = useState<LabelValueObj[]>();
 
   useEffect(() => {
-    const sortedItems = _.sortBy(itemsData?.getItemsForUser, 'name') as Items[];
+    const sortedItems = _.sortBy(
+      itemsData?.getItemsForUser?.items,
+      'name',
+    ) as Items[];
     setItemsSelection(
       _.compact(
         sortedItems.map((i) => {
@@ -289,22 +333,13 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         <ErrorMessage error={error} />
         <Card.Body pb={2}>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-            <Input
+            <ContactSelect
               tabIndex={1}
-              inputName="Customer"
-              inputLabel="Customer"
-              inputType="text"
-              max={20}
-              placeholderValue="Customer Name"
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                const customer = e.target.value;
-                setNewSale((currentState) => ({
-                  ...currentState,
-                  customer,
-                }));
-              }}
-              autoFocus={true}
-              value={newSale?.customer || ''}
+              label="Customer"
+              placeholder="Customer Name"
+              entities={customerEntities}
+              value={newSale?.customer}
+              onSelect={onCustomerSelect}
             />
             <Input
               tabIndex={2}

@@ -68,3 +68,18 @@ export class Items {
 export const ItemsModel = getModelForClass(Items, {
   schemaOptions: { timestamps: true },
 });
+
+// totalStockAmount is aggregated across every Item matching the query's
+// filters (search term included), not just the current page — so it stays
+// correct regardless of which page is in view.
+@ObjectType({ description: 'A page of Items plus totals for the whole set' })
+export class PaginatedItems {
+  @Field((_type) => [Items])
+  items: Items[];
+
+  @Field(NumberField)
+  totalCount: number;
+
+  @Field(NumberField)
+  totalStockAmount: number;
+}

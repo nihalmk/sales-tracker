@@ -33,8 +33,24 @@ export const saleMinimal = `{
     }`;
 
 export const GET_SALES = gql`
-  query getSalesForUser($date: DateRange!) {
-    getSalesForUser(date: $date) ${sale}
+  query getSalesForUser(
+    $date: DateRange!
+    $customer: String
+    $page: Float
+    $limit: Float
+  ) {
+    getSalesForUser(
+      date: $date
+      customer: $customer
+      page: $page
+      limit: $limit
+    ) {
+      items ${sale}
+      totalCount
+      totalAmount
+      totalProfit
+      totalLoss
+    }
   }
 `;
 
@@ -53,6 +69,16 @@ export const GET_SALE_BY_CUSTOMER = gql`
 export const GET_SALE_BY_CONTACT = gql`
   query getSaleByCustomerPhone($contact: String!) {
     getSaleByCustomerPhone(contact: $contact) ${sale}
+  }
+`;
+
+export const GET_CUSTOMERS = gql`
+  query getCustomers($includeUnnamed: Boolean) {
+    getCustomers(includeUnnamed: $includeUnnamed) {
+      customer
+      contact
+      email
+    }
   }
 `;
 

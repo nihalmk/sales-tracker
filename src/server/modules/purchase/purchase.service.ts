@@ -1,4 +1,9 @@
-import { PurchaseModel, Purchase } from './purchase.model';
+import {
+  PurchaseModel,
+  Purchase,
+  PurchaseVendor,
+  PaginatedPurchases,
+} from './purchase.model';
 import { CreatePurchaseInput, UpdatePurchaseInput } from './purchase.input';
 import { CTX } from '../../interfaces/common';
 import { UserService } from '../user/user.service';
@@ -9,6 +14,12 @@ import { ObjectId } from 'mongodb';
 import { DateRange } from '../common/Types/InputTypes';
 
 // Queries on models to to get/create/update purchase data
+
+// Sentinel used both as the synthetic getVendors() entry representing
+// purchases with no vendor name, and as the filter value that means "match
+// purchases with no vendor name" — kept identical so the client can just
+// pass back whatever it received.
+export const NO_VENDOR_NAME = 'No name added';
 
 export class PurchaseService {
   readonly model: typeof PurchaseModel;
@@ -62,20 +73,86 @@ export class PurchaseService {
       });
   }
 
-  async getPurchases(date: { from: Date; to: Date }): Promise<Purchase[]> {
-    return this.model
-      .find({
-        shop: this.ctx.user.shop,
-        createdAt: {
-          $gte: date.from,
-          $lte: date.to,
-        },
-      })
+  // limit=0 means "no pagination, return everything matching" — used by
+  // embedded callers (e.g. the Closing flow) that need the complete set of
+  // ids/totals for a date range, not just one page of it.
+  async getPurchases(
+    date: { from: Date; to: Date },
+    vendor?: string,
+    page = 1,
+    limit = 0,
+  ): Promise<PaginatedPurchases> {
+    const filter: Record<string, unknown> = {
+      shop: this.ctx.user.shop,
+      createdAt: {
+        $gte: date.from,
+        $lte: date.to,
+      },
+    };
+    if (vendor === NO_VENDOR_NAME) {
+      filter.vendor = { $in: [null, ''] };
+    } else if (vendor) {
+      filter.vendor = vendor;
+    }
+
+    let query = this.model
+      .find(filter)
+      .sort({ createdAt: -1 })
       .populate('shop')
       .populate({
         path: 'items.item',
         model: ItemsModel,
       });
+    if (limit > 0) {
+      query = query.skip((page - 1) * limit).limit(limit);
+    }
+
+    const [items, totalCount, aggregate] = await Promise.all([
+      query,
+      this.model.countDocuments(filter),
+      this.model.aggregate([
+        { $match: filter },
+        { $group: { _id: null, totalAmount: { $sum: '$total' } } },
+      ]),
+    ]);
+    const totals = aggregate[0] || { totalAmount: 0 };
+    return {
+      items,
+      totalCount,
+      totalAmount: totals.totalAmount,
+    };
+  }
+
+  // Distinct vendors derived from past purchases for this shop, unique per
+  // vendor+contact+email combination. includeUnnamed also appends a
+  // synthetic entry for purchases that have no vendor name at all — meant
+  // for filter dropdowns only, not the vendor picker used when
+  // creating/editing a purchase.
+  async getVendors(includeUnnamed = false): Promise<PurchaseVendor[]> {
+    const results = await this.model.aggregate([
+      { $match: { shop: this.ctx.user.shop } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: {
+            vendor: '$vendor',
+            contact: '$contact',
+            email: '$email',
+          },
+          vendor: { $first: '$vendor' },
+          contact: { $first: '$contact' },
+          email: { $first: '$email' },
+        },
+      },
+      { $project: { _id: 0, vendor: 1, contact: 1, email: 1 } },
+    ]);
+    const named = results
+      .filter((r) => r.vendor)
+      .sort((a, b) => a.vendor.localeCompare(b.vendor));
+    if (includeUnnamed && results.some((r) => !r.vendor)) {
+      named.unshift({ vendor: NO_VENDOR_NAME, contact: null, email: null });
+    }
+    return named;
   }
 
   async getPurchasesByIds(ids: ObjectId[]): Promise<Purchase[]> {

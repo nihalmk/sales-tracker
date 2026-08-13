@@ -105,3 +105,39 @@ export class Sale {
 export const SaleModel = getModelForClass(Sale, {
   schemaOptions: { timestamps: true },
 });
+
+// Not a persisted collection — derived from distinct customer/contact/email
+// combinations already recorded on past Sales, for autofill on new sales.
+@ObjectType({ description: 'A customer derived from past sales history' })
+export class SaleCustomer {
+  @Field(StringField)
+  customer: string;
+
+  @Field(StringField, { nullable: true })
+  contact?: string;
+
+  @Field(StringField, { nullable: true })
+  email?: string;
+}
+
+// totalAmount/totalProfit/totalLoss are aggregated across every Sale
+// matching the query's filters, not just the current page — so the totals
+// shown in the UI stay correct for the whole selected range regardless of
+// which page is in view.
+@ObjectType({ description: 'A page of Sales plus totals for the whole range' })
+export class PaginatedSales {
+  @Field((_type) => [Sale])
+  items: Sale[];
+
+  @Field(NumberField)
+  totalCount: number;
+
+  @Field(NumberField)
+  totalAmount: number;
+
+  @Field(NumberField)
+  totalProfit: number;
+
+  @Field(NumberField)
+  totalLoss: number;
+}

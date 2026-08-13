@@ -29,8 +29,22 @@ export const purchaseMinimal = `{
     }`;
 
 export const GET_PURCHASES = gql`
-  query getPurchasesForUser($date: DateRange!) {
-    getPurchasesForUser(date: $date) ${purchase}
+  query getPurchasesForUser(
+    $date: DateRange!
+    $vendor: String
+    $page: Float
+    $limit: Float
+  ) {
+    getPurchasesForUser(
+      date: $date
+      vendor: $vendor
+      page: $page
+      limit: $limit
+    ) {
+      items ${purchase}
+      totalCount
+      totalAmount
+    }
   }
 `;
 
@@ -49,6 +63,16 @@ export const GET_PURCHASE_BY_VENDOR = gql`
 export const GET_PURCHASE_BY_CONTACT = gql`
   query getPurchaseByVendorPhone($contact: String!) {
     getPurchaseByVendorPhone(contact: $contact) ${purchase}
+  }
+`;
+
+export const GET_VENDORS = gql`
+  query getVendors($includeUnnamed: Boolean) {
+    getVendors(includeUnnamed: $includeUnnamed) {
+      vendor
+      contact
+      email
+    }
   }
 `;
 

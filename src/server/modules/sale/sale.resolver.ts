@@ -1,7 +1,7 @@
 import { Resolver, Query, Authorized, Ctx, Arg, Mutation } from 'type-graphql';
 import { CTX } from '../../interfaces/common';
 import { SaleService } from './sale.service';
-import { Sale } from './sale.model';
+import { Sale, SaleCustomer, PaginatedSales } from './sale.model';
 import { CreateSaleInput, UpdateSaleInput } from './sale.input';
 import { DateRange } from '../common/Types/InputTypes';
 
@@ -15,14 +15,20 @@ export default class SaleResolver {
   // Queries
   // Get the sale for the logged in user from ctx.user
 
-  @Query((_returns) => [Sale])
+  @Query((_returns) => PaginatedSales)
   @Authorized()
   async getSalesForUser(
     @Ctx() ctx: CTX,
     @Arg('date', (_returns) => DateRange) date: DateRange,
-  ): Promise<Sale[]> {
+    @Arg('customer', (_returns) => String, { nullable: true })
+    customer?: string,
+    @Arg('page', (_returns) => Number, { nullable: true, defaultValue: 1 })
+    page?: number,
+    @Arg('limit', (_returns) => Number, { nullable: true, defaultValue: 0 })
+    limit?: number,
+  ): Promise<PaginatedSales> {
     const saleService = new SaleService(ctx);
-    return await saleService.getSales(date);
+    return await saleService.getSales(date, customer, page, limit);
   }
 
   @Query((_returns) => Sale, { nullable: true })
@@ -52,6 +58,20 @@ export default class SaleResolver {
   ): Promise<Sale[]> {
     const saleService = new SaleService(ctx);
     return await saleService.getSaleByBillNumber(billNumber);
+  }
+
+  @Query((_returns) => [SaleCustomer])
+  @Authorized()
+  async getCustomers(
+    @Ctx() ctx: CTX,
+    @Arg('includeUnnamed', (_returns) => Boolean, {
+      nullable: true,
+      defaultValue: false,
+    })
+    includeUnnamed?: boolean,
+  ): Promise<SaleCustomer[]> {
+    const saleService = new SaleService(ctx);
+    return await saleService.getCustomers(includeUnnamed);
   }
 
   @Query((_returns) => [Sale])

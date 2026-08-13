@@ -81,10 +81,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const [receivedView, setRecievedView] = useState(!isView);
   const [purchasesView, setPurchasesView] = useState(false);
   const [salesView, setSalesView] = useState(false);
-  console.log({
-    newClosing,
-    previousClosing,
-  });
+
   useEffect(() => {
     if (closings?.getClosingForUser) {
       setNewClosing(closings.getClosingForUser[0]);
@@ -203,10 +200,8 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
       </React.Fragment>
     );
   }
-  console.log(salesTotal, receivedTotal, purchaseTotal, spentTotal);
 
   const getNetTotal = () => {
-    console.log(salesTotal, receivedTotal, purchaseTotal, spentTotal);
     return (
       prevClosing.inHandTotal +
       salesTotal +
@@ -320,7 +315,6 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               purchaseFromDate={today.toDate()}
               purchaseToDate={endDate}
               callback={(_purchaseIds, total) => {
-                console.log(_purchaseIds);
                 !isView &&
                   setNewClosing((currentState) => ({
                     ...currentState,

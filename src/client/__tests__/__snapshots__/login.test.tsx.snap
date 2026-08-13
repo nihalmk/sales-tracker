@@ -12,7 +12,7 @@ exports[`Login Page Login page snapshot 1`] = `
         class="css-1yvedla"
       >
         <div
-          class="chakra-card__root css-1krasp4"
+          class="chakra-card__root css-1qmymts"
         >
           <div
             class="chakra-card__body css-1p1fmwq"
@@ -95,7 +95,7 @@ exports[`Login Page Login page snapshot 1`] = `
           </div>
         </div>
         <div
-          class="chakra-card__root css-dlseva"
+          class="chakra-card__root css-3zaj7k"
         >
           <div
             class="chakra-card__header css-br04hd"

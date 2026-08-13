@@ -236,7 +236,6 @@ function createApolloClient(
     link: ApolloLink.from([
       onError(({ graphQLErrors, networkError }) => {
         if (graphQLErrors) {
-          // console.log(graphQLErrors);
           //sendToLoggingService(graphQLErrors);
         }
         if (networkError) {

@@ -1,4 +1,4 @@
-import { ItemsModel, Items } from './items.model';
+import { ItemsModel, Items, PaginatedItems } from './items.model';
 import { CreateItemsInput, UpdateItemsInput } from './items.input';
 import { CTX } from '../../interfaces/common';
 import { UserService } from '../user/user.service';
@@ -31,14 +31,46 @@ export class ItemsService {
       .populate('shop');
   }
 
-  // get all Items of shop
+  // get all Items of shop. limit=0 means "no pagination, return everything
+  // matching" — used by embedded callers (e.g. the product picker on
+  // AddSale/AddPurchase) that need the complete list, not just one page.
+  async getItems(
+    search?: string,
+    page = 1,
+    limit = 0,
+  ): Promise<PaginatedItems> {
+    const filter: Record<string, unknown> = { shop: this.ctx.user.shop };
+    if (search) {
+      filter.$or = [
+        { name: new RegExp(search, 'i') },
+        { shortId: new RegExp(search, 'i') },
+      ];
+    }
 
-  async getItems(): Promise<Items[]> {
-    return this.model
-      .find({
-        shop: this.ctx.user.shop,
-      })
-      .populate('shop');
+    let query = this.model.find(filter).sort({ name: 1 }).populate('shop');
+    if (limit > 0) {
+      query = query.skip((page - 1) * limit).limit(limit);
+    }
+
+    const [items, totalCount, aggregate] = await Promise.all([
+      query,
+      this.model.countDocuments(filter),
+      this.model.aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: null,
+            totalStockAmount: { $sum: { $multiply: ['$price.cost', '$stock'] } },
+          },
+        },
+      ]),
+    ]);
+    const totals = aggregate[0] || { totalStockAmount: 0 };
+    return {
+      items,
+      totalCount,
+      totalStockAmount: totals.totalStockAmount,
+    };
   }
 
   // Create a new items
