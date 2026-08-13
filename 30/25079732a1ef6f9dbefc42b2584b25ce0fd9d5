@@ -1,0 +1,61 @@
+src/client/components/common/SelectBoxes/SelectBox.tsx
+  s_5b771625359126::t_abc975204da0d0 33-34,55,58
+src/client/components/common/SelectBoxes/ContactSelect.tsx
+  h_26a6a0ac037242 119
+src/client/components/common/SelectBoxes/CreatableSelect.tsx
+  h_26a6a0ac037242 20,33,49
+src/server/modules/sale/sale.service.ts
+  s_5b771625359126::t_7329e11e08e468 19-24
+  s_5b771625359126::t_323721b34940bb 85,97-107
+src/server/modules/purchase/purchase.service.ts
+  s_5b771625359126::t_60e3b6d4de2512 24-29
+  s_5b771625359126::t_690556925e66e0 90,102-112
+src/client/components/common/SelectBoxes/ItemSelect.tsx
+  s_5b771625359126::t_3ea3867f7422b4 84
+  s_5b771625359126::t_b766fa3ffd979b 61-62,69-75
+  s_5b771625359126::t_de6913388b57dd 56-60
+  s_5b771625359126::t_25cfa9854b10eb 1-55,63-68,76-83,85-97
+src/server/modules/sale/sale.resolver.ts
+  s_5b771625359126::t_9cbd03a75c8ca4 29-30,33
+src/client/graphql/query/sale.ts
+  s_5b771625359126::t_4c73078d626050 41,48
+src/client/graphql/query/purchase.ts
+  s_5b771625359126::t_3cb9366b6a93c8 37,44
+src/client/components/Sale/Sales.tsx
+  s_5b771625359126::t_43a4503909497a 153,162
+  s_5b771625359126::t_58c7d764e8728c 163-169
+  s_5b771625359126::t_8edc81788c54de 42,47,54
+  s_5b771625359126::t_f2119fcd8d6557 12
+  s_5b771625359126::t_fdb169ae9ed704 80
+src/client/components/Purchase/Purchases.tsx
+  s_5b771625359126::t_9c84580f764406 81
+  s_5b771625359126::t_febdb0cbae4bae 41,46,53
+  s_5b771625359126::t_dd57ed04a34df4 137-143
+  s_5b771625359126::t_c6c8c2dbf9beb5 127,136
+  s_5b771625359126::t_d7f389aafdadc6 12
+src/server/modules/purchase/purchase.resolver.ts
+  s_5b771625359126::t_bfb9d9bf6a8eb5 29-30,33-39
+src/schema.gql
+  s_5b771625359126::t_13a3328b926196 29,115,147,154,161,182,215,226,234,239,263,282,305,370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "3025079732a1ef6f9dbefc42b2584b25ce0fd9d5",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
