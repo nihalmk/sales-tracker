@@ -9,6 +9,12 @@ import { ObjectId } from 'mongodb';
 
 // Queries on models to to get/create/update items data
 
+// Case-insensitive exact match — anchored so "Snack" doesn't also match
+// "Snacks", and the input is escaped so regex metacharacters in a real
+// category name are matched literally, not as regex syntax.
+const exactCaseInsensitive = (value: string) =>
+  new RegExp(`^${_.escapeRegExp(value)}$`, 'i');
+
 export class ItemsService {
   readonly model: typeof ItemsModel;
   readonly ctx: CTX;
@@ -38,6 +44,7 @@ export class ItemsService {
     search?: string,
     page = 1,
     limit = 0,
+    category?: string,
   ): Promise<PaginatedItems> {
     const filter: Record<string, unknown> = { shop: this.ctx.user.shop };
     if (search) {
@@ -45,6 +52,9 @@ export class ItemsService {
         { name: new RegExp(search, 'i') },
         { shortId: new RegExp(search, 'i') },
       ];
+    }
+    if (category) {
+      filter.category = exactCaseInsensitive(category);
     }
 
     let query = this.model.find(filter).sort({ name: 1 }).populate('shop');
@@ -73,6 +83,16 @@ export class ItemsService {
       totalCount,
       totalStockAmount: totals.totalStockAmount,
     };
+  }
+
+  // Distinct categories already used by this shop's items — for filter and
+  // creatable-select dropdowns.
+  async getCategories(): Promise<string[]> {
+    const categories = await this.model.distinct('category', {
+      shop: this.ctx.user.shop,
+      category: { $nin: [null, ''] },
+    });
+    return categories.sort((a: string, b: string) => a.localeCompare(b));
   }
 
   // Create a new items

@@ -7,6 +7,7 @@ import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import { currency } from '../../utils/helpers';
 import {
+  Box,
   Card,
   SimpleGrid,
   Table,
@@ -16,6 +17,9 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import DiscountBanner, {
+  calculateDiscounts,
+} from '../common/DiscountBanner';
 
 interface Props {
   billNumber?: string;
@@ -31,6 +35,7 @@ const SaleCard: NextPage<Props> = function ({
   const [view, setView] = useState(showContent);
   const [isPrinting, setIsPrinting] = useState(false);
   const [selectedPrint, setSelectedPrint] = useState('');
+  const [showProfit, setShowProfit] = useState(false);
 
   const { loading: saleLoading, data: saleData } = useQuery(
     GET_SALE_BY_BILL_NUMBER,
@@ -54,6 +59,15 @@ const SaleCard: NextPage<Props> = function ({
   }, [sale]);
 
   const currentBillNumber = billNumber || sale?.billNumber;
+
+  const getDiscountLineItems = () =>
+    (sale?.items || []).map((saleItem) => ({
+      id: saleItem.item._id,
+      name: saleItem.item.name,
+      mrp: saleItem.item?.price?.list || 0,
+      salePrice: saleItem.cost,
+      quantity: saleItem.quantity,
+    }));
 
   return (
     <Card.Root
@@ -143,6 +157,8 @@ const SaleCard: NextPage<Props> = function ({
                   <React.Fragment>
                     {sale?.items?.map((sale: SaleItem, i: number) => {
                       const item = sale.item;
+                      const profit = sale.cost - item?.price?.cost;
+                      const isProfit = profit > 0;
                       return (
                         <Table.Row key={i}>
                           <Table.Cell color="fg.muted">
@@ -157,6 +173,17 @@ const SaleCard: NextPage<Props> = function ({
                           </Table.Cell>
                           <Table.Cell textAlign="end" fontWeight="semibold">
                             {sale.total}
+                            {showProfit && (
+                              <Box
+                                as="span"
+                                ml={2}
+                                color={isProfit ? 'green.600' : 'red.600'}
+                                fontWeight="medium"
+                              >
+                                {isProfit && '+'}
+                                {profit}
+                              </Box>
+                            )}
                           </Table.Cell>
                           <Table.Cell textAlign="center" color="fg.muted">
                             —
@@ -182,14 +209,46 @@ const SaleCard: NextPage<Props> = function ({
                       </Table.Cell>
                       <Table.Cell textAlign="end" fontWeight="bold">
                         {sale?.total}
+                        {(() => {
+                          const { totalDiscount, totalDiscountPercent } =
+                            calculateDiscounts(getDiscountLineItems());
+                          return (
+                            !!totalDiscount && (
+                              <Text
+                                fontSize="xs"
+                                fontWeight="medium"
+                                color="green.600"
+                              >
+                                −{totalDiscount}₹ discount (
+                                {totalDiscountPercent}%)
+                              </Text>
+                            )
+                          );
+                        })()}
                       </Table.Cell>
-                      <Table.Cell></Table.Cell>
+                      <Table.Cell>
+                        {showProfit && (
+                          <Box
+                            as="span"
+                            color={sale?.profit > 0 ? 'green.600' : 'red.600'}
+                            fontWeight="bold"
+                          >
+                            {sale?.profit > 0 ? '+' : ''}
+                            {sale?.profit}
+                          </Box>
+                        )}
+                      </Table.Cell>
                     </Table.Row>
                   </React.Fragment>
                 )}
               </Table.Body>
             </Table.Root>
           </Table.ScrollArea>
+          {!!sale?.items?.length && (
+            <Card.Body pt={0}>
+              <DiscountBanner items={getDiscountLineItems()} />
+            </Card.Body>
+          )}
           <Card.Footer>
             <HStack w="full">
               {currentBillNumber && (
@@ -213,10 +272,14 @@ const SaleCard: NextPage<Props> = function ({
               )}
               <Button
                 className="hide-in-print"
-                colorPalette="brand"
+                colorPalette="gray"
+                variant="outline"
                 ml="auto"
-                disabled={true}
+                onClick={() => setShowProfit(!showProfit)}
               >
+                {showProfit ? 'Hide P/L' : 'P/L'}
+              </Button>
+              <Button className="hide-in-print" colorPalette="brand" disabled={true}>
                 <Icon name="edit" light />
                 Edit
               </Button>

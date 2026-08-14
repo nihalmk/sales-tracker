@@ -2,26 +2,32 @@ import React, { useState, ChangeEvent, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_ITEM, UPDATE_ITEM } from '../../graphql/mutation/items';
-import { GET_ITEMS } from '../../graphql/query/items';
+import { GET_ITEMS, GET_CATEGORIES } from '../../graphql/query/items';
 import Input from '../common/Inputs/FormInput';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
 import { Items } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
+import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import CreatableSelect from '../common/SelectBoxes/CreatableSelect';
 import {
   Card,
   Heading,
   Text,
   SimpleGrid,
-  GridItem,
   Table,
   Button,
   HStack,
+  VStack,
+  Flex,
+  Box,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 1000;
 const SEARCH_MIN_LENGTH = 2;
 
@@ -39,35 +45,46 @@ const AddStock: NextPage<Props> = function () {
   // query, so short/mid-word keystrokes don't fire a search each time.
   const [searchTerm, setSearchTerm] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [categoryFilter, setCategoryFilter] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setAppliedSearch(
         searchTerm.length >= SEARCH_MIN_LENGTH ? searchTerm : '',
       );
-      setPage(1);
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const {
-    loading: itemsLoading,
-    data: itemsData,
-    refetch: refetchItems,
-  } = useQuery(GET_ITEMS, {
-    variables: {
-      search: appliedSearch || undefined,
-      page,
-      limit: PAGE_SIZE,
-    },
+  const { data: categoriesData } = useQuery(GET_CATEGORIES, {
     fetchPolicy: 'no-cache',
   });
+  const categoryOptions: LabelValueObj[] = (
+    categoriesData?.getCategories || []
+  ).map((c: string) => ({ label: c, value: c }));
 
-  const items: Items[] = itemsData?.getItemsForUser?.items || [];
-  const totalCount = itemsData?.getItemsForUser?.totalCount || 0;
-  const totalStockAmount = itemsData?.getItemsForUser?.totalStockAmount || 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const {
+    items,
+    totalCount,
+    extra: totalStockAmount,
+    loading: itemsLoading,
+    loadingMore: itemsLoadingMore,
+    error: itemsError,
+    hasMore: itemsHasMore,
+    retry: retryItems,
+    refresh: refetchItems,
+    sentinelRef: itemsSentinelRef,
+  } = useInfiniteScroll({
+    query: GET_ITEMS,
+    variables: {
+      search: appliedSearch || undefined,
+      category: categoryFilter || undefined,
+    },
+    pageSize: PAGE_SIZE,
+    getItems: (data): Items[] => data?.getItemsForUser?.items || [],
+    getTotalCount: (data) => data?.getItemsForUser?.totalCount || 0,
+    getExtra: (data) => data?.getItemsForUser?.totalStockAmount || 0,
+  });
 
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -75,6 +92,9 @@ const AddStock: NextPage<Props> = function () {
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
 
   const [newItem, setNewItem] = useState<Items>();
+  // Tracks whether the user has typed into the Sale field directly, so MRP
+  // changes keep mirroring into Sale only until the user takes over.
+  const [saleManuallySet, setSaleManuallySet] = useState(false);
 
   const [editItem, setEditItem] = useState<Items>();
 
@@ -121,6 +141,7 @@ const AddStock: NextPage<Props> = function () {
       await refetchItems();
       setMessage('New item added successfully');
       setNewItem(undefined);
+      setSaleManuallySet(false);
       setSubmitted(false);
       setTimeout(() => {
         setMessage('');
@@ -199,149 +220,187 @@ const AddStock: NextPage<Props> = function () {
               * For Service Charges, add -1 stock with 0 cost, 0 list and
               Service charges as sale price
             </Text>
-            <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
-              <GridItem colSpan={{ base: 1, md: 2 }}>
-                <Input
-                  tabIndex={1}
-                  inputName="name"
-                  inputLabel="Name"
-                  inputType="text"
-                  max={50}
-                  placeholderValue="Name"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    const name = e.target.value;
-                    setNewItem((currentState) => ({
-                      ...currentState,
-                      name: name,
-                    }));
-                  }}
-                  disabled={createLoading}
-                  isInvalid={!!(submitted && !newItem?.name)}
-                  value={newItem?.name || ''}
-                />
-              </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
-                <Input
-                  tabIndex={2}
-                  inputName="cost"
-                  inputLabel="Cost"
-                  inputType="number"
-                  max={20}
-                  placeholderValue="Cost Price"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    const cost = Number(e.target.value);
-                    setNewItem((currentState) => ({
-                      ...currentState,
-                      price: {
-                        ...currentState?.price,
-                        cost,
-                      },
-                    }));
-                  }}
-                  disabled={createLoading}
-                  isInvalid={!!(submitted && newItem?.price?.cost < 0)}
-                  value={newItem?.price?.cost || 0}
-                />
-              </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
-                <Input
-                  tabIndex={3}
-                  inputName="list"
-                  inputLabel="MRP"
-                  inputType="number"
-                  max={20}
-                  placeholderValue="MRP"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    const list = Number(e.target.value);
-                    setNewItem((currentState) => ({
-                      ...currentState,
-                      price: {
-                        ...currentState?.price,
-                        list,
-                      },
-                    }));
-                  }}
-                  disabled={createLoading}
-                  isInvalid={!!(submitted && newItem?.price?.list < 0)}
-                  value={newItem?.price?.list || 0}
-                />
-              </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
-                <Input
-                  tabIndex={4}
-                  inputName="sale"
-                  inputLabel="Sale"
-                  inputType="number"
-                  max={20}
-                  placeholderValue="Sale Price"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    const sale = Number(e.target.value);
-                    setNewItem((currentState) => ({
-                      ...currentState,
-                      price: {
-                        ...currentState?.price,
-                        sale,
-                      },
-                    }));
-                  }}
-                  disabled={createLoading}
-                  isInvalid={!!(submitted && newItem?.price?.sale < 0)}
-                  value={newItem?.price?.sale || 0}
-                />
-              </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
-                <Input
-                  tabIndex={5}
-                  inputName="stock"
-                  inputLabel="Stock"
-                  inputType="number"
-                  max={20}
-                  placeholderValue="Stock Count"
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    const stock = Number(e.target.value);
-                    setNewItem((currentState) => ({
-                      ...currentState,
-                      stock,
-                    }));
-                  }}
-                  disabled={createLoading}
-                  isInvalid={!!(submitted && !newItem?.stock)}
-                  value={newItem?.stock}
-                />
-              </GridItem>
-              <GridItem colSpan={{ base: 2, md: 2 }}>
-                <Button
-                  id="item-submit"
-                  type="submit"
-                  colorPalette="brand"
-                  w="full"
-                  loading={createLoading}
-                  onClick={onNewItemCreate}
-                >
-                  <Icon name="add" light />
-                  Add New Item
-                </Button>
-              </GridItem>
+            <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} mb={4}>
+              <Input
+                tabIndex={1}
+                inputName="name"
+                inputLabel="Name"
+                inputType="text"
+                max={50}
+                placeholderValue="Name"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const name = e.target.value;
+                  setNewItem((currentState) => ({
+                    ...currentState,
+                    name: name,
+                  }));
+                }}
+                disabled={createLoading}
+                isInvalid={!!(submitted && !newItem?.name)}
+                value={newItem?.name || ''}
+              />
+              <CreatableSelect
+                tabIndex={2}
+                selectLabel="Category"
+                options={categoryOptions}
+                placeholder="Category (optional)"
+                isClearable
+                isDisabled={createLoading}
+                onChange={(picked: LabelValueObj | null) => {
+                  setNewItem((currentState) => ({
+                    ...currentState,
+                    category: picked?.value || '',
+                  }));
+                }}
+                value={
+                  newItem?.category
+                    ? { label: newItem.category, value: newItem.category }
+                    : null
+                }
+              />
             </SimpleGrid>
+            <SimpleGrid columns={{ base: 2, md: 4 }} gap={4} mb={4}>
+              <Input
+                tabIndex={3}
+                inputName="cost"
+                inputLabel="Cost"
+                inputType="number"
+                max={20}
+                placeholderValue="Cost Price"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const cost = Number(e.target.value);
+                  setNewItem((currentState) => ({
+                    ...currentState,
+                    price: {
+                      ...currentState?.price,
+                      cost,
+                    },
+                  }));
+                }}
+                disabled={createLoading}
+                isInvalid={!!(submitted && newItem?.price?.cost < 0)}
+                value={newItem?.price?.cost || ''}
+              />
+              <Input
+                tabIndex={4}
+                inputName="list"
+                inputLabel="MRP"
+                inputType="number"
+                max={20}
+                placeholderValue="MRP"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const list = Number(e.target.value);
+                  setNewItem((currentState) => ({
+                    ...currentState,
+                    price: {
+                      ...currentState?.price,
+                      list,
+                      sale: saleManuallySet ? currentState?.price?.sale : list,
+                    },
+                  }));
+                }}
+                disabled={createLoading}
+                isInvalid={!!(submitted && newItem?.price?.list < 0)}
+                value={newItem?.price?.list || ''}
+              />
+              <Input
+                tabIndex={5}
+                inputName="sale"
+                inputLabel="Sale"
+                inputType="number"
+                max={20}
+                placeholderValue="Sale Price"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const raw = e.target.value;
+                  const sale = Number(raw);
+                  setSaleManuallySet(raw !== '');
+                  setNewItem((currentState) => ({
+                    ...currentState,
+                    price: {
+                      ...currentState?.price,
+                      sale,
+                    },
+                  }));
+                }}
+                disabled={createLoading}
+                isInvalid={!!(submitted && newItem?.price?.sale < 0)}
+                value={newItem?.price?.sale || ''}
+              />
+              <Input
+                tabIndex={6}
+                inputName="stock"
+                inputLabel="Stock"
+                inputType="number"
+                max={20}
+                placeholderValue="Stock Count"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const stock = Number(e.target.value);
+                  setNewItem((currentState) => ({
+                    ...currentState,
+                    stock,
+                  }));
+                }}
+                disabled={createLoading}
+                isInvalid={!!(submitted && !newItem?.stock)}
+                value={newItem?.stock || ''}
+              />
+            </SimpleGrid>
+            <Flex justify="flex-end">
+              <Button
+                id="item-submit"
+                type="submit"
+                colorPalette="brand"
+                w={{ base: 'full', md: 'auto' }}
+                minW="48"
+                loading={createLoading}
+                onClick={onNewItemCreate}
+              >
+                <Icon name="add" light />
+                Add New Item
+              </Button>
+            </Flex>
             <button type="submit" hidden></button>
           </Card.Body>
         </form>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
         <Card.Body pt={0} pb={4}>
-          <Input
-            tabIndex={9}
-            inputName="Search"
-            inputType="text"
-            max={20}
-            placeholderValue="Search Product by Name or ID"
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              const search = e.target.value;
-              setSearchTerm(search);
-            }}
-            disabled={createLoading || updateLoading}
-            value={searchTerm || ''}
-          />
+          <Flex gap={3} wrap="wrap" align="flex-end">
+            <Box flex="1" minW="200px">
+              <Input
+                tabIndex={9}
+                inputName="Search"
+                inputType="text"
+                max={20}
+                placeholderValue="Search Product by Name or ID"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const search = e.target.value;
+                  setSearchTerm(search);
+                }}
+                disabled={createLoading || updateLoading}
+                value={searchTerm || ''}
+              />
+            </Box>
+            <Box w="220px" flexShrink={0}>
+              <SelectBox
+                tabIndex={16}
+                selectLabel="Category"
+                selectData={categoryOptions}
+                isClearable
+                isSearchable
+                placeholder="Filter by category"
+                isDisabled={createLoading || updateLoading}
+                onSelectChange={(picked: LabelValueObj | null) => {
+                  setCategoryFilter(picked?.value || '');
+                }}
+                selectDefault={
+                  categoryFilter
+                    ? { label: categoryFilter, value: categoryFilter }
+                    : undefined
+                }
+              />
+            </Box>
+          </Flex>
         </Card.Body>
 
         <Table.ScrollArea>
@@ -350,6 +409,7 @@ const AddStock: NextPage<Props> = function () {
               <Table.Row>
                 <Table.ColumnHeader>#ID</Table.ColumnHeader>
                 <Table.ColumnHeader>Product</Table.ColumnHeader>
+                <Table.ColumnHeader>Category</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">
                   Cost Price
                 </Table.ColumnHeader>
@@ -366,14 +426,32 @@ const AddStock: NextPage<Props> = function () {
             <Table.Body>
               {itemsLoading ? (
                 <Table.Row>
-                  <Table.Cell textAlign="center" py={8} colSpan={7}>
+                  <Table.Cell textAlign="center" py={8} colSpan={8}>
                     <Loader />
+                  </Table.Cell>
+                </Table.Row>
+              ) : itemsError && items?.length === 0 ? (
+                <Table.Row>
+                  <Table.Cell textAlign="center" py={8} colSpan={8}>
+                    <VStack gap={2}>
+                      <Text color="red.600" fontSize="sm">
+                        Failed to load items.
+                      </Text>
+                      <Button
+                        size="sm"
+                        colorPalette="red"
+                        variant="outline"
+                        onClick={retryItems}
+                      >
+                        Retry
+                      </Button>
+                    </VStack>
                   </Table.Cell>
                 </Table.Row>
               ) : (
                 items?.length === 0 && (
                   <Table.Row>
-                    <Table.Cell textAlign="center" py={8} colSpan={7}>
+                    <Table.Cell textAlign="center" py={8} colSpan={8}>
                       <Text color="fg.muted" fontSize="sm">
                         No items added yet
                       </Text>
@@ -411,6 +489,33 @@ const AddStock: NextPage<Props> = function () {
                           />
                         ) : (
                           item.name
+                        )}
+                      </Table.Cell>
+                      <Table.Cell color="fg.muted">
+                        {isEdit ? (
+                          <CreatableSelect
+                            tabIndex={15}
+                            options={categoryOptions}
+                            placeholder="Category"
+                            isClearable
+                            isDisabled={updateLoading}
+                            onChange={(picked: LabelValueObj | null) => {
+                              setEditItem((currentState) => ({
+                                ...currentState,
+                                category: picked?.value || '',
+                              }));
+                            }}
+                            value={
+                              editItem?.category
+                                ? {
+                                    label: editItem.category,
+                                    value: editItem.category,
+                                  }
+                                : null
+                            }
+                          />
+                        ) : (
+                          item.category || '-'
                         )}
                       </Table.Cell>
                       <Table.Cell textAlign="end">
@@ -575,31 +680,18 @@ const AddStock: NextPage<Props> = function () {
             </Table.Body>
           </Table.Root>
         </Table.ScrollArea>
-        {totalCount > PAGE_SIZE && (
-          <Card.Body pt={0}>
-            <HStack justify="center" gap={4}>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </Button>
-              <Text fontSize="sm" color="fg.muted">
-                Page {page} of {totalPages}
-              </Text>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </Button>
-            </HStack>
-          </Card.Body>
-        )}
+        <Card.Body pt={0}>
+          <InfiniteScrollStatus
+            loadingMore={itemsLoadingMore}
+            error={!!items?.length && itemsError}
+            hasMore={itemsHasMore}
+            itemsCount={items?.length || 0}
+            totalCount={totalCount}
+            onRetry={retryItems}
+            sentinelRef={itemsSentinelRef}
+            itemLabel="items"
+          />
+        </Card.Body>
       </Card.Root>
     </React.Fragment>
   );

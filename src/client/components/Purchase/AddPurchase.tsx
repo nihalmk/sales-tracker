@@ -21,9 +21,11 @@ import {
 } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
-import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import CreatableSelect from '../common/SelectBoxes/CreatableSelect';
 import ContactSelect from '../common/SelectBoxes/ContactSelect';
-import { GET_ITEMS } from '../../graphql/query/items';
+import { GET_ITEMS, GET_CATEGORIES } from '../../graphql/query/items';
+import { CREATE_ITEM } from '../../graphql/mutation/items';
 import Link from 'next/link';
 import {
   Card,
@@ -36,9 +38,16 @@ import {
   Text,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import OverLay from '../OverLay';
 
 interface Props {
   billNumber?: string;
+}
+
+interface ProductOption extends LabelValueObj {
+  shortId: string;
+  cost: number;
+  stock: number;
 }
 
 const AddPurchase: NextPage<Props> = function ({ billNumber }) {
@@ -48,6 +57,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
     useMutation(CREATE_PURCHASE);
   const [submitUpdatePurchase, { loading: updateLoading }] =
     useMutation(UPDATE_PURCHASE);
+  const [submitCreateItem, { loading: createItemLoading }] =
+    useMutation(CREATE_ITEM);
 
   const {
     loading: purchaseLoading,
@@ -73,6 +84,13 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   const { loading: itemsLoading, data: itemsData } = useQuery(GET_ITEMS, {
     fetchPolicy: 'no-cache',
   });
+
+  const { data: categoriesData } = useQuery(GET_CATEGORIES, {
+    fetchPolicy: 'no-cache',
+  });
+  const categoryOptions: LabelValueObj[] = (
+    categoriesData?.getCategories || []
+  ).map((c: string) => ({ label: c, value: c }));
 
   const { data: vendorsData } = useQuery(GET_VENDORS, {
     fetchPolicy: 'no-cache',
@@ -117,31 +135,97 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
 
   const [items, setItems] = useState<Items[]>();
 
-  const [itemsSelection, setItemsSelection] = useState<LabelValueObj[]>();
+  const [itemsSelection, setItemsSelection] = useState<ProductOption[]>();
+
+  // Plain item name as the option label (used for matching typed text
+  // against existing options, so CreatableSelect only offers "Create X"
+  // when X genuinely doesn't exist) — the richer #shortId/cost display
+  // lives in renderProductOption below via customOption.
+  const toProductOption = (i: Items): ProductOption => ({
+    label: i.name,
+    value: i._id,
+    shortId: i.shortId,
+    cost: i.price?.cost,
+    stock: i.stock,
+  });
 
   useEffect(() => {
     const sortedItems = _.sortBy(
       itemsData?.getItemsForUser?.items,
       'name',
     ) as Items[];
-    setItemsSelection(
-      _.compact(
-        sortedItems.map((i) => {
-          return {
-            label: `#${i.shortId} | ${i.name} ${
-              i.stock > 0 ? `(${i.price.cost}₹)` : ''
-            }`,
-            value: i._id,
-          };
-        }),
-      ),
-    );
+    setItemsSelection(_.compact(sortedItems.map(toProductOption)));
     setItems(sortedItems);
   }, [itemsData]);
+
+  const renderProductOption = (option: ProductOption) => (
+    <Text>
+      #{option.shortId} | {option.label}{' '}
+      {option.stock > 0 ? `(${option.cost}₹)` : ''}
+    </Text>
+  );
 
   const [purchaseItems, setPurchaseItems] = useState<PurchaseItem[]>([]);
   const [newPurchaseItem, setNewPurchaseItem] = useState<PurchaseItem>();
   const [newItem, setNewItem] = useState<Items>();
+
+  // New-item-inline-creation modal state — lets a purchase in progress
+  // create a product on the fly instead of navigating to Stock and losing
+  // everything already entered on this form.
+  const [newItemModalOpen, setNewItemModalOpen] = useState(false);
+  const [pendingItemName, setPendingItemName] = useState('');
+  const [newItemDraft, setNewItemDraft] = useState<{
+    category?: string;
+    cost?: number;
+    list?: number;
+  }>({});
+  const [newItemDraftSubmitted, setNewItemDraftSubmitted] = useState(false);
+  const [newItemError, setNewItemError] = useState('');
+
+  const resetNewItemModal = () => {
+    setNewItemModalOpen(false);
+    setPendingItemName('');
+    setNewItemDraft({});
+    setNewItemDraftSubmitted(false);
+    setNewItemError('');
+  };
+
+  const onCreateNewItem = async () => {
+    setNewItemDraftSubmitted(true);
+    if (!(newItemDraft.cost >= 0) || !(newItemDraft.list >= 0)) {
+      setNewItemError('Please enter cost and MRP');
+      return;
+    }
+    try {
+      const res = await submitCreateItem({
+        variables: {
+          name: pendingItemName,
+          category: newItemDraft.category || undefined,
+          price: {
+            cost: newItemDraft.cost,
+            list: newItemDraft.list,
+            sale: newItemDraft.list,
+          },
+          stock: 0,
+        },
+      });
+      const created = res.data.createItem as Items;
+      const updatedItems = _.sortBy([...(items || []), created], 'name');
+      setItems(updatedItems);
+      setItemsSelection(updatedItems.map(toProductOption));
+      setNewItem(created);
+      setNewPurchaseItem({
+        item: created,
+        quantity: 1,
+        cost: created.price?.cost,
+        total: created.price?.cost,
+      });
+      resetNewItemModal();
+      productSelectRef?.current?.focus();
+    } catch (e) {
+      setNewItemError(`Error creating item. ${e.message}`);
+    }
+  };
 
   useEffect(() => {
     setPurchaseItems(purchaseData?.getPurchaseByBillNumber?.[0].items || []);
@@ -359,18 +443,34 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
           <Card.Body pt={0}>
             <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
               <GridItem colSpan={{ base: 2, md: 3 }}>
-                <SelectBox
+                <CreatableSelect
                   tabIndex={4}
                   selectLabel="Product"
-                  selectData={itemsSelection?.filter((i) => {
+                  options={itemsSelection?.filter((i) => {
                     const purchaseItemsIds = purchaseItems.map(
                       (s) => s.item._id,
                     );
                     return !purchaseItemsIds.includes(i.value);
                   })}
                   isDisabled={itemsLoading}
-                  onSelectChange={(e: LabelValueObj) => {
-                    const itemId = e.value;
+                  customOption={renderProductOption}
+                  onChange={(
+                    picked: (ProductOption & { __isNew__?: boolean }) | null,
+                  ) => {
+                    if (!picked) {
+                      setNewItem(undefined);
+                      setNewPurchaseItem(undefined);
+                      return;
+                    }
+                    if (picked.__isNew__) {
+                      setPendingItemName(picked.value);
+                      setNewItemDraft({});
+                      setNewItemDraftSubmitted(false);
+                      setNewItemError('');
+                      setNewItemModalOpen(true);
+                      return;
+                    }
+                    const itemId = picked.value;
                     const item = items.find((i) => i._id === itemId);
                     setNewItem(item);
                     setNewPurchaseItem({
@@ -380,14 +480,14 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                       total: item.price?.cost,
                     });
                   }}
-                  selectDefault={itemsSelection?.find(
+                  value={itemsSelection?.find(
                     (i) =>
                       i.value === (newPurchaseItem?.item as unknown as string),
                   )}
                   isInvalid={!!(newItemSubmitted && !newItem)}
                   noOptionsMessage={'Not in Stock'}
                   innerRef={productSelectRef}
-                ></SelectBox>
+                />
               </GridItem>
               <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
@@ -661,6 +761,92 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
           </HStack>
         </Card.Footer>
       </Card.Root>
+      <OverLay show={newItemModalOpen}>
+        <Card.Root mb={0} variant="elevated">
+          <Card.Header>
+            <Heading size="md">Create &quot;{pendingItemName}&quot;</Heading>
+          </Card.Header>
+          <Card.Body>
+            <ErrorMessage error={newItemError} />
+            <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+              <CreatableSelect
+                selectLabel="Category"
+                options={categoryOptions}
+                placeholder="Category (optional)"
+                isClearable
+                onChange={(picked: LabelValueObj | null) => {
+                  setNewItemDraft((currentState) => ({
+                    ...currentState,
+                    category: picked?.value || '',
+                  }));
+                }}
+                value={
+                  newItemDraft.category
+                    ? { label: newItemDraft.category, value: newItemDraft.category }
+                    : null
+                }
+              />
+              <Input
+                inputName="Cost"
+                inputLabel="Cost Price"
+                inputType="number"
+                max={20}
+                placeholderValue="Cost Price"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const cost = Number(e.target.value);
+                  setNewItemDraft((currentState) => ({
+                    ...currentState,
+                    cost,
+                  }));
+                }}
+                isInvalid={
+                  !!(newItemDraftSubmitted && !(newItemDraft.cost >= 0))
+                }
+                value={newItemDraft.cost ?? ''}
+              />
+              <Input
+                inputName="MRP"
+                inputLabel="MRP"
+                inputType="number"
+                max={20}
+                placeholderValue="MRP"
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const list = Number(e.target.value);
+                  setNewItemDraft((currentState) => ({
+                    ...currentState,
+                    list,
+                  }));
+                }}
+                isInvalid={
+                  !!(newItemDraftSubmitted && !(newItemDraft.list >= 0))
+                }
+                value={newItemDraft.list ?? ''}
+              />
+            </SimpleGrid>
+          </Card.Body>
+          <Card.Footer>
+            <HStack w="full">
+              <Button
+                variant="outline"
+                colorPalette="red"
+                onClick={resetNewItemModal}
+              >
+                <Icon name="cancel" />
+                Cancel
+              </Button>
+              <Button
+                colorPalette="brand"
+                ml="auto"
+                loading={createItemLoading}
+                onClick={onCreateNewItem}
+              >
+                <Icon name="add" light />
+                Create &amp; Select
+              </Button>
+            </HStack>
+          </Card.Footer>
+        </Card.Root>
+      </OverLay>
     </React.Fragment>
   );
 };

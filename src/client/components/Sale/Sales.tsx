@@ -11,8 +11,10 @@ import DatePicker from '../common/DatePicker/DatePicker';
 import ContactSelect from '../common/SelectBoxes/ContactSelect';
 import ItemSelect from '../common/SelectBoxes/ItemSelect';
 import { currency } from '../../utils/helpers';
-import { Box, Card, Flex, Text, Button, HStack } from '@chakra-ui/react';
+import { Box, Card, Flex, Text, Button, VStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
 
 const PAGE_SIZE = 10;
 
@@ -45,14 +47,12 @@ const Sales: NextPage<Props> = function ({
   const [dateTo, setDateTo] = useState(pendingDateTo);
   const [customerFilter, setCustomerFilter] = useState('');
   const [itemNameFilter, setItemNameFilter] = useState('');
-  const [page, setPage] = useState(1);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);
     setDateTo(pendingDateTo);
     setCustomerFilter(pendingCustomer);
     setItemNameFilter(pendingItemName);
-    setPage(1);
   };
 
   const { data: customersData } = useQuery(GET_CUSTOMERS, {
@@ -67,69 +67,103 @@ const Sales: NextPage<Props> = function ({
     }),
   );
 
+  const filterVariables = {
+    date: {
+      from: dateFrom.clone().startOf('day').toDate(),
+      to: dateTo.clone().endOf('day').toDate(),
+    },
+    customer: customerFilter || undefined,
+    itemName: itemNameFilter || undefined,
+  };
+
   // Embedded usage (saleDateFrom passed in, e.g. from the Closing flow) needs
   // the complete matching set for its callback's ids/total, not one page of
   // it — only the standalone dashboard tab actually paginates.
-  const { loading: saleLoading, data: saleData } = useQuery(GET_SALES, {
-    variables: {
-      date: {
-        from: dateFrom.clone().startOf('day').toDate(),
-        to: dateTo.clone().endOf('day').toDate(),
-      },
-      customer: customerFilter || undefined,
-      itemName: itemNameFilter || undefined,
-      page: saleDateFrom ? undefined : page,
-      limit: saleDateFrom ? undefined : PAGE_SIZE,
-    },
+  const { loading: embeddedLoading, data: embeddedData } = useQuery(GET_SALES, {
+    variables: filterVariables,
     fetchPolicy: 'no-cache',
+    skip: !saleDateFrom,
   });
 
-  const sales: Sale[] = saleData?.getSalesForUser?.items || [];
-  const totalCount = saleData?.getSalesForUser?.totalCount || 0;
-  const totalAmount = saleData?.getSalesForUser?.totalAmount || 0;
-  const totalProfit = saleData?.getSalesForUser?.totalProfit || 0;
+  const {
+    items: infiniteSales,
+    totalCount: infiniteTotalCount,
+    extra: infiniteExtra,
+    loading: infiniteLoading,
+    loadingMore,
+    error: salesError,
+    hasMore,
+    retry,
+    sentinelRef,
+  } = useInfiniteScroll({
+    query: GET_SALES,
+    variables: filterVariables,
+    pageSize: PAGE_SIZE,
+    getItems: (data): Sale[] => data?.getSalesForUser?.items || [],
+    getTotalCount: (data) => data?.getSalesForUser?.totalCount || 0,
+    getExtra: (data) => ({
+      totalAmount: data?.getSalesForUser?.totalAmount || 0,
+      totalProfit: data?.getSalesForUser?.totalProfit || 0,
+    }),
+    skip: !!saleDateFrom,
+  });
+
+  const sales: Sale[] = saleDateFrom
+    ? embeddedData?.getSalesForUser?.items || []
+    : infiniteSales;
+  const totalCount = saleDateFrom
+    ? embeddedData?.getSalesForUser?.totalCount || 0
+    : infiniteTotalCount;
+  const totalAmount = saleDateFrom
+    ? embeddedData?.getSalesForUser?.totalAmount || 0
+    : infiniteExtra?.totalAmount || 0;
+  const totalProfit = saleDateFrom
+    ? embeddedData?.getSalesForUser?.totalProfit || 0
+    : infiniteExtra?.totalProfit || 0;
+  const saleLoading = saleDateFrom ? embeddedLoading : infiniteLoading;
 
   useEffect(() => {
-    if (saleData?.getSalesForUser && callback) {
+    if (embeddedData?.getSalesForUser && callback) {
       callback(
         sales.map((s) => s._id),
         totalAmount,
       );
     }
-  }, [saleData]);
+  }, [embeddedData]);
 
   const TotalSection = () => {
     return (
-      <Box
+      <Flex
         ml={hideExtraFields ? 'auto' : undefined}
         textAlign={hideExtraFields ? 'right' : undefined}
       >
-        <Text fontSize="sm" color="fg.muted">
+        <Text fontSize="sm" color="fg.muted" mr={2}>
           {'Total'}
         </Text>
         <Text
           color={totalProfit > 0 ? 'green.600' : 'red.600'}
           fontWeight="medium"
+          fontSize="sm"
+          mr={3}
         >
           {totalAmount}
           {currency}
         </Text>
-        <Text fontSize="sm" color="fg.muted" mt={1}>
+        <Text fontSize="sm" color="fg.muted" mr={2}>
           {'Profile/Loss'}
         </Text>
         <Text
           color={totalProfit > 0 ? 'green.600' : 'red.600'}
           fontWeight="medium"
+          fontSize="sm"
         >
           {totalProfit > 0 && '+'}
           {totalProfit}
           {currency}
         </Text>
-      </Box>
+      </Flex>
     );
   };
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <React.Fragment>
@@ -199,6 +233,20 @@ const Sales: NextPage<Props> = function ({
           <React.Fragment>
             {saleLoading ? (
               <Loader />
+            ) : !saleDateFrom && salesError && _.isEmpty(sales) ? (
+              <Card.Root variant="outline" textAlign="center" py={10}>
+                <VStack gap={3}>
+                  <Text color="red.600">Failed to load sales.</Text>
+                  <Button
+                    size="sm"
+                    colorPalette="red"
+                    variant="outline"
+                    onClick={retry}
+                  >
+                    Retry
+                  </Button>
+                </VStack>
+              </Card.Root>
             ) : (
               (!_.isEmpty(sales) &&
                 sales.map((sale: Sale, i) => {
@@ -218,28 +266,17 @@ const Sales: NextPage<Props> = function ({
                 </React.Fragment>
               )
             )}
-            {!saleDateFrom && totalCount > PAGE_SIZE && (
-              <HStack className="hide-in-print" justify="center" gap={4} mt={4}>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  Previous
-                </Button>
-                <Text fontSize="sm" color="fg.muted">
-                  Page {page} of {totalPages}
-                </Text>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next
-                </Button>
-              </HStack>
+            {!saleDateFrom && (
+              <InfiniteScrollStatus
+                loadingMore={loadingMore}
+                error={!_.isEmpty(sales) && salesError}
+                hasMore={hasMore}
+                itemsCount={sales.length}
+                totalCount={totalCount}
+                onRetry={retry}
+                sentinelRef={sentinelRef}
+                itemLabel="sales"
+              />
             )}
           </React.Fragment>
         )}

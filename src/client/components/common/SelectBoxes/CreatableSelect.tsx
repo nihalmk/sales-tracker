@@ -18,6 +18,9 @@ interface Props {
   customOption?: (val: LabelValueObj) => React.ReactElement | null;
   placeholder?: string;
   isClearable?: boolean;
+  noOptionsMessage?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  innerRef?: any;
 }
 const CreatableSelect: React.FC<Props> = ({
   onChange,
@@ -31,6 +34,8 @@ const CreatableSelect: React.FC<Props> = ({
   customOption,
   placeholder,
   isClearable,
+  noOptionsMessage,
+  innerRef,
 }) => {
   return (
     <Field.Root invalid={isInvalid}>
@@ -49,6 +54,8 @@ const CreatableSelect: React.FC<Props> = ({
         isClearable={isClearable}
         formatOptionLabel={customOption}
         placeholder={placeholder}
+        noOptionsMessage={() => noOptionsMessage}
+        ref={innerRef}
         styles={brandSelectStyles(isInvalid)}
       />
       {isInvalid && (

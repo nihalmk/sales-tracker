@@ -11,6 +11,15 @@ export const CREATE_ITEM = gql`
       item: { name: $name, category: $category, price: $price, stock: $stock }
     ) {
       _id
+      shortId
+      name
+      category
+      price {
+        cost
+        list
+        sale
+      }
+      stock
     }
   }
 `;

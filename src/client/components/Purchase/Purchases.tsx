@@ -10,8 +10,10 @@ import PurchaseCard from './Purchase';
 import DatePicker from '../common/DatePicker/DatePicker';
 import ContactSelect from '../common/SelectBoxes/ContactSelect';
 import ItemSelect from '../common/SelectBoxes/ItemSelect';
-import { Box, Card, Flex, Text, Button, HStack } from '@chakra-ui/react';
+import { Box, Card, Flex, Text, Button, VStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
+import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
 
 const PAGE_SIZE = 10;
 
@@ -44,14 +46,12 @@ const Purchases: NextPage<Props> = function ({
   const [dateTo, setDateTo] = useState(pendingDateTo);
   const [vendorFilter, setVendorFilter] = useState('');
   const [itemNameFilter, setItemNameFilter] = useState('');
-  const [page, setPage] = useState(1);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);
     setDateTo(pendingDateTo);
     setVendorFilter(pendingVendor);
     setItemNameFilter(pendingItemName);
-    setPage(1);
   };
 
   const { data: vendorsData } = useQuery(GET_VENDORS, {
@@ -66,56 +66,82 @@ const Purchases: NextPage<Props> = function ({
     }),
   );
 
+  const filterVariables = {
+    date: {
+      from: dateFrom.clone().startOf('day').toDate(),
+      to: dateTo.clone().endOf('day').toDate(),
+    },
+    vendor: vendorFilter || undefined,
+    itemName: itemNameFilter || undefined,
+  };
+
   // Embedded usage (purchaseFromDate passed in, e.g. from the Closing flow)
   // needs the complete matching set for its callback's ids/total, not one
   // page of it — only the standalone dashboard tab actually paginates.
-  const { loading: purchaseLoading, data: purchaseData } = useQuery(
+  const { loading: embeddedLoading, data: embeddedData } = useQuery(
     GET_PURCHASES,
     {
-      variables: {
-        date: {
-          from: dateFrom.clone().startOf('day').toDate(),
-          to: dateTo.clone().endOf('day').toDate(),
-        },
-        vendor: vendorFilter || undefined,
-        itemName: itemNameFilter || undefined,
-        page: purchaseFromDate ? undefined : page,
-        limit: purchaseFromDate ? undefined : PAGE_SIZE,
-      },
+      variables: filterVariables,
       fetchPolicy: 'no-cache',
+      skip: !purchaseFromDate,
     },
   );
 
-  const purchases: Purchase[] = purchaseData?.getPurchasesForUser?.items || [];
-  const totalCount = purchaseData?.getPurchasesForUser?.totalCount || 0;
-  const totalAmount = purchaseData?.getPurchasesForUser?.totalAmount || 0;
+  const {
+    items: infinitePurchases,
+    totalCount: infiniteTotalCount,
+    extra: infiniteTotalAmount,
+    loading: infiniteLoading,
+    loadingMore,
+    error: purchasesError,
+    hasMore,
+    retry,
+    sentinelRef,
+  } = useInfiniteScroll({
+    query: GET_PURCHASES,
+    variables: filterVariables,
+    pageSize: PAGE_SIZE,
+    getItems: (data): Purchase[] => data?.getPurchasesForUser?.items || [],
+    getTotalCount: (data) => data?.getPurchasesForUser?.totalCount || 0,
+    getExtra: (data) => data?.getPurchasesForUser?.totalAmount || 0,
+    skip: !!purchaseFromDate,
+  });
+
+  const purchases: Purchase[] = purchaseFromDate
+    ? embeddedData?.getPurchasesForUser?.items || []
+    : infinitePurchases;
+  const totalCount = purchaseFromDate
+    ? embeddedData?.getPurchasesForUser?.totalCount || 0
+    : infiniteTotalCount;
+  const totalAmount = purchaseFromDate
+    ? embeddedData?.getPurchasesForUser?.totalAmount || 0
+    : infiniteTotalAmount || 0;
+  const purchaseLoading = purchaseFromDate ? embeddedLoading : infiniteLoading;
 
   useEffect(() => {
-    if (purchaseData?.getPurchasesForUser && callback) {
+    if (embeddedData?.getPurchasesForUser && callback) {
       callback(
         purchases.map((s) => s._id),
         totalAmount,
       );
     }
-  }, [purchaseData]);
+  }, [embeddedData]);
 
   const TotalSection = () => {
     return (
-      <Box
+      <Flex
         ml={hideExtraFields ? 'auto' : undefined}
         textAlign={hideExtraFields ? 'right' : undefined}
       >
-        <Text fontSize="sm" color="fg.muted">
+        <Text fontSize="sm" color="fg.muted" mr={2}>
           {'Total'}
         </Text>
-        <Text color="red.600" fontWeight="medium">
+        <Text color="red.600" fontWeight="medium" fontSize={'sm'}>
           -{totalAmount}₹
         </Text>
-      </Box>
+      </Flex>
     );
   };
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   return (
     <React.Fragment>
@@ -173,6 +199,20 @@ const Purchases: NextPage<Props> = function ({
           <React.Fragment>
             {purchaseLoading ? (
               <Loader />
+            ) : !purchaseFromDate && purchasesError && _.isEmpty(purchases) ? (
+              <Card.Root variant="outline" textAlign="center" py={10}>
+                <VStack gap={3}>
+                  <Text color="red.600">Failed to load purchases.</Text>
+                  <Button
+                    size="sm"
+                    colorPalette="red"
+                    variant="outline"
+                    onClick={retry}
+                  >
+                    Retry
+                  </Button>
+                </VStack>
+              </Card.Root>
             ) : (
               (!_.isEmpty(purchases) &&
                 purchases.map((purchase: Purchase, i) => {
@@ -192,28 +232,17 @@ const Purchases: NextPage<Props> = function ({
                 </React.Fragment>
               )
             )}
-            {!purchaseFromDate && totalCount > PAGE_SIZE && (
-              <HStack className="hide-in-print" justify="center" gap={4} mt={4}>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  Previous
-                </Button>
-                <Text fontSize="sm" color="fg.muted">
-                  Page {page} of {totalPages}
-                </Text>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next
-                </Button>
-              </HStack>
+            {!purchaseFromDate && (
+              <InfiniteScrollStatus
+                loadingMore={loadingMore}
+                error={!_.isEmpty(purchases) && purchasesError}
+                hasMore={hasMore}
+                itemsCount={purchases.length}
+                totalCount={totalCount}
+                onRetry={retry}
+                sentinelRef={sentinelRef}
+                itemLabel="purchases"
+              />
             )}
           </React.Fragment>
         )}

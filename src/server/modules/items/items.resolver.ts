@@ -24,9 +24,18 @@ export default class ItemsResolver {
     page?: number,
     @Arg('limit', (_returns) => Number, { nullable: true, defaultValue: 0 })
     limit?: number,
+    @Arg('category', (_returns) => String, { nullable: true })
+    category?: string,
   ): Promise<PaginatedItems> {
     const itemsService = new ItemsService(ctx);
-    return await itemsService.getItems(search, page, limit);
+    return await itemsService.getItems(search, page, limit, category);
+  }
+
+  @Query((_returns) => [String])
+  @Authorized()
+  async getCategories(@Ctx() ctx: CTX): Promise<string[]> {
+    const itemsService = new ItemsService(ctx);
+    return await itemsService.getCategories();
   }
 
   // Mutations

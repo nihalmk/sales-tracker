@@ -31,6 +31,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import DiscountBanner from '../common/DiscountBanner';
 
 interface Props {
   billNumber?: string;
@@ -310,6 +311,16 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     const loss = profit < 0 ? Math.abs(profit) : 0;
     return [profit, loss];
   };
+
+  const getDiscountLineItems = () =>
+    (saleItems || []).map((sale) => ({
+      id: sale.item._id,
+      name: sale.item.name,
+      mrp: sale.item?.price?.list || 0,
+      salePrice: sale.cost,
+      quantity: sale.quantity,
+    }));
+
   return (
     <React.Fragment>
       <Card.Root
@@ -710,7 +721,12 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             </Table.Body>
           </Table.Root>
         </Table.ScrollArea>
-        <Card.Footer>
+        {saleItems?.length > 0 && (
+          <Card.Body pt={1}>
+            <DiscountBanner items={getDiscountLineItems()} />
+          </Card.Body>
+        )}
+        <Card.Footer pt={2}>
           <HStack w="full">
             <Button asChild variant="outline" colorPalette="red">
               <Link href="/dashboard">
