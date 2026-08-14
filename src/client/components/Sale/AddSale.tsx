@@ -33,9 +33,7 @@ import {
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import DiscountBanner from '../common/DiscountBanner';
-import MissingMrpWarning, {
-  MrpWarningItem,
-} from '../common/MissingMrpWarning';
+import MissingMrpWarning, { MrpWarningItem } from '../common/MissingMrpWarning';
 
 interface Props {
   billNumber?: string;
@@ -330,11 +328,10 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   // warning icon and discount math update immediately — no refetch or page
   // reload, so nothing already filled in on this form is lost.
   const onItemMrpUpdated = (updated: MrpWarningItem) => {
-    setItems(
-      (current) =>
-        current?.map((i) =>
-          i._id === updated._id ? { ...i, price: updated.price } : i,
-        ),
+    setItems((current) =>
+      current?.map((i) =>
+        i._id === updated._id ? { ...i, price: updated.price } : i,
+      ),
     );
     setSaleItems((current) =>
       current.map((si) =>
@@ -638,7 +635,11 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                               value={editSale?.cost || ''}
                             />
                           ) : (
-                            <Text as="span" color="blue.600" fontWeight="medium">
+                            <Text
+                              as="span"
+                              color="blue.600"
+                              fontWeight="medium"
+                            >
                               {sale.cost}
                             </Text>
                           )}
@@ -746,7 +747,11 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                         Total
                       </Text>
                     </Table.Cell>
-                    <Table.Cell textAlign="end" fontWeight="bold" color="purple.700">
+                    <Table.Cell
+                      textAlign="end"
+                      fontWeight="bold"
+                      color="purple.700"
+                    >
                       {newSale?.total}
                     </Table.Cell>
                     <Table.Cell>

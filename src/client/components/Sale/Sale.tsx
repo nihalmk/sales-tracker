@@ -18,9 +18,7 @@ import {
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import DiscountBanner, { calculateDiscounts } from '../common/DiscountBanner';
-import MissingMrpWarning, {
-  MrpWarningItem,
-} from '../common/MissingMrpWarning';
+import MissingMrpWarning, { MrpWarningItem } from '../common/MissingMrpWarning';
 
 interface Props {
   billNumber?: string;
@@ -189,7 +187,11 @@ const SaleCard: NextPage<Props> = function ({
                             />
                           </Table.Cell>
                           <Table.Cell textAlign="end">
-                            <Text as="span" color="blue.600" fontWeight="medium">
+                            <Text
+                              as="span"
+                              color="blue.600"
+                              fontWeight="medium"
+                            >
                               {sale.cost}
                             </Text>
                           </Table.Cell>
