@@ -1,0 +1,136 @@
+src/client/components/Purchase/AddPurchase.tsx
+  s_5b771625359126::t_deae468eb5cfa7 395-397
+  h_26a6a0ac037242 487
+  s_5b771625359126::t_c0d17a08106f21 244-258
+  s_5b771625359126::t_8b4609d05238e4 817-818,821-829,833-834
+  s_5b771625359126::t_8ff6677e24bb7e 312,337-339,344
+  s_5b771625359126::t_1b40c213b310f1 48-51,60-64
+src/client/components/hooks/useUrlFilters.tsx
+  s_5b771625359126::t_1eac514933b9ab 1-39,45-54
+  s_5b771625359126::t_24d46ee10714bc 40-44
+src/client/components/Purchase/Purchases.tsx
+  s_5b771625359126::t_db00e38d9b4ce3 17
+  s_5b771625359126::t_e5d464489e6127 51-94
+src/client/components/Closing/NewClosing.tsx
+  s_5b771625359126::t_f764c47331f084 69-78
+  s_5b771625359126::t_fbd562213100e7 216
+  s_5b771625359126::t_0b01c7c33e76f3 121-129
+  s_5b771625359126::t_e55beb7f02a40f 483-488,490-491
+  s_5b771625359126::t_cb33ef3a77d7eb 140-144,163,168-183,188,195-200
+  h_26a6a0ac037242 489
+  s_5b771625359126::t_e6df379f926095 23
+  s_5b771625359126::t_eb32c1b3096384 201
+  s_5b771625359126::t_cc281cf49906d2 481-482
+src/client/graphql/query/closing.ts
+  s_5b771625359126::t_e564936a1f84b0 32-37
+src/client/components/Sale/Sale.tsx
+  s_5b771625359126::t_57a0669c23cdde 22
+  s_5b771625359126::t_53abd6eab477e2 4
+  s_5b771625359126::t_0281fa40f29c22 6
+  s_5b771625359126::t_ec4b3d97c77b89 52,56-79
+  s_5b771625359126::t_9812fe3846596d 46
+  s_5b771625359126::t_613243ec6a842e 147-151,158-161
+  s_5b771625359126::t_df75f95ebc9509 348-353,367
+  s_5b771625359126::t_c7ee6c290364d8 3,24-29
+  s_5b771625359126::t_e6e5a132938fec 355-366
+  s_5b771625359126::t_4cd9a3bc06c3eb 80-90
+  s_5b771625359126::t_4d4fdd57ee1efe 152-157
+  s_5b771625359126::t_4225d3a2eee004 91
+src/client/components/common/SelectBoxes/ContactSelect.tsx
+  s_5b771625359126::t_df5ed06d9b84b4 57-62,65-71,73-86
+src/client/components/Header/Header.tsx
+  h_26a6a0ac037242 71
+src/client/components/Closing/Spent.tsx
+  s_5b771625359126::t_077eba419afd98 26-31,38-45
+src/client/components/Closing/Received.tsx
+  s_5b771625359126::t_dce247bbbd96cf 26-31,38-45
+src/server/modules/sale/sale.service.ts
+  s_5b771625359126::t_1d9e6abb68e485 116
+  s_5b771625359126::t_0dd4e9d9e6bb2e 46
+  s_5b771625359126::t_a3fe7d44f52cad 10
+  s_5b771625359126::t_5d8cc377bffe16 8
+  s_5b771625359126::t_74de232aba5b29 194-214,218,230,238
+  s_5b771625359126::t_0f1d803733ed08 229,231-237,253-255
+  s_5b771625359126::t_0386b65c7aa118 282-289,291-292
+  s_5b771625359126::t_770358ea370881 256
+src/server/modules/closing/closing.resolver.ts
+  s_5b771625359126::t_24b8fa5241b157 37-44
+  s_5b771625359126::t_a804f39282be9c 35-36
+src/server/modules/purchase/purchase.service.ts
+  s_5b771625359126::t_12c0bd1533654a 15
+  s_5b771625359126::t_f81a81d82e8cf8 186-209,213
+  s_5b771625359126::t_53ec975c9b58e1 241,243-249,265-267
+  s_5b771625359126::t_3ad286fa78140b 13
+  s_5b771625359126::t_d3fe4f5a9d1c42 294-304,306-307
+  s_5b771625359126::t_17db80abd9eb57 51
+  s_5b771625359126::t_957c8c113a46eb 121
+  s_5b771625359126::t_f9471248a0d7b8 242,250
+  s_5b771625359126::t_e80cd121e1e974 268
+src/client/components/Stock/AddStock.tsx
+  s_5b771625359126::t_432a3f42059db1 52-60,64,67-72,75-77
+  s_5b771625359126::t_370ef27deaceb8 61-63,65-66,73-74
+  s_5b771625359126::t_85f98f0ad39afa 30
+src/server/modules/items/items.service.ts
+  s_5b771625359126::t_2258ad8ded9b98 18-32
+  s_5b771625359126::t_e3ec125342a07b 182-244
+src/client/next-env.d.ts
+  s_5b771625359126::t_8770f1d8a1003d 3-4
+src/client/components/common/SelectBoxes/CreatableSelect.tsx
+  h_26a6a0ac037242 26,43,58
+src/client/components/common/DiscountBanner.tsx
+  h_26a6a0ac037242 119
+src/client/pages/dashboard.tsx
+  h_26a6a0ac037242 271
+  s_5b771625359126::t_fb4296c5744244 267-270,272
+src/client/components/Sale/Sales.tsx
+  s_5b771625359126::t_e44d63cf16fb0b 18
+  s_5b771625359126::t_06ff094d79ef82 52-95
+src/client/components/Sale/AddSale.tsx
+  s_5b771625359126::t_a9326da5401f58 379-381
+  s_5b771625359126::t_0eb466b49b0781 40-45,48
+  s_5b771625359126::t_4c630c7852f3e2 247,275-277,282
+  h_26a6a0ac037242 468
+  s_5b771625359126::t_ab2006912c5258 842-854
+  s_5b771625359126::t_6b3c47caa5e83d 154-169
+  s_5b771625359126::t_1660c82f64f1f3 810-811,814-822,833-834
+src/client/components/Purchase/Purchase.tsx
+  s_5b771625359126::t_94b2ce0cc0a881 5
+  s_5b771625359126::t_ffe2cc9a68e7d5 69-79
+  s_5b771625359126::t_7a43276221cdb3 108-112,121-124
+  s_5b771625359126::t_73d0af8d739f1e 113-120
+  s_5b771625359126::t_948a7289d84e3b 251-256,258-270
+  s_5b771625359126::t_a6241fa8ec1dab 3
+  s_5b771625359126::t_3e6bbd5abff0d3 42,45-55,58-68
+  s_5b771625359126::t_9754209cd9843b 11,21-22,36,43-44
+  s_5b771625359126::t_41e47763e563eb 41
+src/server/modules/closing/closing.service.ts
+  s_5b771625359126::t_2662200347f3de 177-181,186
+  s_5b771625359126::t_00ccd7166834a2 148-159
+  s_5b771625359126::t_65c16a5ae02558 47-82,87-90,92-106,108,121-130,132-140,142-143
+  s_5b771625359126::t_9057e67fa87822 109-120
+src/client/components/common/SelectBoxes/ItemSelect.tsx
+  s_5b771625359126::t_2dcb67cf8b5de7 45-47,50-53,55-59
+src/client/components/Report/Report.tsx
+  h_26a6a0ac037242 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "67e700d6f81efd43354c29b0439cea484b179fa9",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
