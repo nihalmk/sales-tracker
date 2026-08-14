@@ -45,6 +45,10 @@ import Tooltip from '../common/Tooltip';
 
 interface Props {
   billNumber?: string;
+  // Present when embedded inline inside an existing Purchase card for
+  // editing — Cancel/Submit call these instead of navigating away.
+  onCancel?: () => void;
+  onSaved?: () => void;
 }
 
 interface ProductOption extends LabelValueObj {
@@ -53,7 +57,11 @@ interface ProductOption extends LabelValueObj {
   stock: number;
 }
 
-const AddPurchase: NextPage<Props> = function ({ billNumber }) {
+const AddPurchase: NextPage<Props> = function ({
+  billNumber,
+  onCancel,
+  onSaved,
+}) {
   const productSelectRef = useRef<any>(null);
 
   const [submitCreatePurchase, { loading: createLoading }] =
@@ -233,7 +241,21 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
   };
 
   useEffect(() => {
-    setPurchaseItems(purchaseData?.getPurchaseByBillNumber?.[0].items || []);
+    const existingPurchase = purchaseData?.getPurchaseByBillNumber?.[0];
+    setPurchaseItems(existingPurchase?.items || []);
+    // Seed the fields the edit form doesn't derive from `items` — most
+    // importantly `_id`, which `onPurchaseEdit` sends as a required mutation
+    // variable; omitting it here means the update mutation would be sent
+    // with `_id: undefined`, which Apollo drops from the request entirely.
+    if (existingPurchase) {
+      setNewPurchase((currentState) => ({
+        ...currentState,
+        _id: existingPurchase._id,
+        vendor: existingPurchase.vendor,
+        contact: existingPurchase.contact,
+        email: existingPurchase.email,
+      }));
+    }
   }, [purchaseData]);
 
   useEffect(() => {
@@ -287,7 +309,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
     e && e.preventDefault();
     const { vendor, contact, email, items, _id, total } = newPurchase || {};
     setUpdateSubmitted(true);
-    if (!_.isEmpty(items)) {
+    if (_.isEmpty(items)) {
       setError('Please enter values for all fields');
       setTimeout(() => {
         setError('');
@@ -312,12 +334,14 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
       });
       await refetchPurchase();
       setEditPurchase(undefined);
-      setMessage(`Purchase ${name} Updated successfully`);
+      setUpdateSubmitted(false);
+      setMessage('Purchase updated successfully');
+      onSaved?.();
       setTimeout(() => {
         setMessage('');
       }, 5000);
     } catch (e) {
-      setError(`Error adding new purchase. ${e.message}`);
+      setError(`Error updating purchase. ${e.message}`);
       setTimeout(() => {
         setError('');
       }, 5000);
@@ -368,7 +392,9 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         <Card.Header>
           <HStack gap={2}>
             <Icon name="newPurchase" boxSize={5} />
-            <Heading size="md">New Purchase</Heading>
+            <Heading size="md">
+              {billNumber ? `Edit Purchase #${billNumber}` : 'New Purchase'}
+            </Heading>
           </HStack>
         </Card.Header>
         <SuccessMessage message={message} />
@@ -458,6 +484,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                     return !purchaseItemsIds.includes(i.value);
                   })}
                   isDisabled={itemsLoading}
+                  isLoading={itemsLoading}
                   isClearable
                   filterOption={searchByLabelOrShortId}
                   customOption={renderProductOption}
@@ -787,17 +814,24 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         </Table.ScrollArea>
         <Card.Footer>
           <HStack w="full">
-            <Button asChild variant="outline" colorPalette="red">
-              <Link href="/dashboard">
+            {onCancel ? (
+              <Button variant="outline" colorPalette="red" onClick={onCancel}>
                 <Icon name="cancel" />
                 Cancel
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button asChild variant="outline" colorPalette="red">
+                <Link href="/dashboard">
+                  <Icon name="cancel" />
+                  Cancel
+                </Link>
+              </Button>
+            )}
             <Button
               colorPalette="brand"
               ml="auto"
-              loading={createLoading}
-              onClick={onNewPurchaseCreate}
+              loading={billNumber ? updateLoading : createLoading}
+              onClick={billNumber ? onPurchaseEdit : onNewPurchaseCreate}
             >
               <Icon name="done" light />
               Submit

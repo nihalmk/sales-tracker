@@ -29,6 +29,12 @@ export const GET_PREVIOUS_CLOSING = gql`
   }
 `;
 
+export const GET_DRAFT_CLOSING = gql`
+  query getDraftClosing {
+    getDraftClosing ${closing}
+  }
+`;
+
 export const GET_CLOSING_BY_ID = gql`
   query getClosingByClosingId($closingId: String!) {
     getClosingByClosingId(closingId: $closingId) ${closing}

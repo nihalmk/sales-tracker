@@ -264,7 +264,12 @@ const Home: NextPage<Props> = () => {
                 moment(),
                 'day',
               ) && (
-                <Alert.Root status="warning" borderRadius="l2" mt={3}>
+                <Alert.Root
+                  status="warning"
+                  borderRadius="l2"
+                  mt={3}
+                  className="hide-in-print"
+                >
                   <Alert.Indicator />
                   <Alert.Content>
                     <Alert.Description>

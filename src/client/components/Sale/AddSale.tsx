@@ -37,9 +37,15 @@ import MissingMrpWarning, { MrpWarningItem } from '../common/MissingMrpWarning';
 
 interface Props {
   billNumber?: string;
+  // Present when embedded inline inside an existing Sale card for editing —
+  // Cancel/Submit call these instead of navigating away, and the trailing
+  // "Today's Sales" list (only relevant on the standalone create page) is
+  // suppressed.
+  onCancel?: () => void;
+  onSaved?: () => void;
 }
 
-const AddSale: NextPage<Props> = function ({ billNumber }) {
+const AddSale: NextPage<Props> = function ({ billNumber, onCancel, onSaved }) {
   const productSelectRef = useRef<any>(null);
 
   const [submitCreateSale, { loading: createLoading }] =
@@ -145,7 +151,22 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
   const [newItem, setNewItem] = useState<Items>();
 
   useEffect(() => {
-    setSaleItems(saleData?.getSaleByBillNumber?.[0].items || []);
+    const existingSale = saleData?.getSaleByBillNumber?.[0];
+    setSaleItems(existingSale?.items || []);
+    // Seed the fields the edit form doesn't derive from `items` — most
+    // importantly `_id`, which `onSaleEdit` sends as a required mutation
+    // variable; omitting it here means the update mutation would be sent
+    // with `_id: undefined`, which Apollo drops from the request entirely.
+    if (existingSale) {
+      setNewSale((currentState) => ({
+        ...currentState,
+        _id: existingSale._id,
+        customer: existingSale.customer,
+        contact: existingSale.contact,
+        email: existingSale.email,
+        discount: existingSale.discount,
+      }));
+    }
   }, [saleData]);
 
   useEffect(() => {
@@ -223,7 +244,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
     const discount =
       _.sum(items.map((i) => i.discount)) + (newSale.discount || 0);
     setUpdateSubmitted(true);
-    if (!_.isEmpty(items)) {
+    if (_.isEmpty(items)) {
       setError('Please enter values for all fields');
       setTimeout(() => {
         setError('');
@@ -251,12 +272,14 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       });
       await refetchSale();
       setEditSale(undefined);
-      setMessage(`Sale ${name} Updated successfully`);
+      setUpdateSubmitted(false);
+      setMessage('Sale updated successfully');
+      onSaved?.();
       setTimeout(() => {
         setMessage('');
       }, 5000);
     } catch (e) {
-      setError(`Error adding new sale. ${e.message}`);
+      setError(`Error updating sale. ${e.message}`);
       setTimeout(() => {
         setError('');
       }, 5000);
@@ -353,7 +376,9 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         <Card.Header>
           <HStack gap={2}>
             <Icon name="newSale" boxSize={5} />
-            <Heading size="md">New Sale</Heading>
+            <Heading size="md">
+              {billNumber ? `Edit Sale #${billNumber}` : 'New Sale'}
+            </Heading>
           </HStack>
         </Card.Header>
         <SuccessMessage message={message} />
@@ -440,6 +465,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     return !saleItemsIds.includes(i.value);
                   })}
                   isDisabled={itemsLoading}
+                  isLoading={itemsLoading}
                   isClearable
                   filterOption={searchByLabelOrShortId}
                   onSelectChange={(e: LabelValueObj | null) => {
@@ -781,12 +807,19 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         )}
         <Card.Footer pt={2}>
           <HStack w="full">
-            <Button asChild variant="outline" colorPalette="red">
-              <Link href="/dashboard">
+            {onCancel ? (
+              <Button variant="outline" colorPalette="red" onClick={onCancel}>
                 <Icon name="cancel" />
                 Cancel
-              </Link>
-            </Button>
+              </Button>
+            ) : (
+              <Button asChild variant="outline" colorPalette="red">
+                <Link href="/dashboard">
+                  <Icon name="cancel" />
+                  Cancel
+                </Link>
+              </Button>
+            )}
             <Button
               colorPalette="gray"
               variant="outline"
@@ -797,8 +830,8 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             </Button>
             <Button
               colorPalette="brand"
-              loading={createLoading}
-              onClick={onNewSaleCreate}
+              loading={billNumber ? updateLoading : createLoading}
+              onClick={billNumber ? onSaleEdit : onNewSaleCreate}
             >
               <Icon name="done" light />
               Submit
@@ -806,11 +839,19 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
           </HStack>
         </Card.Footer>
       </Card.Root>
-      <HStack className="hide-in-print" mb={3} gap={2}>
-        <Icon name="sales" boxSize={5} />
-        <Heading size="md">Today's Sales</Heading>
-      </HStack>
-      {createLoading ? <Loader /> : <Sales saleDateFrom={moment().toDate()} />}
+      {!billNumber && (
+        <React.Fragment>
+          <HStack className="hide-in-print" mb={3} gap={2}>
+            <Icon name="sales" boxSize={5} />
+            <Heading size="md">Today's Sales</Heading>
+          </HStack>
+          {createLoading ? (
+            <Loader />
+          ) : (
+            <Sales saleDateFrom={moment().toDate()} />
+          )}
+        </React.Fragment>
+      )}
     </React.Fragment>
   );
 };

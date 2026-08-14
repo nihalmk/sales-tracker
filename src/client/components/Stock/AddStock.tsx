@@ -27,6 +27,7 @@ import Icon from '../common/Icon';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
 import { useLinkedPriceField } from '../hooks/useLinkedPriceField';
+import { useUrlFilters } from '../hooks/useUrlFilters';
 
 const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 1000;
@@ -47,6 +48,32 @@ const AddStock: NextPage<Props> = function () {
   const [searchTerm, setSearchTerm] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+
+  const { params: urlParams, isReady: urlReady, setParams: setUrlParams } =
+    useUrlFilters();
+
+  // Resume filters from the URL once the router has hydrated — a reload
+  // shouldn't reset the search/category filter back to blank.
+  useEffect(() => {
+    if (!urlReady) {
+      return;
+    }
+    if (urlParams.stockQuery) {
+      setSearchTerm(urlParams.stockQuery);
+      setAppliedSearch(urlParams.stockQuery);
+    }
+    if (urlParams.stockCategory) {
+      setCategoryFilter(urlParams.stockCategory);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlReady]);
+
+  useEffect(() => {
+    setUrlParams({
+      stockQuery: appliedSearch || undefined,
+      stockCategory: categoryFilter || undefined,
+    });
+  }, [appliedSearch, categoryFilter, setUrlParams]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

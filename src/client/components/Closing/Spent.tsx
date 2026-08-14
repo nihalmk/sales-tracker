@@ -23,13 +23,26 @@ export const Spent: NextPage<Props> = function ({
   const [newSpentItem, setNewSpentItem] = useState<SpentItemsInput>();
   const [submitted, setIsSubmitted] = useState(false);
   const formFocus = useRef<any>(null);
+  // spentItemsList arrives async (a GraphQL query) — it's often still empty
+  // at mount, so the useState initializer above misses it. This does a
+  // one-time catch-up sync the first time real data shows up (e.g. resuming
+  // an existing draft), without re-syncing on every subsequent change and
+  // clobbering items the user has since added locally.
+  const hasSyncedInitialData = useRef(false);
 
   useEffect(() => {
     !isView && callback(spentItems);
   }, [spentItems]);
 
   useEffect(() => {
-    isView && setSpentItems(spentItemsList || []);
+    if (isView) {
+      setSpentItems(spentItemsList || []);
+      return;
+    }
+    if (!hasSyncedInitialData.current && spentItemsList?.length) {
+      setSpentItems(spentItemsList);
+      hasSyncedInitialData.current = true;
+    }
   }, [spentItemsList]);
 
   return (

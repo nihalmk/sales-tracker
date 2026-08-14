@@ -15,6 +15,21 @@ import { ObjectId } from 'mongodb';
 const exactCaseInsensitive = (value: string) =>
   new RegExp(`^${_.escapeRegExp(value)}$`, 'i');
 
+// Sums quantity per item id — items are looked up by id fresh (not
+// populated), so `String(item.item)` is always the plain ObjectId hex
+// string, whether it came from a pre-edit Mongoose subdocument or a
+// freshly-submitted input.
+const sumQuantitiesByItemId = (
+  items: { item: unknown; quantity: number }[],
+): Map<string, number> => {
+  const map = new Map<string, number>();
+  for (const i of items || []) {
+    const id = String(i.item);
+    map.set(id, (map.get(id) || 0) + i.quantity);
+  }
+  return map;
+};
+
 export class ItemsService {
   readonly model: typeof ItemsModel;
   readonly ctx: CTX;
@@ -161,6 +176,69 @@ export class ItemsService {
             },
           },
         );
+      }
+    }
+  }
+
+  // Editing a past sale must move stock by the DIFFERENCE between the old
+  // and new quantities, not re-apply the new quantities outright — the
+  // original sale already took stock out once. Sale quantity going up means
+  // more stock leaves, hence the negated delta (mirrors updateStock's sign).
+  async reconcileStockForSaleEdit(
+    oldItems: { item: unknown; quantity: number }[],
+    newItems: SaleItemInput[],
+  ): Promise<void> {
+    const oldQty = sumQuantitiesByItemId(oldItems);
+    const newQty = sumQuantitiesByItemId(newItems);
+    const itemIds = new Set([...oldQty.keys(), ...newQty.keys()]);
+    for (const itemId of itemIds) {
+      const delta = (newQty.get(itemId) || 0) - (oldQty.get(itemId) || 0);
+      if (!delta) {
+        continue;
+      }
+      const inStockItem = await this.model.findById(itemId);
+      if (!inStockItem || inStockItem.stock === -1) {
+        continue;
+      }
+      await this.model.updateOne(
+        { _id: itemId },
+        { $inc: { stock: -delta } },
+      );
+    }
+  }
+
+  // Same delta approach as reconcileStockForSaleEdit, but purchases also
+  // carry a price refresh — mirroring updateStockWithPurchase's side effect
+  // for any item still present after the edit (added, kept, or
+  // quantity-changed), while items removed during the edit only get their
+  // stock contribution reversed, not their price touched.
+  async reconcileStockForPurchaseEdit(
+    oldItems: { item: unknown; quantity: number }[],
+    newItems: PurchaseItemInput[],
+  ): Promise<void> {
+    const oldQty = sumQuantitiesByItemId(oldItems);
+    const newQty = sumQuantitiesByItemId(newItems);
+    const itemIds = new Set([...oldQty.keys(), ...newQty.keys()]);
+    for (const itemId of itemIds) {
+      const delta = (newQty.get(itemId) || 0) - (oldQty.get(itemId) || 0);
+      const inStockItem = await this.model.findById(itemId);
+      if (!inStockItem || inStockItem.stock === -1) {
+        continue;
+      }
+      const newItem = newItems.find((i) => String(i.item) === itemId);
+      const update: Record<string, unknown> = {};
+      if (delta) {
+        update.stock = inStockItem.stock + delta;
+      }
+      if (newItem) {
+        update.price = {
+          list: newItem.list || inStockItem.price.list,
+          sale: newItem.sale || inStockItem.price.sale,
+          cost: newItem.cost || inStockItem.price.cost,
+        };
+      }
+      if (Object.keys(update).length) {
+        await this.model.updateOne({ _id: itemId }, { $set: update });
       }
     }
   }

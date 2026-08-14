@@ -42,10 +42,21 @@ const ItemSelect: React.FC<Props> = ({
     return () => clearTimeout(timer);
   }, [inputValue]);
 
+  // Sync from the caller's `value` (e.g. restored from a URL param) — not
+  // just when it goes back to empty. No fetch is needed to display it: the
+  // pinned-selection logic below renders it regardless of search results.
   useEffect(() => {
     if (!value) {
-      setSelected(null);
+      if (selected) {
+        setSelected(null);
+      }
+      return;
     }
+    if (selected?.value === value) {
+      return;
+    }
+    setSelected({ label: value, value });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const { data, loading } = useQuery(GET_ITEMS, {

@@ -68,7 +68,7 @@ export const Header: React.FC<Props> = ({ hide }) => {
   }
 
   return (
-    <Box position="sticky" top={0} zIndex="docked">
+    <Box position="sticky" top={0} zIndex="docked" className="hide-in-print">
       <Flex bg="brand.700" px={{ base: 3, xl: 6 }} py={2} align="center">
         <Link href="/">
           <Flex align="center">

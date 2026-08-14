@@ -20,6 +20,7 @@ import { Received } from './Received';
 import {
   GET_PREVIOUS_CLOSING,
   GET_CLOSINGS,
+  GET_DRAFT_CLOSING,
 } from '../../graphql/query/closing';
 import Loader from '../Loaders/Loader';
 import { currency, omitTypenameKey } from '../../utils/helpers';
@@ -65,6 +66,16 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
     fetchPolicy: 'no-cache',
   });
 
+  // The shop's one in-progress draft, if any — resumes it instead of
+  // always starting the form blank.
+  const { data: draftClosing, loading: draftClosingLoading } = useQuery(
+    GET_DRAFT_CLOSING,
+    {
+      fetchPolicy: 'no-cache',
+      skip: isView,
+    },
+  );
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [, setSubmitted] = useState(false);
@@ -107,6 +118,15 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
     }
   }, [closings]);
 
+  // Runs after the effect above, so an existing draft (if any) wins over
+  // whatever GET_CLOSINGS happened to find for the date range — resuming
+  // the same in-progress closing rather than starting blank.
+  useEffect(() => {
+    if (draftClosing?.getDraftClosing) {
+      setNewClosing(draftClosing.getDraftClosing);
+    }
+  }, [draftClosing]);
+
   useEffect(() => {
     setToday(moment(startDate));
   }, [startDate]);
@@ -117,8 +137,11 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
     }
   }, [previousClosing]);
 
-  const onNewClosingCreate = async (e?: React.SyntheticEvent) => {
-    e && e.preventDefault();
+  // Shared by "Save Draft" (active: false) and "Submit" (active: true) —
+  // the server upserts into the shop's one existing draft either way, only
+  // finalizing (stamping the real date and locking everything in) when
+  // active is true.
+  const submitClosing = async (active: boolean) => {
     const {
       salesIds,
       spentItems,
@@ -137,33 +160,44 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
           receivedItems: receivedItems && omitTypenameKey(receivedItems),
           spentTotal,
           inHandTotal,
-          active: true,
+          active,
           date: today.endOf('day').toDate(),
         },
       });
-      setMessage('New closing added successfully');
-      setNewClosing(undefined);
       setSubmitted(false);
-      setSelectedMenu(NavItems.REPORT);
-      setNavItems({
-        sale: false,
-        stock: true,
-        purchase: false,
-        purchases: true,
-        sales: true,
-        closing: false,
-        report: true,
-      });
+      if (active) {
+        setMessage('Closing finalized successfully');
+        setNewClosing(undefined);
+        setSelectedMenu(NavItems.REPORT);
+        setNavItems({
+          sale: false,
+          stock: true,
+          purchase: false,
+          purchases: true,
+          sales: true,
+          closing: false,
+          report: true,
+        });
+      } else {
+        setMessage('Draft saved');
+      }
       setTimeout(() => {
         setMessage('');
       }, 5000);
     } catch (e) {
-      setError(`Error adding new closing. ${e.message}`);
+      setError(`Error saving closing. ${e.message}`);
       setTimeout(() => {
         setError('');
       }, 5000);
     }
   };
+
+  const onNewClosingCreate = (e?: React.SyntheticEvent) => {
+    e && e.preventDefault();
+    submitClosing(true);
+  };
+
+  const onSaveDraft = () => submitClosing(false);
 
   const getTotal = () => {
     const receivedItemsTotal = _.sum(
@@ -179,7 +213,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
     return [inHandTotal, spentTotal];
   };
 
-  if (previousClosingLoading || closingsLoading) {
+  if (previousClosingLoading || closingsLoading || draftClosingLoading) {
     return (
       <React.Fragment>
         <Text textAlign="center" py={4} color="fg.muted">
@@ -444,6 +478,17 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
             <Box ml="auto">
               <Print setPrintStatus={() => {}} />
             </Box>
+            <Button
+              className="hide-in-print"
+              colorPalette="gray"
+              variant="outline"
+              loading={createLoading}
+              disabled={isView}
+              onClick={onSaveDraft}
+            >
+              <Icon name="edit" />
+              Save Draft
+            </Button>
             <Button
               className="hide-in-print"
               colorPalette="brand"

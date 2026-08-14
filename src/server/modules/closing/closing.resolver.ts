@@ -34,6 +34,16 @@ export default class ClosingResolver {
     return await closingService.getPreviousClosing();
   }
 
+  // The shop's single in-progress (not yet finalized) closing, if any —
+  // lets the New Closing form resume a draft instead of always starting
+  // blank.
+  @Query((_returns) => Closing, { nullable: true })
+  @Authorized()
+  async getDraftClosing(@Ctx() ctx: CTX): Promise<Closing | null> {
+    const closingService = new ClosingService(ctx);
+    return await closingService.getDraftClosing();
+  }
+
 
 
   @Query((_returns) => [Closing])

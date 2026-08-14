@@ -5,8 +5,9 @@ import { UserService } from '../user/user.service';
 import _ from 'lodash';
 import { ItemsModel } from '../items/items.model';
 import { ItemsService } from '../items/items.service';
+import { ClosingModel } from '../closing/closing.model';
 import { ObjectId } from 'mongodb';
-import { DateRange } from '../common/Types/InputTypes';
+import moment from 'moment-timezone';
 
 // Queries on models to to get/create/update sale data
 
@@ -42,6 +43,7 @@ export class SaleService {
         billNumber: new RegExp(billNumber, 'g'),
       })
       .populate('shop')
+      .populate('closing')
       .populate({
         path: 'items.item',
         model: ItemsModel,
@@ -111,6 +113,7 @@ export class SaleService {
       .find(filter)
       .sort({ createdAt: -1 })
       .populate('shop')
+      .populate('closing')
       .populate({
         path: 'items.item',
         model: ItemsModel,
@@ -188,9 +191,31 @@ export class SaleService {
     });
   }
 
+  // The authoritative "is this day closed" signal is the shop's most
+  // recent *finalized* closing's date, not a record's own `closing` ref —
+  // a draft closing locks nothing, and a backlog closing can sweep up
+  // several days at once, so per-record tagging alone can't be trusted
+  // (see markSalesClosed below). Used to gate both creating a sale for an
+  // already-closed day and editing one that falls before the watermark.
+  private async assertDateIsOpen(date: Date, action: string): Promise<void> {
+    const lastActiveClosing = await ClosingModel.find({
+      shop: this.ctx.user.shop,
+      active: true,
+    })
+      .sort({ date: -1 })
+      .limit(1);
+    if (
+      lastActiveClosing[0] &&
+      moment(date).isSameOrBefore(lastActiveClosing[0].date, 'day')
+    ) {
+      throw new Error(`This sale is part of a closed day and cannot be ${action}.`);
+    }
+  }
+
   // Create a new sale
 
   async createSale(sale: CreateSaleInput): Promise<Sale> {
+    await this.assertDateIsOpen(new Date(), 'created');
     const createdSale = await this.model.create({
       ...sale,
       shop: sale.shop || this.ctx.user.shop,
@@ -201,6 +226,16 @@ export class SaleService {
 
   async updateSale(sale: UpdateSaleInput): Promise<Sale> {
     const _id = sale._id;
+    // Fetch the pre-edit state fresh (unpopulated) — reconciling stock needs
+    // the OLD item ids/quantities before they're overwritten below.
+    const existing = await this.model.findOne({
+      _id,
+      shop: this.ctx.user.shop,
+    });
+    if (!existing) {
+      return null;
+    }
+    await this.assertDateIsOpen(existing.createdAt, 'edited');
     const updateSale = await this.model.findOneAndUpdate(
       {
         _id,
@@ -214,6 +249,10 @@ export class SaleService {
       {
         new: true,
       },
+    );
+    await this.itemsService.reconcileStockForSaleEdit(
+      existing.items,
+      sale.items,
     );
     return updateSale;
   }
@@ -240,19 +279,17 @@ export class SaleService {
     });
   }
 
-  async updateClosing(date: DateRange, closingId: ObjectId): Promise<void> {
+  // Tags exactly the sales included in a finalized closing, by id — not by
+  // date range. A closing can sweep up a multi-day backlog in one go, and a
+  // date range keyed off the closing's own single `date` would only ever
+  // catch one of those days.
+  async markSalesClosed(ids: ObjectId[], closingId: ObjectId): Promise<void> {
+    if (!ids?.length) {
+      return;
+    }
     await this.model.updateMany(
-      {
-        createdAt: {
-          $gte: date.from,
-          $lte: date.to,
-        },
-      },
-      {
-        $set: {
-          closing: closingId,
-        },
-      },
+      { _id: { $in: ids }, shop: this.ctx.user.shop },
+      { $set: { closing: closingId } },
     );
   }
 }

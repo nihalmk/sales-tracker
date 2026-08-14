@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_PURCHASE_BY_BILL_NUMBER } from '../../graphql/query/purchase';
+import { GET_PREVIOUS_CLOSING } from '../../graphql/query/closing';
 import { Purchase, PurchaseItem } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
 import { currency } from '../../utils/helpers';
 import {
+  Box,
   Card,
   SimpleGrid,
   Table,
@@ -16,6 +18,8 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import Tooltip from '../common/Tooltip';
+import AddPurchase from './AddPurchase';
 
 interface Props {
   billNumber?: string;
@@ -29,27 +33,50 @@ const PurchaseCard: NextPage<Props> = function ({
   showContent = true,
 }) {
   const [view, setView] = useState(showContent);
-
-  const { loading: purchaseLoading, data: purchaseData } = useQuery(
-    GET_PURCHASE_BY_BILL_NUMBER,
-    {
-      variables: {
-        billNumber,
-      },
-      skip: !billNumber,
-      fetchPolicy: 'no-cache',
-    },
-  );
+  const [isEditing, setIsEditing] = useState(false);
 
   const [purchase, setPurchase] = useState<Purchase>();
 
   useEffect(() => {
-    setPurchase(purchaseData?.getPurchaseByBillNumber?.[0]);
-  }, [purchaseData]);
+    setPurchase(purchaseDetails);
+  }, [purchaseDetails]);
+
+  const currentBillNumber = billNumber || purchase?.billNumber;
+
+  // Lazy rather than an eager `useQuery`: when this card is embedded in a
+  // list (`purchaseDetails` prop, no `billNumber`), the list's own query
+  // already supplied the initial data above — firing an extra per-card
+  // query on mount would turn one list query into N. It's only needed (a)
+  // up front for standalone/single-purchase usage (`billNumber` prop passed
+  // directly), and (b) on demand right after a successful edit, since
+  // neither this card nor its parent list otherwise learns the edit
+  // happened.
+  const [fetchPurchase, { loading: purchaseLoading, data: purchaseData }] =
+    useLazyQuery(GET_PURCHASE_BY_BILL_NUMBER, { fetchPolicy: 'no-cache' });
 
   useEffect(() => {
-    setPurchase(purchaseDetails);
-  }, [purchase]);
+    if (billNumber) {
+      fetchPurchase({ variables: { billNumber } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billNumber]);
+
+  useEffect(() => {
+    if (purchaseData?.getPurchaseByBillNumber?.[0]) {
+      setPurchase(purchaseData.getPurchaseByBillNumber[0]);
+    }
+  }, [purchaseData]);
+  // A purchase is locked once it falls on or before the shop's most recent
+  // *finalized* closing's date — a per-record `closing` ref can't be
+  // trusted here: a closing can sweep up a multi-day backlog in one go,
+  // and a draft closing (active: false) locks nothing at all.
+  const { data: lastClosingData } = useQuery(GET_PREVIOUS_CLOSING, {
+    fetchPolicy: 'no-cache',
+  });
+  const lastActiveClosing = lastClosingData?.getPreviousClosing;
+  const isEditable =
+    !lastActiveClosing ||
+    moment(purchase?.createdAt).isAfter(moment(lastActiveClosing.date), 'day');
 
   return (
     <Card.Root variant="outline" mb={4}>
@@ -78,7 +105,23 @@ const PurchaseCard: NextPage<Props> = function ({
           </HStack>
         </HStack>
       </Card.Header>
-      {view && (
+      {view && isEditing && (
+        <Card.Body>
+          <AddPurchase
+            billNumber={currentBillNumber}
+            onCancel={() => setIsEditing(false)}
+            onSaved={() => {
+              setIsEditing(false);
+              if (currentBillNumber) {
+                fetchPurchase({
+                  variables: { billNumber: currentBillNumber },
+                });
+              }
+            }}
+          />
+        </Card.Body>
+      )}
+      {view && !isEditing && (
         <React.Fragment>
           <Card.Body>
             <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
@@ -205,15 +248,26 @@ const PurchaseCard: NextPage<Props> = function ({
           </Table.ScrollArea>
           <Card.Footer>
             <HStack w="full">
-              <Button
-                className="hide-in-print"
-                colorPalette="brand"
-                ml="auto"
-                disabled={true}
+              <Tooltip
+                content={
+                  isEditable
+                    ? 'Edit this purchase'
+                    : "This purchase is part of a closed day and can't be edited."
+                }
               >
-                <Icon name="edit" light />
-                Edit
-              </Button>
+                {/* Wrapped so the tooltip still shows on hover even while
+                    the Button itself is natively disabled. */}
+                <Box display="inline-block" ml="auto" className="hide-in-print">
+                  <Button
+                    colorPalette="brand"
+                    disabled={!isEditable}
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Icon name="edit" light />
+                    Edit
+                  </Button>
+                </Box>
+              </Tooltip>
             </HStack>
           </Card.Footer>
         </React.Fragment>

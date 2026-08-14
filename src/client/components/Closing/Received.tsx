@@ -23,13 +23,26 @@ export const Received: NextPage<Props> = function ({
   const [newReceivedItem, setNewReceivedItem] = useState<ReceivedItemsInput>();
   const [submitted, setIsSubmitted] = useState(false);
   const formFocus = useRef<any>(null);
+  // receivedItemsList arrives async (a GraphQL query) — it's often still
+  // empty at mount, so the useState initializer above misses it. This does
+  // a one-time catch-up sync the first time real data shows up (e.g.
+  // resuming an existing draft), without re-syncing on every subsequent
+  // change and clobbering items the user has since added locally.
+  const hasSyncedInitialData = useRef(false);
 
   useEffect(() => {
     !isView && callback(receivedItems);
   }, [receivedItems]);
 
   useEffect(() => {
-    isView && setReceivedItems(receivedItemsList || []);
+    if (isView) {
+      setReceivedItems(receivedItemsList || []);
+      return;
+    }
+    if (!hasSyncedInitialData.current && receivedItemsList?.length) {
+      setReceivedItems(receivedItemsList);
+      hasSyncedInitialData.current = true;
+    }
   }, [receivedItemsList]);
   return (
     <React.Fragment>

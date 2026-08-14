@@ -15,6 +15,7 @@ import { Box, Card, Flex, Text, Button, VStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
+import { useUrlFilters } from '../hooks/useUrlFilters';
 
 const PAGE_SIZE = 10;
 
@@ -47,6 +48,50 @@ const Sales: NextPage<Props> = function ({
   const [dateTo, setDateTo] = useState(pendingDateTo);
   const [customerFilter, setCustomerFilter] = useState('');
   const [itemNameFilter, setItemNameFilter] = useState('');
+
+  // Only the standalone dashboard tab (no saleDateFrom prop) owns the URL —
+  // embedded usage (Closing flow, AddSale's "Today's Sales" list) must
+  // never read from or write to it.
+  const isStandalone = !saleDateFrom;
+  const { params: urlParams, isReady: urlReady, setParams: setUrlParams } =
+    useUrlFilters();
+
+  useEffect(() => {
+    if (!isStandalone || !urlReady) {
+      return;
+    }
+    if (urlParams.salesCustomer) {
+      setPendingCustomer(urlParams.salesCustomer);
+      setCustomerFilter(urlParams.salesCustomer);
+    }
+    if (urlParams.salesItem) {
+      setPendingItemName(urlParams.salesItem);
+      setItemNameFilter(urlParams.salesItem);
+    }
+    if (urlParams.salesFrom) {
+      const from = moment(urlParams.salesFrom);
+      setPendingDateFrom(from);
+      setDateFrom(from);
+    }
+    if (urlParams.salesTo) {
+      const to = moment(urlParams.salesTo);
+      setPendingDateTo(to);
+      setDateTo(to);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStandalone, urlReady]);
+
+  useEffect(() => {
+    if (!isStandalone) {
+      return;
+    }
+    setUrlParams({
+      salesCustomer: customerFilter || undefined,
+      salesItem: itemNameFilter || undefined,
+      salesFrom: dateFrom.format('YYYY-MM-DD'),
+      salesTo: dateTo.format('YYYY-MM-DD'),
+    });
+  }, [isStandalone, customerFilter, itemNameFilter, dateFrom, dateTo, setUrlParams]);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);

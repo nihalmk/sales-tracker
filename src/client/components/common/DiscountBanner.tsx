@@ -116,7 +116,7 @@ const DiscountBanner: React.FC<Props> = ({ items }) => {
         {!!totalDiscount && (
           <HStack gap={2}>
             <Text fontWeight="bold" color="green.700" fontSize="lg">
-              Saved {totalDiscount}₹
+              Total Discount {totalDiscount}₹
             </Text>
             <Text
               color="green.700"

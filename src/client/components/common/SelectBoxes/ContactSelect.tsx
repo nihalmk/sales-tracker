@@ -54,11 +54,36 @@ const ContactSelect: React.FC<Props> = ({
 
   const [selected, setSelected] = useState<ContactOption | null>(null);
 
+  // Sync from the caller's `value` (e.g. restored from a URL param) — not
+  // just when it goes back to empty. `entities` is a query result that can
+  // still be loading when this first runs, so fall back to a bare
+  // name-only option rather than waiting; once entities are supplied,
+  // `currentName === value` already holds and we leave it as-is.
+  const currentName = selected ? selected.name || selected.value : undefined;
   useEffect(() => {
     if (!value) {
-      setSelected(null);
+      if (selected) {
+        setSelected(null);
+      }
+      return;
     }
-  }, [value]);
+    if (currentName === value) {
+      return;
+    }
+    const match = entities.find((e) => e.name === value);
+    setSelected(
+      match
+        ? {
+            label: match.name,
+            value: `${match.name}__${match.contact || ''}__${match.email || ''}`,
+            name: match.name,
+            contact: match.contact,
+            email: match.email,
+          }
+        : { label: value, value, name: value },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, entities]);
 
   const handleChange = (
     picked: (ContactOption & { __isNew__?: boolean }) | null,

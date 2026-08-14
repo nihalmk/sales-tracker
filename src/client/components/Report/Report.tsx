@@ -37,6 +37,7 @@ const Report: React.FC<{}> = ({}) => {
           ></DatePicker>
         </Box>
         <Button
+          className="hide-in-print"
           colorPalette="brand"
           onClick={() => {
             setSubmittedDate({

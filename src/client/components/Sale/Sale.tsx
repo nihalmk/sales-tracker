@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/client';
+import dynamic from 'next/dynamic';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_SALE_BY_BILL_NUMBER } from '../../graphql/query/sale';
+import { GET_PREVIOUS_CLOSING } from '../../graphql/query/closing';
 import { Sale, SaleItem } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import moment from 'moment-timezone';
@@ -17,8 +19,14 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
-import DiscountBanner, { calculateDiscounts } from '../common/DiscountBanner';
+import DiscountBanner from '../common/DiscountBanner';
 import MissingMrpWarning, { MrpWarningItem } from '../common/MissingMrpWarning';
+import Tooltip from '../common/Tooltip';
+
+// Dynamic import — AddSale (imported statically here for the inline edit
+// view) itself renders the Sales list, which renders this SaleCard, so a
+// static import would be circular.
+const AddSale = dynamic(() => import('./AddSale'));
 
 interface Props {
   billNumber?: string;
@@ -35,29 +43,51 @@ const SaleCard: NextPage<Props> = function ({
   const [isPrinting, setIsPrinting] = useState(false);
   const [selectedPrint, setSelectedPrint] = useState('');
   const [showProfit, setShowProfit] = useState(false);
-
-  const { loading: saleLoading, data: saleData } = useQuery(
-    GET_SALE_BY_BILL_NUMBER,
-    {
-      variables: {
-        billNumber,
-      },
-      skip: !billNumber,
-      fetchPolicy: 'no-cache',
-    },
-  );
+  const [isEditing, setIsEditing] = useState(false);
 
   const [sale, setSale] = useState<Sale>();
 
   useEffect(() => {
-    setSale(saleData?.getSaleByBillNumber?.[0]);
-  }, [saleData]);
-
-  useEffect(() => {
     setSale(saleDetails);
-  }, [sale]);
+  }, [saleDetails]);
 
   const currentBillNumber = billNumber || sale?.billNumber;
+
+  // Lazy rather than an eager `useQuery`: when this card is embedded in a
+  // list (`saleDetails` prop, no `billNumber`), the list's own query already
+  // supplied the initial data above — firing an extra per-card query on
+  // mount would turn one list query into N. It's only needed (a) up front
+  // for standalone/single-sale usage (`billNumber` prop passed directly),
+  // and (b) on demand right after a successful edit, since neither this
+  // card nor its parent list otherwise learns the edit happened.
+  const [fetchSale, { loading: saleLoading, data: saleData }] = useLazyQuery(
+    GET_SALE_BY_BILL_NUMBER,
+    { fetchPolicy: 'no-cache' },
+  );
+
+  useEffect(() => {
+    if (billNumber) {
+      fetchSale({ variables: { billNumber } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [billNumber]);
+
+  useEffect(() => {
+    if (saleData?.getSaleByBillNumber?.[0]) {
+      setSale(saleData.getSaleByBillNumber[0]);
+    }
+  }, [saleData]);
+  // A sale is locked once it falls on or before the shop's most recent
+  // *finalized* closing's date — a per-record `closing` ref can't be
+  // trusted here: a closing can sweep up a multi-day backlog in one go,
+  // and a draft closing (active: false) locks nothing at all.
+  const { data: lastClosingData } = useQuery(GET_PREVIOUS_CLOSING, {
+    fetchPolicy: 'no-cache',
+  });
+  const lastActiveClosing = lastClosingData?.getPreviousClosing;
+  const isEditable =
+    !lastActiveClosing ||
+    moment(sale?.createdAt).isAfter(moment(lastActiveClosing.date), 'day');
 
   const getDiscountLineItems = () =>
     (sale?.items || []).map((saleItem) => ({
@@ -114,7 +144,21 @@ const SaleCard: NextPage<Props> = function ({
           </HStack>
         </HStack>
       </Card.Header>
-      {view && (
+      {view && isEditing && (
+        <Card.Body>
+          <AddSale
+            billNumber={currentBillNumber}
+            onCancel={() => setIsEditing(false)}
+            onSaved={() => {
+              setIsEditing(false);
+              if (currentBillNumber) {
+                fetchSale({ variables: { billNumber: currentBillNumber } });
+              }
+            }}
+          />
+        </Card.Body>
+      )}
+      {view && !isEditing && (
         <React.Fragment>
           <Card.Body>
             <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
@@ -247,22 +291,6 @@ const SaleCard: NextPage<Props> = function ({
                         color="purple.700"
                       >
                         {sale?.total}
-                        {(() => {
-                          const { totalDiscount, totalDiscountPercent } =
-                            calculateDiscounts(getDiscountLineItems());
-                          return (
-                            !!totalDiscount && (
-                              <Text
-                                fontSize="xs"
-                                fontWeight="medium"
-                                color="green.600"
-                              >
-                                −{totalDiscount}₹ discount (
-                                {totalDiscountPercent}%)
-                              </Text>
-                            )
-                          );
-                        })()}
                       </Table.Cell>
                       <Table.Cell>
                         {showProfit && (
@@ -317,14 +345,26 @@ const SaleCard: NextPage<Props> = function ({
               >
                 {showProfit ? 'Hide P/L' : 'P/L'}
               </Button>
-              <Button
-                className="hide-in-print"
-                colorPalette="brand"
-                disabled={true}
+              <Tooltip
+                content={
+                  isEditable
+                    ? 'Edit this sale'
+                    : "This sale is part of a closed day and can't be edited."
+                }
               >
-                <Icon name="edit" light />
-                Edit
-              </Button>
+                {/* Wrapped so the tooltip still shows on hover even while
+                    the Button itself is natively disabled. */}
+                <Box display="inline-block" className="hide-in-print">
+                  <Button
+                    colorPalette="brand"
+                    disabled={!isEditable}
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Icon name="edit" light />
+                    Edit
+                  </Button>
+                </Box>
+              </Tooltip>
             </HStack>
           </Card.Footer>
         </React.Fragment>

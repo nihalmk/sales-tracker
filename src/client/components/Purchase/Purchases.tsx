@@ -14,6 +14,7 @@ import { Box, Card, Flex, Text, Button, VStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
+import { useUrlFilters } from '../hooks/useUrlFilters';
 
 const PAGE_SIZE = 10;
 
@@ -46,6 +47,50 @@ const Purchases: NextPage<Props> = function ({
   const [dateTo, setDateTo] = useState(pendingDateTo);
   const [vendorFilter, setVendorFilter] = useState('');
   const [itemNameFilter, setItemNameFilter] = useState('');
+
+  // Only the standalone dashboard tab (no purchaseFromDate prop) owns the
+  // URL — embedded usage (Closing flow) must never read from or write to
+  // it.
+  const isStandalone = !purchaseFromDate;
+  const { params: urlParams, isReady: urlReady, setParams: setUrlParams } =
+    useUrlFilters();
+
+  useEffect(() => {
+    if (!isStandalone || !urlReady) {
+      return;
+    }
+    if (urlParams.purchaseVendor) {
+      setPendingVendor(urlParams.purchaseVendor);
+      setVendorFilter(urlParams.purchaseVendor);
+    }
+    if (urlParams.purchaseItem) {
+      setPendingItemName(urlParams.purchaseItem);
+      setItemNameFilter(urlParams.purchaseItem);
+    }
+    if (urlParams.purchaseFrom) {
+      const from = moment(urlParams.purchaseFrom);
+      setPendingDateFrom(from);
+      setDateFrom(from);
+    }
+    if (urlParams.purchaseTo) {
+      const to = moment(urlParams.purchaseTo);
+      setPendingDateTo(to);
+      setDateTo(to);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStandalone, urlReady]);
+
+  useEffect(() => {
+    if (!isStandalone) {
+      return;
+    }
+    setUrlParams({
+      purchaseVendor: vendorFilter || undefined,
+      purchaseItem: itemNameFilter || undefined,
+      purchaseFrom: dateFrom.format('YYYY-MM-DD'),
+      purchaseTo: dateTo.format('YYYY-MM-DD'),
+    });
+  }, [isStandalone, vendorFilter, itemNameFilter, dateFrom, dateTo, setUrlParams]);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);
