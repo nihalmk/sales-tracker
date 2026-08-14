@@ -32,12 +32,16 @@ interface Props {
   billNumber?: string;
   saleDetails?: Sale;
   showContent?: boolean;
+  // View-only usage (e.g. the "See sale" popup from a report/closing
+  // table) — hides the Edit action regardless of isEditable.
+  readOnly?: boolean;
 }
 
 const SaleCard: NextPage<Props> = function ({
   billNumber,
   saleDetails,
   showContent = true,
+  readOnly,
 }) {
   const [view, setView] = useState(showContent);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -345,26 +349,28 @@ const SaleCard: NextPage<Props> = function ({
               >
                 {showProfit ? 'Hide P/L' : 'P/L'}
               </Button>
-              <Tooltip
-                content={
-                  isEditable
-                    ? 'Edit this sale'
-                    : "This sale is part of a closed day and can't be edited."
-                }
-              >
-                {/* Wrapped so the tooltip still shows on hover even while
-                    the Button itself is natively disabled. */}
-                <Box display="inline-block" className="hide-in-print">
-                  <Button
-                    colorPalette="brand"
-                    disabled={!isEditable}
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <Icon name="edit" light />
-                    Edit
-                  </Button>
-                </Box>
-              </Tooltip>
+              {!readOnly && (
+                <Tooltip
+                  content={
+                    isEditable
+                      ? 'Edit this sale'
+                      : "This sale is part of a closed day and can't be edited."
+                  }
+                >
+                  {/* Wrapped so the tooltip still shows on hover even while
+                      the Button itself is natively disabled. */}
+                  <Box display="inline-block" className="hide-in-print">
+                    <Button
+                      colorPalette="brand"
+                      disabled={!isEditable}
+                      onClick={() => setIsEditing(true)}
+                    >
+                      <Icon name="edit" light />
+                      Edit
+                    </Button>
+                  </Box>
+                </Tooltip>
+              )}
             </HStack>
           </Card.Footer>
         </React.Fragment>

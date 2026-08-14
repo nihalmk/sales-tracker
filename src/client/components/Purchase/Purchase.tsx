@@ -25,12 +25,16 @@ interface Props {
   billNumber?: string;
   purchaseDetails?: Purchase;
   showContent?: boolean;
+  // View-only usage (e.g. the "See purchase" popup from a report/closing
+  // table) — hides the Edit action regardless of isEditable.
+  readOnly?: boolean;
 }
 
 const PurchaseCard: NextPage<Props> = function ({
   billNumber,
   purchaseDetails,
   showContent = true,
+  readOnly,
 }) {
   const [view, setView] = useState(showContent);
   const [isEditing, setIsEditing] = useState(false);
@@ -248,26 +252,32 @@ const PurchaseCard: NextPage<Props> = function ({
           </Table.ScrollArea>
           <Card.Footer>
             <HStack w="full">
-              <Tooltip
-                content={
-                  isEditable
-                    ? 'Edit this purchase'
-                    : "This purchase is part of a closed day and can't be edited."
-                }
-              >
-                {/* Wrapped so the tooltip still shows on hover even while
-                    the Button itself is natively disabled. */}
-                <Box display="inline-block" ml="auto" className="hide-in-print">
-                  <Button
-                    colorPalette="brand"
-                    disabled={!isEditable}
-                    onClick={() => setIsEditing(true)}
+              {!readOnly && (
+                <Tooltip
+                  content={
+                    isEditable
+                      ? 'Edit this purchase'
+                      : "This purchase is part of a closed day and can't be edited."
+                  }
+                >
+                  {/* Wrapped so the tooltip still shows on hover even while
+                      the Button itself is natively disabled. */}
+                  <Box
+                    display="inline-block"
+                    ml="auto"
+                    className="hide-in-print"
                   >
-                    <Icon name="edit" light />
-                    Edit
-                  </Button>
-                </Box>
-              </Tooltip>
+                    <Button
+                      colorPalette="brand"
+                      disabled={!isEditable}
+                      onClick={() => setIsEditing(true)}
+                    >
+                      <Icon name="edit" light />
+                      Edit
+                    </Button>
+                  </Box>
+                </Tooltip>
+              )}
             </HStack>
           </Card.Footer>
         </React.Fragment>

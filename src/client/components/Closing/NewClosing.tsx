@@ -9,12 +9,14 @@ import { useMutation, useQuery } from '@apollo/client';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
 import _ from 'lodash';
-import { CreateClosingInput, Closing } from '../../generated/graphql';
+import { CreateClosingInput, Closing, Sale, Purchase } from '../../generated/graphql';
 import Link from 'next/link';
 import { CREATE_CLOSING } from '../../graphql/mutation/closing';
 import moment from 'moment-timezone';
 import Sales from '../Sale/Sales';
+import SalesItemsTable from '../Sale/SalesItemsTable';
 import Purchases from '../Purchase/Purchases';
+import PurchaseItemsTable from '../Purchase/PurchaseItemsTable';
 import { Spent } from './Spent';
 import { Received } from './Received';
 import {
@@ -32,6 +34,7 @@ import Print from '../common/Print';
 // import UserContext from '../UserWrapper/UserContext';
 import { Box, Card, Heading, Text, Button, HStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import ExpandableSection from '../common/ExpandableSection';
 
 interface Props {
   closingId?: string;
@@ -92,6 +95,8 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const [receivedView, setRecievedView] = useState(!isView);
   const [purchasesView, setPurchasesView] = useState(false);
   const [salesView, setSalesView] = useState(false);
+  const [salesRecords, setSalesRecords] = useState<Sale[]>([]);
+  const [purchaseRecords, setPurchaseRecords] = useState<Purchase[]>([]);
 
   useEffect(() => {
     if (closings?.getClosingForUser) {
@@ -296,156 +301,141 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               time closing
             </Text>
           )}
-          <HStack gap={2} mb={2}>
-            <Icon name="sales" boxSize={4} />
-            <Heading size="sm">Sales</Heading>
-          </HStack>
-          <Button
-            className="hide-in-print"
-            colorPalette="brand"
-            size="sm"
-            w="full"
-            mb={3}
-            onClick={() => {
-              setSalesView(!salesView);
-            }}
-          >
-            {(salesView ? 'Hide' : 'View') + ' Sales'}
-          </Button>
-          <Box mb={4}>
+          {/* Headless — drives the ids/total/records used for the closing
+              math and the table below; nothing here is rendered. */}
+          <Box display="none">
             <Sales
-              hideExtraFields={!salesView}
+              hideExtraFields
               saleDateFrom={today.toDate()}
               saleDateTo={endDate}
-              callback={(salesIds, total) => {
+              callback={(salesIds, total, records) => {
                 !isView &&
                   setNewClosing((currentState) => ({
                     ...currentState,
                     salesIds,
                   }));
                 setSalesTotal(total);
+                setSalesRecords(records || []);
               }}
             />
           </Box>
-          <HStack gap={2} mb={2}>
-            <Icon name="purchases" boxSize={4} />
-            <Heading size="sm">Purchases</Heading>
-          </HStack>
-          <Button
-            className="hide-in-print"
-            colorPalette="brand"
-            size="sm"
-            w="full"
-            mb={3}
-            onClick={() => {
-              setPurchasesView(!purchasesView);
-            }}
+          <ExpandableSection
+            icon="sales"
+            label="Sales"
+            isOpen={salesView}
+            onToggle={() => setSalesView(!salesView)}
+            badge={
+              <Text
+                fontWeight="medium"
+                color={
+                  _.sum(salesRecords.map((s) => s.profit)) >= 0
+                    ? 'green.600'
+                    : 'red.600'
+                }
+              >
+                {salesTotal}
+                {currency}
+              </Text>
+            }
           >
-            {(purchasesView ? 'Hide' : 'View') + ' Purchases'}
-          </Button>
-          <Box mb={4}>
+            <SalesItemsTable sales={salesRecords} />
+          </ExpandableSection>
+          {/* Headless — drives the ids/total/records used for the closing
+              math and the table below; nothing here is rendered. */}
+          <Box display="none">
             <Purchases
-              hideExtraFields={!purchasesView}
+              hideExtraFields
               purchaseFromDate={today.toDate()}
               purchaseToDate={endDate}
-              callback={(_purchaseIds, total) => {
+              callback={(_purchaseIds, total, records) => {
                 !isView &&
                   setNewClosing((currentState) => ({
                     ...currentState,
                     purchaseIds: _purchaseIds,
                   }));
                 setPurchaseTotal(total);
+                setPurchaseRecords(records || []);
               }}
             />
           </Box>
-          <HStack gap={2} mb={2}>
-            <Icon name="expenses" boxSize={4} />
-            <Heading size="sm">Expenses</Heading>
-          </HStack>
-          <Text fontSize="sm" color="fg.muted" mb={2}>
-            * Include borrowed money to deduct money received from sales
-          </Text>
-          <Card.Root variant="outline" p={0} mb={4} id={newClosing?.date}>
-            <HStack justify="flex-end" p={2}>
-              <Text color="red.600" fontWeight="medium">
+          <ExpandableSection
+            icon="purchases"
+            label="Purchases"
+            isOpen={purchasesView}
+            onToggle={() => setPurchasesView(!purchasesView)}
+            badge={
+              <Text fontWeight="medium" color="red.600">
+                -{purchaseTotal}
+                {currency}
+              </Text>
+            }
+          >
+            <PurchaseItemsTable purchases={purchaseRecords} />
+          </ExpandableSection>
+          <ExpandableSection
+            icon="expenses"
+            label="Expenses"
+            isOpen={spentView}
+            onToggle={() => setSpentView(!spentView)}
+            id={newClosing?.date}
+            badge={
+              <Text fontWeight="medium" color="red.600">
                 {spentTotal}
                 {currency}
               </Text>
-            </HStack>
-            <Box px={2} pb={2}>
-              <Button
-                className="hide-in-print"
-                colorPalette="brand"
-                size="sm"
-                onClick={() => {
-                  setSpentView(!spentView);
-                }}
-              >
-                {(spentView ? 'Hide' : 'View') + ' Spent Items'}
-              </Button>
-            </Box>
-            {spentView && (
-              <Spent
-                callback={(spentItems) => {
-                  !isView &&
-                    setSpentTotal(_.sum(spentItems.map((s) => s.amount)));
-                  !isView &&
-                    setNewClosing((currentState) => ({
-                      ...currentState,
-                      spentItems,
-                    }));
-                }}
-                isView={isView}
-                spentItemsList={_.flatMap(
-                  allClosings?.map((c) => c.spentItems),
-                )}
-                id={newClosing?.date}
-              />
-            )}
-          </Card.Root>
-          <HStack gap={2} mb={2}>
-            <Icon name="received" boxSize={4} />
-            <Heading size="sm">Received</Heading>
-          </HStack>
-          <Card.Root variant="outline" p={0} mb={4} id={newClosing?.date}>
-            <HStack justify="flex-end" p={2}>
-              <Text color="green.600" fontWeight="medium">
+            }
+          >
+            <Text fontSize="sm" color="fg.muted" mb={3}>
+              * Include borrowed money to deduct money received from sales
+            </Text>
+            <Spent
+              callback={(spentItems) => {
+                !isView &&
+                  setSpentTotal(_.sum(spentItems.map((s) => s.amount)));
+                !isView &&
+                  setNewClosing((currentState) => ({
+                    ...currentState,
+                    spentItems,
+                  }));
+              }}
+              isView={isView}
+              spentItemsList={_.flatMap(
+                allClosings?.map((c) => c.spentItems),
+              )}
+              id={newClosing?.date}
+            />
+          </ExpandableSection>
+          <ExpandableSection
+            icon="received"
+            label="Received"
+            isOpen={receivedView}
+            onToggle={() => setRecievedView(!receivedView)}
+            id={newClosing?.date}
+            badge={
+              <Text fontWeight="medium" color="green.600">
                 {receivedTotal}
                 {currency}
               </Text>
-            </HStack>
-            <Box px={2} pb={2}>
-              <Button
-                className="hide-in-print"
-                colorPalette="brand"
-                size="sm"
-                onClick={() => {
-                  setRecievedView(!receivedView);
-                }}
-              >
-                {(receivedView ? 'Hide' : 'View') + ' Received Items'}
-              </Button>
-            </Box>
-            {receivedView && (
-              <Received
-                callback={(receivedItems) => {
-                  !isView &&
-                    setReceivedTotal(_.sum(receivedItems.map((s) => s.amount)));
+            }
+          >
+            <Received
+              callback={(receivedItems) => {
+                !isView &&
+                  setReceivedTotal(_.sum(receivedItems.map((s) => s.amount)));
 
-                  !isView &&
-                    setNewClosing((currentState) => ({
-                      ...currentState,
-                      receivedItems,
-                    }));
-                }}
-                isView={isView}
-                receivedItemsList={_.flatMap(
-                  allClosings?.map((c) => c.receivedItems),
-                )}
-                id={newClosing?.date}
-              />
-            )}
-          </Card.Root>
+                !isView &&
+                  setNewClosing((currentState) => ({
+                    ...currentState,
+                    receivedItems,
+                  }));
+              }}
+              isView={isView}
+              receivedItemsList={_.flatMap(
+                allClosings?.map((c) => c.receivedItems),
+              )}
+              id={newClosing?.date}
+            />
+          </ExpandableSection>
           {!isView && (
             <Card.Root variant="outline" mb={4} p={3}>
               <HStack justify="space-between">
@@ -476,7 +466,18 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               </Link>
             </Button>
             <Box ml="auto">
-              <Print setPrintStatus={() => {}} />
+              {/* Print runs setPrintStatus, then window.print() on the next
+                  tick — expanding every accordion here means the printed
+                  page shows all the itemised detail, not just whichever
+                  sections happened to be open on screen. */}
+              <Print
+                setPrintStatus={() => {
+                  setSalesView(true);
+                  setPurchasesView(true);
+                  setSpentView(true);
+                  setRecievedView(true);
+                }}
+              />
             </Box>
             <Button
               className="hide-in-print"

@@ -23,7 +23,11 @@ interface Props {
   hideExtraFields?: boolean;
   purchaseFromDate?: Date;
   purchaseToDate?: Date;
-  callback?: (purchaseIds: string[], total: number) => void;
+  callback?: (
+    purchaseIds: string[],
+    total: number,
+    purchases?: Purchase[],
+  ) => void;
 }
 
 const Purchases: NextPage<Props> = function ({
@@ -178,6 +182,7 @@ const Purchases: NextPage<Props> = function ({
       callback(
         purchases.map((s) => s._id),
         totalAmount,
+        purchases,
       );
     }
   }, [embeddedData]);
