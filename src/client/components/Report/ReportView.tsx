@@ -194,11 +194,7 @@ const ReportView: React.FC<Props> = ({ startDate, endDate }) => {
               emptyMessage="No money spent"
             />
           ) : (
-            <Spent
-              isView
-              spentItemsList={spentItemsList}
-              id="report-spent"
-            />
+            <Spent isView spentItemsList={spentItemsList} id="report-spent" />
           )}
         </ExpandableSection>
         <ExpandableSection
