@@ -44,6 +44,9 @@ const MultiSelect: React.FC<Props> = ({
         isDisabled={isDisabled}
         classNamePrefix="custom-select"
         components={{ MultiValueContainer: MultiValueComponent }}
+        menuPortalTarget={
+          typeof document !== 'undefined' ? document.body : undefined
+        }
         styles={{
           ...brandSelectStyles(isInvalid),
           valueContainer: (styles) => ({

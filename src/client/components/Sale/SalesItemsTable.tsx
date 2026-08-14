@@ -3,14 +3,7 @@ import _ from 'lodash';
 import moment from 'moment-timezone';
 import { Sale, SaleItem } from '../../generated/graphql';
 import { currency } from '../../utils/helpers';
-import {
-  Box,
-  Button,
-  HStack,
-  IconButton,
-  Table,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, HStack, IconButton, Table, Text } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import Tooltip from '../common/Tooltip';
 import OverLay from '../OverLay';
@@ -55,9 +48,7 @@ const SalesItemsTable: React.FC<Props> = ({ sales }) => {
               <Table.ColumnHeader textAlign="end">Price</Table.ColumnHeader>
               <Table.ColumnHeader textAlign="end">Quantity</Table.ColumnHeader>
               <Table.ColumnHeader textAlign="end">Total</Table.ColumnHeader>
-              <Table.ColumnHeader textAlign="center">
-                Action
-              </Table.ColumnHeader>
+              <Table.ColumnHeader textAlign="center">Action</Table.ColumnHeader>
             </Table.Row>
           </Table.Header>
           <Table.Body>

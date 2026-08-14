@@ -60,6 +60,9 @@ const SelectBox: React.FunctionComponent<Props> = (props) => {
         placeholder={props.placeholder}
         ref={props.innerRef}
         styles={brandSelectStyles(props.isInvalid)}
+        menuPortalTarget={
+          typeof document !== 'undefined' ? document.body : undefined
+        }
       />
     </Field.Root>
   );

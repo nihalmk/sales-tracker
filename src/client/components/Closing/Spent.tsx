@@ -1,8 +1,11 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
+import { useQuery } from '@apollo/client';
 import _ from 'lodash';
 import { SpentItemsInput } from '../../generated/graphql';
 import Input from '../common/Inputs/FormInput';
+import CategorySelect from '../common/SelectBoxes/CategorySelect';
+import { GET_SPENT_CATEGORIES } from '../../graphql/query/closing';
 import { Table, Button, SimpleGrid, GridItem, Text } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 
@@ -29,6 +32,11 @@ export const Spent: NextPage<Props> = function ({
   // an existing draft), without re-syncing on every subsequent change and
   // clobbering items the user has since added locally.
   const hasSyncedInitialData = useRef(false);
+
+  const { data: categoriesData } = useQuery(GET_SPENT_CATEGORIES, {
+    fetchPolicy: 'no-cache',
+  });
+  const categories: string[] = categoriesData?.getSpentCategories || [];
 
   useEffect(() => {
     !isView && callback(spentItems);
@@ -128,22 +136,19 @@ export const Spent: NextPage<Props> = function ({
             alignItems="end"
           >
             <GridItem colSpan={{ base: 2, md: 6 }}>
-              <Input
+              <CategorySelect
                 tabIndex={2}
-                inputName="Spent On"
-                inputLabel="Spent On"
-                inputType="text"
-                max={20}
-                placeholderValue="Spend Amount On?"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const spentOn = e.target.value;
+                label="Spent On"
+                placeholder="Spend Amount On?"
+                categories={categories}
+                value={newSpentItem?.spentOn}
+                onSelect={(spentOn) => {
                   setNewSpentItem((currentState) => ({
                     ...currentState,
-                    spentOn,
+                    spentOn: spentOn || '',
                   }));
                 }}
                 isInvalid={submitted && !newSpentItem?.spentOn}
-                value={newSpentItem?.spentOn || ''}
                 innerRef={formFocus}
               />
             </GridItem>

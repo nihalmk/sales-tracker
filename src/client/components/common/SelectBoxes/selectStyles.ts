@@ -27,6 +27,11 @@ export const brandSelectStyles = (isInvalid?: boolean) => ({
     zIndex: 20,
     overflow: 'hidden',
   }),
+  // Menus render via menuPortalTarget (document.body) so they escape any
+  // ancestor with overflow:hidden or clipped stacking context (e.g. the
+  // accordion cards on the Closing/Report pages) — the portal needs its
+  // own z-index since it's no longer nested under `menu`'s.
+  menuPortal: (base: any) => ({ ...base, zIndex: 1500 }),
   option: (base: any, state: any) => ({
     ...base,
     backgroundColor: state.isSelected

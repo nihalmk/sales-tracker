@@ -52,6 +52,20 @@ export default class ClosingResolver {
     return await closingService.getClosingByClosingId(closingId);
   }
 
+  @Query((_returns) => [String])
+  @Authorized()
+  async getSpentCategories(@Ctx() ctx: CTX): Promise<string[]> {
+    const closingService = new ClosingService(ctx);
+    return await closingService.getSpentCategories();
+  }
+
+  @Query((_returns) => [String])
+  @Authorized()
+  async getReceivedCategories(@Ctx() ctx: CTX): Promise<string[]> {
+    const closingService = new ClosingService(ctx);
+    return await closingService.getReceivedCategories();
+  }
+
   // Mutations
 
   @Mutation((_returns) => Closing, { nullable: true })

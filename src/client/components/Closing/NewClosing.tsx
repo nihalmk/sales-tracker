@@ -1,15 +1,15 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  // useContext
-} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { NextPage } from 'next';
 import { useMutation, useQuery } from '@apollo/client';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
 import _ from 'lodash';
-import { CreateClosingInput, Closing, Sale, Purchase } from '../../generated/graphql';
+import {
+  CreateClosingInput,
+  Closing,
+  Sale,
+  Purchase,
+} from '../../generated/graphql';
 import Link from 'next/link';
 import { CREATE_CLOSING } from '../../graphql/mutation/closing';
 import moment from 'moment-timezone';
@@ -31,19 +31,21 @@ import OverLay from '../OverLay';
 import { NavItems } from '../Navigation/Navigation';
 import UserContext from '../UserWrapper/UserContext';
 import Print from '../common/Print';
-// import UserContext from '../UserWrapper/UserContext';
 import { Box, Card, Heading, Text, Button, HStack } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import ExpandableSection from '../common/ExpandableSection';
 
 interface Props {
-  closingId?: string;
+  // Only set for the "you have a backlog day to close" flow — otherwise
+  // the closing is always for today.
   startDate?: Date;
-  endDate?: Date;
-  isView?: boolean;
 }
 
-const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
+// The day-to-day closing workflow only — draft/finalize a single day (or a
+// backlog day passed via startDate). The read-only, date-range analysis
+// view lives entirely in Report/ReportView.tsx now; this component no
+// longer has any view-mode branching.
+const NewClosing: NextPage<Props> = function ({ startDate }) {
   const { setSelectedMenu, setNavItems } = useContext(UserContext);
 
   const [submitCreateClosing, { loading: createLoading }] =
@@ -51,19 +53,14 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
 
   const { data: previousClosing, loading: previousClosingLoading } = useQuery(
     GET_PREVIOUS_CLOSING,
-    {
-      fetchPolicy: 'no-cache',
-      skip: isView,
-    },
+    { fetchPolicy: 'no-cache' },
   );
 
   const { data: closings, loading: closingsLoading } = useQuery(GET_CLOSINGS, {
     variables: {
       date: {
         from: moment(startDate).startOf('day').toDate(),
-        to: moment(endDate || startDate)
-          .endOf('day')
-          .toDate(),
+        to: moment(startDate).endOf('day').toDate(),
       },
     },
     fetchPolicy: 'no-cache',
@@ -73,10 +70,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   // always starting the form blank.
   const { data: draftClosing, loading: draftClosingLoading } = useQuery(
     GET_DRAFT_CLOSING,
-    {
-      fetchPolicy: 'no-cache',
-      skip: isView,
-    },
+    { fetchPolicy: 'no-cache' },
   );
 
   const [message, setMessage] = useState('');
@@ -91,8 +85,8 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
   const [spentTotal, setSpentTotal] = useState(0);
   const [receivedTotal, setReceivedTotal] = useState(0);
   const [closingConfirmation, setClosingConfirmation] = useState(false);
-  const [spentView, setSpentView] = useState(!isView);
-  const [receivedView, setRecievedView] = useState(!isView);
+  const [spentView, setSpentView] = useState(true);
+  const [receivedView, setRecievedView] = useState(true);
   const [purchasesView, setPurchasesView] = useState(false);
   const [salesView, setSalesView] = useState(false);
   const [salesRecords, setSalesRecords] = useState<Sale[]>([]);
@@ -228,32 +222,6 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
       </React.Fragment>
     );
   }
-  if (isView && !newClosing) {
-    return (
-      <React.Fragment>
-        <Card.Root variant="outline">
-          <Text textAlign="center" py={4}>
-            No closing found
-          </Text>
-        </Card.Root>
-      </React.Fragment>
-    );
-  }
-
-  const getNetTotal = () => {
-    return (
-      prevClosing.inHandTotal +
-      salesTotal +
-      receivedTotal -
-      purchaseTotal -
-      spentTotal
-    );
-  };
-
-  // const inHandTotalAtLastDate = () => {
-  //   const lastClosing = allClosings.sort((closing) => closing.date);
-  //   return lastClosing[lastClosing.length - 1];
-  // };
 
   return (
     <React.Fragment>
@@ -261,32 +229,28 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
         <Card.Header>
           <HStack justify="space-between" wrap="wrap">
             <HStack gap={2}>
-              <Icon name={isView ? 'report' : 'closing'} boxSize={5} />
+              <Icon name="closing" boxSize={5} />
               <Heading size="md">
-                {isView ? 'Report | ' : 'New Closing | '}
-                {today.format('DD/MM/YYYY')}{' '}
-                {endDate && `- ${moment(endDate).format('DD/MM/YYYY')}`}
+                New Closing | {today.format('DD/MM/YYYY')}
               </Heading>
             </HStack>
-            {!isView && (
-              <Text>
-                Previous (
-                {moment(
-                  prevClosing?.date || moment(today).subtract(1, 'days'),
-                ).format('DD/MM/YYYY')}
-                ):{' '}
-                <Text as="span" color="green.600" fontWeight="medium">
-                  {prevClosing?.inHandTotal || 0}
-                  {currency}
-                </Text>
+            <Text>
+              Previous (
+              {moment(
+                prevClosing?.date || moment(today).subtract(1, 'days'),
+              ).format('DD/MM/YYYY')}
+              ):{' '}
+              <Text as="span" color="green.600" fontWeight="medium">
+                {prevClosing?.inHandTotal || 0}
+                {currency}
               </Text>
-            )}
+            </Text>
           </HStack>
         </Card.Header>
         <SuccessMessage message={message} />
         <ErrorMessage error={error} />
         <Card.Body pb={0}>
-          {!isView && !prevClosing?.inHandTotal && (
+          {!prevClosing?.inHandTotal && (
             <Text
               className="hide-in-print"
               color="red.600"
@@ -307,13 +271,11 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
             <Sales
               hideExtraFields
               saleDateFrom={today.toDate()}
-              saleDateTo={endDate}
               callback={(salesIds, total, records) => {
-                !isView &&
-                  setNewClosing((currentState) => ({
-                    ...currentState,
-                    salesIds,
-                  }));
+                setNewClosing((currentState) => ({
+                  ...currentState,
+                  salesIds,
+                }));
                 setSalesTotal(total);
                 setSalesRecords(records || []);
               }}
@@ -346,13 +308,11 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
             <Purchases
               hideExtraFields
               purchaseFromDate={today.toDate()}
-              purchaseToDate={endDate}
               callback={(_purchaseIds, total, records) => {
-                !isView &&
-                  setNewClosing((currentState) => ({
-                    ...currentState,
-                    purchaseIds: _purchaseIds,
-                  }));
+                setNewClosing((currentState) => ({
+                  ...currentState,
+                  purchaseIds: _purchaseIds,
+                }));
                 setPurchaseTotal(total);
                 setPurchaseRecords(records || []);
               }}
@@ -390,18 +350,13 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
             </Text>
             <Spent
               callback={(spentItems) => {
-                !isView &&
-                  setSpentTotal(_.sum(spentItems.map((s) => s.amount)));
-                !isView &&
-                  setNewClosing((currentState) => ({
-                    ...currentState,
-                    spentItems,
-                  }));
+                setSpentTotal(_.sum(spentItems.map((s) => s.amount)));
+                setNewClosing((currentState) => ({
+                  ...currentState,
+                  spentItems,
+                }));
               }}
-              isView={isView}
-              spentItemsList={_.flatMap(
-                allClosings?.map((c) => c.spentItems),
-              )}
+              spentItemsList={_.flatMap(allClosings?.map((c) => c.spentItems))}
               id={newClosing?.date}
             />
           </ExpandableSection>
@@ -420,37 +375,29 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
           >
             <Received
               callback={(receivedItems) => {
-                !isView &&
-                  setReceivedTotal(_.sum(receivedItems.map((s) => s.amount)));
-
-                !isView &&
-                  setNewClosing((currentState) => ({
-                    ...currentState,
-                    receivedItems,
-                  }));
+                setReceivedTotal(_.sum(receivedItems.map((s) => s.amount)));
+                setNewClosing((currentState) => ({
+                  ...currentState,
+                  receivedItems,
+                }));
               }}
-              isView={isView}
               receivedItemsList={_.flatMap(
                 allClosings?.map((c) => c.receivedItems),
               )}
               id={newClosing?.date}
             />
           </ExpandableSection>
-          {!isView && (
-            <Card.Root variant="outline" mb={4} p={3}>
-              <HStack justify="space-between">
-                <Text fontSize="lg" fontWeight="bold">
-                  {isView
-                    ? 'Net Balance (Sales Total + Received Total - Purchases Total - Expenses Total)'
-                    : 'Closing Balance'}
-                </Text>
-                <Text fontSize="lg" fontWeight="bold" color="green.600">
-                  {isView ? getNetTotal() || 0 : getTotal()[0].toFixed(2)}
-                  {currency}
-                </Text>
-              </HStack>
-            </Card.Root>
-          )}
+          <Card.Root variant="outline" mb={4} p={3}>
+            <HStack justify="space-between">
+              <Text fontSize="lg" fontWeight="bold">
+                Closing Balance
+              </Text>
+              <Text fontSize="lg" fontWeight="bold" color="green.600">
+                {getTotal()[0].toFixed(2)}
+                {currency}
+              </Text>
+            </HStack>
+          </Card.Root>
         </Card.Body>
         <Card.Footer>
           <HStack w="full">
@@ -484,7 +431,6 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               colorPalette="gray"
               variant="outline"
               loading={createLoading}
-              disabled={isView}
               onClick={onSaveDraft}
             >
               <Icon name="edit" />
@@ -494,10 +440,7 @@ const NewClosing: NextPage<Props> = function ({ startDate, endDate, isView }) {
               className="hide-in-print"
               colorPalette="brand"
               loading={createLoading}
-              disabled={isView}
-              onClick={() => {
-                !isView && setClosingConfirmation(true);
-              }}
+              onClick={() => setClosingConfirmation(true)}
             >
               <Icon name="done" light />
               Submit

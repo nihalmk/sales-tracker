@@ -1,8 +1,11 @@
 import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
+import { useQuery } from '@apollo/client';
 import _ from 'lodash';
 import { ReceivedItemsInput } from '../../generated/graphql';
 import Input from '../common/Inputs/FormInput';
+import CategorySelect from '../common/SelectBoxes/CategorySelect';
+import { GET_RECEIVED_CATEGORIES } from '../../graphql/query/closing';
 import { Table, Button, SimpleGrid, GridItem, Text } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 
@@ -29,6 +32,11 @@ export const Received: NextPage<Props> = function ({
   // resuming an existing draft), without re-syncing on every subsequent
   // change and clobbering items the user has since added locally.
   const hasSyncedInitialData = useRef(false);
+
+  const { data: categoriesData } = useQuery(GET_RECEIVED_CATEGORIES, {
+    fetchPolicy: 'no-cache',
+  });
+  const categories: string[] = categoriesData?.getReceivedCategories || [];
 
   useEffect(() => {
     !isView && callback(receivedItems);
@@ -132,22 +140,19 @@ export const Received: NextPage<Props> = function ({
             alignItems="end"
           >
             <GridItem colSpan={{ base: 2, md: 6 }}>
-              <Input
+              <CategorySelect
                 tabIndex={4}
-                inputName="Received For"
-                inputLabel="Received For"
-                inputType="text"
-                max={20}
-                placeholderValue="Received Amount For?"
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const receivedFor = e.target.value;
+                label="Received For"
+                placeholder="Received Amount For?"
+                categories={categories}
+                value={newReceivedItem?.receivedFor}
+                onSelect={(receivedFor) => {
                   setNewReceivedItem((currentState) => ({
                     ...currentState,
-                    receivedFor,
+                    receivedFor: receivedFor || '',
                   }));
                 }}
                 isInvalid={submitted && !newReceivedItem?.receivedFor}
-                value={newReceivedItem?.receivedFor || ''}
                 innerRef={formFocus}
               />
             </GridItem>

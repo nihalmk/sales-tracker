@@ -48,7 +48,6 @@ const ExpandableSection: React.FC<Props> = ({
       gap={3}
       cursor="pointer"
       textAlign="left"
-      className="hide-in-print"
       bg={isOpen ? 'brand.subtle' : 'bg.panel'}
       _hover={{ bg: 'brand.subtle' }}
       transition="background-color 0.15s"

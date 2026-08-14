@@ -64,6 +64,9 @@ const CreatableSelect: React.FC<Props> = ({
         noOptionsMessage={() => noOptionsMessage}
         ref={innerRef}
         styles={brandSelectStyles(isInvalid)}
+        menuPortalTarget={
+          typeof document !== 'undefined' ? document.body : undefined
+        }
       />
       {isInvalid && (
         // @ts-expect-error Chakra v3's Ark UI-derived FieldErrorTextProps doesn't model `children` in its polymorphic types, though it renders them fine.

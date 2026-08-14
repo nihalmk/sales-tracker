@@ -236,6 +236,7 @@ type Query {
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
   getPurchaseWithoutClosing: [Purchase!]
   getPurchasesForUser(date: DateRange!, itemName: String, limit: Float = 0, page: Float = 1, vendor: String): PaginatedPurchases!
+  getReceivedCategories: [String!]!
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!
@@ -243,6 +244,7 @@ type Query {
   getSalesForUser(customer: String, date: DateRange!, itemName: String, limit: Float = 0, page: Float = 1): PaginatedSales!
   getShopForUser: Shop
   getShopTypes: [LabelValueObj!]
+  getSpentCategories: [String!]!
   getUserById(id: ID!): User
   getVendors(includeUnnamed: Boolean = false): [PurchaseVendor!]!
   me: User

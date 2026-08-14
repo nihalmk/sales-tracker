@@ -40,3 +40,15 @@ export const GET_CLOSING_BY_ID = gql`
     getClosingByClosingId(closingId: $closingId) ${closing}
   }
 `;
+
+export const GET_SPENT_CATEGORIES = gql`
+  query getSpentCategories {
+    getSpentCategories
+  }
+`;
+
+export const GET_RECEIVED_CATEGORIES = gql`
+  query getReceivedCategories {
+    getReceivedCategories
+  }
+`;

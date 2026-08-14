@@ -187,4 +187,27 @@ export class ClosingService {
       .limit(1);
     return closing[0];
   }
+
+  // Distinct "Spent On" / "Received For" labels used across every past
+  // closing — powers the creatable select on the New Closing form so
+  // recurring categories (rent, electricity, loan repayment, ...) can be
+  // picked instead of retyped each time.
+  async getSpentCategories(): Promise<string[]> {
+    const categories: string[] = await this.model.distinct(
+      'spentItems.spentOn',
+      { shop: this.ctx.user.shop, 'spentItems.spentOn': { $nin: [null, ''] } },
+    );
+    return categories.sort((a, b) => a.localeCompare(b));
+  }
+
+  async getReceivedCategories(): Promise<string[]> {
+    const categories: string[] = await this.model.distinct(
+      'receivedItems.receivedFor',
+      {
+        shop: this.ctx.user.shop,
+        'receivedItems.receivedFor': { $nin: [null, ''] },
+      },
+    );
+    return categories.sort((a, b) => a.localeCompare(b));
+  }
 }
