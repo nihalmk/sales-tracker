@@ -17,6 +17,9 @@ export class PurchaseItemInput {
   @Field(NumberField, { nullable: true })
   sale?: number;
 
+  @Field(NumberField, { nullable: true })
+  list?: number;
+
   @Field(NumberField)
   total: number;
 }

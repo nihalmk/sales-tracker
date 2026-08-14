@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Alert, Button, HStack } from '@chakra-ui/react';
+import Icon from '../common/Icon';
 
 interface Props {
   message: string;
@@ -36,6 +37,7 @@ const ConfirmationDialog: React.FC<Props> = ({
             colorPalette="red"
             onClick={() => success(false)}
           >
+            <Icon name="cancel" />
             Cancel
           </Button>
           <Button
@@ -43,6 +45,7 @@ const ConfirmationDialog: React.FC<Props> = ({
             colorPalette="brand"
             onClick={() => success(true)}
           >
+            <Icon name="done" light />
             Continue
           </Button>
         </HStack>

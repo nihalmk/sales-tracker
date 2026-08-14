@@ -21,6 +21,8 @@ interface Props {
   noOptionsMessage?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   innerRef?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filterOption?: (option: any, inputValue: string) => boolean;
 }
 const CreatableSelect: React.FC<Props> = ({
   onChange,
@@ -36,6 +38,7 @@ const CreatableSelect: React.FC<Props> = ({
   isClearable,
   noOptionsMessage,
   innerRef,
+  filterOption,
 }) => {
   return (
     <Field.Root invalid={isInvalid}>
@@ -52,6 +55,7 @@ const CreatableSelect: React.FC<Props> = ({
         isDisabled={isDisabled}
         classNamePrefix="select"
         isClearable={isClearable}
+        filterOption={filterOption}
         formatOptionLabel={customOption}
         placeholder={placeholder}
         noOptionsMessage={() => noOptionsMessage}

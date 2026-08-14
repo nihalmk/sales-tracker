@@ -26,6 +26,7 @@ import {
 import Icon from '../common/Icon';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
+import { useLinkedPriceField } from '../hooks/useLinkedPriceField';
 
 const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 1000;
@@ -92,9 +93,11 @@ const AddStock: NextPage<Props> = function () {
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
 
   const [newItem, setNewItem] = useState<Items>();
-  // Tracks whether the user has typed into the Sale field directly, so MRP
-  // changes keep mirroring into Sale only until the user takes over.
-  const [saleManuallySet, setSaleManuallySet] = useState(false);
+  const {
+    onDependentChange: onSalePriceChange,
+    nextDependentValue: nextSalePrice,
+    reset: resetSaleLink,
+  } = useLinkedPriceField();
 
   const [editItem, setEditItem] = useState<Items>();
 
@@ -141,7 +144,7 @@ const AddStock: NextPage<Props> = function () {
       await refetchItems();
       setMessage('New item added successfully');
       setNewItem(undefined);
-      setSaleManuallySet(false);
+      resetSaleLink();
       setSubmitted(false);
       setTimeout(() => {
         setMessage('');
@@ -295,7 +298,7 @@ const AddStock: NextPage<Props> = function () {
                     price: {
                       ...currentState?.price,
                       list,
-                      sale: saleManuallySet ? currentState?.price?.sale : list,
+                      sale: nextSalePrice(currentState?.price?.sale, list),
                     },
                   }));
                 }}
@@ -313,7 +316,7 @@ const AddStock: NextPage<Props> = function () {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const raw = e.target.value;
                   const sale = Number(raw);
-                  setSaleManuallySet(raw !== '');
+                  onSalePriceChange(raw);
                   setNewItem((currentState) => ({
                     ...currentState,
                     price: {
@@ -371,7 +374,7 @@ const AddStock: NextPage<Props> = function () {
                 tabIndex={9}
                 inputName="Search"
                 inputType="text"
-                max={20}
+                max={50}
                 placeholderValue="Search Product by Name or ID"
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   const search = e.target.value;

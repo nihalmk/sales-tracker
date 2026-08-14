@@ -199,6 +199,7 @@ type Purchase {
 type PurchaseItem {
   cost: Float!
   item: Items!
+  list: Float
   quantity: Float!
   sale: Float
   total: Float!
@@ -207,6 +208,7 @@ type PurchaseItem {
 input PurchaseItemInput {
   cost: Float!
   item: ID!
+  list: Float
   quantity: Float!
   sale: Float
   total: Float!

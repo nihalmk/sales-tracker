@@ -36,7 +36,12 @@ const InfiniteScrollStatus: React.FC<Props> = ({
         <Text color="red.600" fontSize="sm">
           Failed to load more {itemLabel}.
         </Text>
-        <Button size="sm" colorPalette="red" variant="outline" onClick={onRetry}>
+        <Button
+          size="sm"
+          colorPalette="red"
+          variant="outline"
+          onClick={onRetry}
+        >
           Retry
         </Button>
       </VStack>

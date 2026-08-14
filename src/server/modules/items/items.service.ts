@@ -154,7 +154,7 @@ export class ItemsService {
             $set: {
               stock: inStockItem.stock + item.quantity,
               price: {
-                list: inStockItem.price.list,
+                list: item.list || inStockItem.price.list,
                 sale: item.sale || inStockItem.price.sale,
                 cost: item.cost || inStockItem.price.cost,
               },

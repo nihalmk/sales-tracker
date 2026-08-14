@@ -14,6 +14,7 @@ import { Sale, SaleItem, Items, SaleItemInput } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
+import { searchByLabelOrShortId } from '../common/SelectBoxes/searchByLabelOrShortId';
 import ContactSelect from '../common/SelectBoxes/ContactSelect';
 import { GET_ITEMS } from '../../graphql/query/items';
 import Link from 'next/link';
@@ -32,6 +33,9 @@ import {
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import DiscountBanner from '../common/DiscountBanner';
+import MissingMrpWarning, {
+  MrpWarningItem,
+} from '../common/MissingMrpWarning';
 
 interface Props {
   billNumber?: string;
@@ -321,6 +325,26 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
       quantity: sale.quantity,
     }));
 
+  // Patches the fixed item's price everywhere it's referenced locally
+  // (the stock lookup list and any line already added to this sale) so the
+  // warning icon and discount math update immediately — no refetch or page
+  // reload, so nothing already filled in on this form is lost.
+  const onItemMrpUpdated = (updated: MrpWarningItem) => {
+    setItems(
+      (current) =>
+        current?.map((i) =>
+          i._id === updated._id ? { ...i, price: updated.price } : i,
+        ),
+    );
+    setSaleItems((current) =>
+      current.map((si) =>
+        si.item._id === updated._id
+          ? { ...si, item: { ...si.item, price: updated.price } }
+          : si,
+      ),
+    );
+  };
+
   return (
     <React.Fragment>
       <Card.Root
@@ -410,7 +434,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
         >
           <Card.Body pt={0}>
             <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
-              <GridItem colSpan={{ base: 2, md: 5 }}>
+              <GridItem colSpan={{ base: 2, md: 6 }}>
                 <SelectBox
                   tabIndex={4}
                   selectLabel="Product"
@@ -419,7 +443,14 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     return !saleItemsIds.includes(i.value);
                   })}
                   isDisabled={itemsLoading}
-                  onSelectChange={(e: LabelValueObj) => {
+                  isClearable
+                  filterOption={searchByLabelOrShortId}
+                  onSelectChange={(e: LabelValueObj | null) => {
+                    if (!e) {
+                      setNewItem(undefined);
+                      setNewSaleItem(undefined);
+                      return;
+                    }
                     const itemId = e.value;
                     const item = items.find((i) => i._id === itemId);
                     setNewItem(item);
@@ -460,7 +491,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                   value={newSaleItem?.cost || ''}
                 />
               </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
+              <GridItem colSpan={{ base: 1, md: 1 }}>
                 <Input
                   tabIndex={6}
                   inputName="quantity"
@@ -534,6 +565,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                 <Table.ColumnHeader textAlign="end">
                   Sale Price
                 </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">MRP</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">
                   Quantity
                 </Table.ColumnHeader>
@@ -546,14 +578,14 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
             <Table.Body>
               {(billNumber && saleLoading) || createLoading ? (
                 <Table.Row>
-                  <Table.Cell textAlign="center" py={8} colSpan={6}>
+                  <Table.Cell textAlign="center" py={8} colSpan={7}>
                     <Loader />
                   </Table.Cell>
                 </Table.Row>
               ) : (
                 saleItems?.length === 0 && (
                   <Table.Row>
-                    <Table.Cell textAlign="center" py={8} colSpan={6}>
+                    <Table.Cell textAlign="center" py={8} colSpan={7}>
                       <Text color="fg.muted" fontSize="sm">
                         No products added yet
                       </Text>
@@ -571,7 +603,14 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     return (
                       <Table.Row key={i}>
                         <Table.Cell color="fg.muted">{item.shortId}</Table.Cell>
-                        <Table.Cell fontWeight="medium">{item.name}</Table.Cell>
+                        <Table.Cell fontWeight="medium">
+                          {item.name}
+                          <MissingMrpWarning
+                            item={item}
+                            fallbackPrice={sale.cost}
+                            onUpdated={onItemMrpUpdated}
+                          />
+                        </Table.Cell>
                         <Table.Cell
                           textAlign="end"
                           onSubmit={(e) => {
@@ -599,8 +638,13 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                               value={editSale?.cost || ''}
                             />
                           ) : (
-                            sale.cost
+                            <Text as="span" color="blue.600" fontWeight="medium">
+                              {sale.cost}
+                            </Text>
                           )}
+                        </Table.Cell>
+                        <Table.Cell textAlign="end" color="gray.500">
+                          {item.price?.list || '-'}
                         </Table.Cell>
                         <Table.Cell textAlign="end">
                           {isEdit ? (
@@ -636,7 +680,11 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                             sale.quantity
                           )}
                         </Table.Cell>
-                        <Table.Cell textAlign="end" fontWeight="semibold">
+                        <Table.Cell
+                          textAlign="end"
+                          fontWeight="semibold"
+                          color="purple.700"
+                        >
                           {sale.total}
                           {showProfit ? (
                             <Box
@@ -687,7 +735,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                     borderTopWidth="2px"
                     borderTopColor="gray.300"
                   >
-                    <Table.Cell colSpan={4}>
+                    <Table.Cell colSpan={5}>
                       <Text
                         fontWeight="bold"
                         fontSize="xs"
@@ -698,7 +746,7 @@ const AddSale: NextPage<Props> = function ({ billNumber }) {
                         Total
                       </Text>
                     </Table.Cell>
-                    <Table.Cell textAlign="end" fontWeight="bold">
+                    <Table.Cell textAlign="end" fontWeight="bold" color="purple.700">
                       {newSale?.total}
                     </Table.Cell>
                     <Table.Cell>

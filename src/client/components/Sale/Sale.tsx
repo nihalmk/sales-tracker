@@ -17,9 +17,10 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
-import DiscountBanner, {
-  calculateDiscounts,
-} from '../common/DiscountBanner';
+import DiscountBanner, { calculateDiscounts } from '../common/DiscountBanner';
+import MissingMrpWarning, {
+  MrpWarningItem,
+} from '../common/MissingMrpWarning';
 
 interface Props {
   billNumber?: string;
@@ -68,6 +69,20 @@ const SaleCard: NextPage<Props> = function ({
       salePrice: saleItem.cost,
       quantity: saleItem.quantity,
     }));
+
+  // Patches the fixed item's price on this already-loaded sale record so the
+  // warning icon and discount math update immediately — no refetch or page
+  // reload needed.
+  const onItemMrpUpdated = (updated: MrpWarningItem) => {
+    setSale((current) => ({
+      ...current,
+      items: current.items.map((si) =>
+        si.item._id === updated._id
+          ? { ...si, item: { ...si.item, price: updated.price } }
+          : si,
+      ),
+    }));
+  };
 
   return (
     <Card.Root
@@ -126,6 +141,7 @@ const SaleCard: NextPage<Props> = function ({
                   <Table.ColumnHeader textAlign="end">
                     Sale Price
                   </Table.ColumnHeader>
+                  <Table.ColumnHeader textAlign="end">MRP</Table.ColumnHeader>
                   <Table.ColumnHeader textAlign="end">
                     Quantity
                   </Table.ColumnHeader>
@@ -138,14 +154,14 @@ const SaleCard: NextPage<Props> = function ({
               <Table.Body>
                 {billNumber && saleLoading ? (
                   <Table.Row>
-                    <Table.Cell textAlign="center" py={8} colSpan={6}>
+                    <Table.Cell textAlign="center" py={8} colSpan={7}>
                       <Loader />
                     </Table.Cell>
                   </Table.Row>
                 ) : (
                   sale?.items.length === 0 && (
                     <Table.Row>
-                      <Table.Cell textAlign="center" py={8} colSpan={6}>
+                      <Table.Cell textAlign="center" py={8} colSpan={7}>
                         <Text color="fg.muted" fontSize="sm">
                           No products added
                         </Text>
@@ -166,12 +182,28 @@ const SaleCard: NextPage<Props> = function ({
                           </Table.Cell>
                           <Table.Cell fontWeight="medium">
                             {item.name}
+                            <MissingMrpWarning
+                              item={item}
+                              fallbackPrice={sale.cost}
+                              onUpdated={onItemMrpUpdated}
+                            />
                           </Table.Cell>
-                          <Table.Cell textAlign="end">{sale.cost}</Table.Cell>
+                          <Table.Cell textAlign="end">
+                            <Text as="span" color="blue.600" fontWeight="medium">
+                              {sale.cost}
+                            </Text>
+                          </Table.Cell>
+                          <Table.Cell textAlign="end" color="gray.500">
+                            {item.price?.list || '-'}
+                          </Table.Cell>
                           <Table.Cell textAlign="end">
                             {sale.quantity}
                           </Table.Cell>
-                          <Table.Cell textAlign="end" fontWeight="semibold">
+                          <Table.Cell
+                            textAlign="end"
+                            fontWeight="semibold"
+                            color="purple.700"
+                          >
                             {sale.total}
                             {showProfit && (
                               <Box
@@ -196,7 +228,7 @@ const SaleCard: NextPage<Props> = function ({
                       borderTopWidth="2px"
                       borderTopColor="gray.300"
                     >
-                      <Table.Cell colSpan={4}>
+                      <Table.Cell colSpan={5}>
                         <Text
                           fontWeight="bold"
                           fontSize="xs"
@@ -207,7 +239,11 @@ const SaleCard: NextPage<Props> = function ({
                           Total
                         </Text>
                       </Table.Cell>
-                      <Table.Cell textAlign="end" fontWeight="bold">
+                      <Table.Cell
+                        textAlign="end"
+                        fontWeight="bold"
+                        color="purple.700"
+                      >
                         {sale?.total}
                         {(() => {
                           const { totalDiscount, totalDiscountPercent } =
@@ -279,7 +315,11 @@ const SaleCard: NextPage<Props> = function ({
               >
                 {showProfit ? 'Hide P/L' : 'P/L'}
               </Button>
-              <Button className="hide-in-print" colorPalette="brand" disabled={true}>
+              <Button
+                className="hide-in-print"
+                colorPalette="brand"
+                disabled={true}
+              >
                 <Icon name="edit" light />
                 Edit
               </Button>

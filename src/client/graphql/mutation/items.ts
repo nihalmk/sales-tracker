@@ -42,6 +42,15 @@ export const UPDATE_ITEM = gql`
       }
     ) {
       _id
+      shortId
+      name
+      category
+      price {
+        cost
+        list
+        sale
+      }
+      stock
     }
   }
 `;

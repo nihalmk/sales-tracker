@@ -535,6 +535,7 @@ export type PurchaseItem = {
   quantity: Scalars['Float'];
   cost: Scalars['Float'];
   sale?: Maybe<Scalars['Float']>;
+  list?: Maybe<Scalars['Float']>;
   total: Scalars['Float'];
 };
 
@@ -665,6 +666,7 @@ export type PurchaseItemInput = {
   quantity: Scalars['Float'];
   cost: Scalars['Float'];
   sale?: Maybe<Scalars['Float']>;
+  list?: Maybe<Scalars['Float']>;
   total: Scalars['Float'];
 };
 

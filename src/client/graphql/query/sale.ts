@@ -4,12 +4,16 @@ export const sale = `{
       _id
       items {
         item {
+          _id
           shortId
           name
+          category
           price {
             cost
+            sale
             list
           }
+          stock
         }
         quantity
         cost

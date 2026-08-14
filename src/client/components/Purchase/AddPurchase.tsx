@@ -23,11 +23,13 @@ import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
 import { LabelValueObj } from '../common/SelectBoxes/SelectBox';
 import CreatableSelect from '../common/SelectBoxes/CreatableSelect';
+import { searchByLabelOrShortId } from '../common/SelectBoxes/searchByLabelOrShortId';
 import ContactSelect from '../common/SelectBoxes/ContactSelect';
 import { GET_ITEMS, GET_CATEGORIES } from '../../graphql/query/items';
 import { CREATE_ITEM } from '../../graphql/mutation/items';
 import Link from 'next/link';
 import {
+  Box,
   Card,
   Heading,
   SimpleGrid,
@@ -39,6 +41,7 @@ import {
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
 import OverLay from '../OverLay';
+import Tooltip from '../common/Tooltip';
 
 interface Props {
   billNumber?: string;
@@ -218,6 +221,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         item: created,
         quantity: 1,
         cost: created.price?.cost,
+        sale: created.price?.sale,
+        list: created.price?.list,
         total: created.price?.cost,
       });
       resetNewItemModal();
@@ -442,7 +447,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
         >
           <Card.Body pt={0}>
             <SimpleGrid columns={{ base: 2, md: 12 }} gap={4} alignItems="end">
-              <GridItem colSpan={{ base: 2, md: 3 }}>
+              <GridItem colSpan={{ base: 2, md: 6 }}>
                 <CreatableSelect
                   tabIndex={4}
                   selectLabel="Product"
@@ -453,6 +458,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                     return !purchaseItemsIds.includes(i.value);
                   })}
                   isDisabled={itemsLoading}
+                  isClearable
+                  filterOption={searchByLabelOrShortId}
                   customOption={renderProductOption}
                   onChange={(
                     picked: (ProductOption & { __isNew__?: boolean }) | null,
@@ -477,6 +484,8 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                       item: item,
                       quantity: 1,
                       cost: item.price?.cost,
+                      sale: item.price?.sale,
+                      list: item.price?.list,
                       total: item.price?.cost,
                     });
                   }}
@@ -492,11 +501,11 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
               <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
                   tabIndex={5}
-                  inputName="Purchase"
-                  inputLabel="Purchase Price"
+                  inputName="Cost"
+                  inputLabel="Cost Price"
                   inputType="number"
                   max={20}
-                  placeholderValue="Purchase Price"
+                  placeholderValue="Cost Price"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const cost = Number(e.target.value);
                     setNewPurchaseItem((currentState) => ({
@@ -511,8 +520,25 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                 />
               </GridItem>
               <GridItem colSpan={{ base: 1, md: 2 }}>
+                <Tooltip content="MRP can't be changed here — create this as a new product instead if the MRP needs to change.">
+                  <Box>
+                    <Input
+                      tabIndex={6}
+                      inputName="list"
+                      inputLabel="MRP"
+                      inputType="number"
+                      max={20}
+                      placeholderValue="MRP"
+                      onChange={() => {}}
+                      disabled
+                      value={newPurchaseItem?.list || ''}
+                    />
+                  </Box>
+                </Tooltip>
+              </GridItem>
+              <GridItem colSpan={{ base: 1, md: 2 }}>
                 <Input
-                  tabIndex={6}
+                  tabIndex={7}
                   inputName="Sale"
                   inputLabel="Sale Price"
                   inputType="number"
@@ -530,9 +556,9 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                   value={newPurchaseItem?.sale || ''}
                 />
               </GridItem>
-              <GridItem colSpan={{ base: 1, md: 2 }}>
+              <GridItem colSpan={{ base: 1, md: 1 }}>
                 <Input
-                  tabIndex={7}
+                  tabIndex={8}
                   inputName="quantity"
                   inputLabel="Quantity"
                   inputType="number"
@@ -553,7 +579,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
               </GridItem>
               <GridItem colSpan={{ base: 1, md: 1 }}>
                 <Input
-                  tabIndex={8}
+                  tabIndex={9}
                   inputName="total"
                   inputLabel="Total"
                   inputType="tel"
@@ -586,9 +612,9 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
             </SimpleGrid>
             <Text fontSize="sm" color="red.600" mt={3}>
               * For any change in cost price of item, add new a item from Stock
-              menu with new cost
-              <br />* Changing Purchase price will create a new product with a
-              new ID
+              menu/Create new item with new cost
+              <br />* Changing Cost price will create a new product with a new
+              ID
             </Text>
           </Card.Body>
         </form>
@@ -600,8 +626,9 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                 <Table.ColumnHeader>#ID</Table.ColumnHeader>
                 <Table.ColumnHeader>Product</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">
-                  Purchase Price
+                  Cost Price
                 </Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="end">MRP</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">
                   Quantity
                 </Table.ColumnHeader>
@@ -614,14 +641,14 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
             <Table.Body>
               {(billNumber && purchaseLoading) || createLoading ? (
                 <Table.Row>
-                  <Table.Cell textAlign="center" py={8} colSpan={6}>
+                  <Table.Cell textAlign="center" py={8} colSpan={7}>
                     <Loader />
                   </Table.Cell>
                 </Table.Row>
               ) : (
                 purchaseItems?.length === 0 && (
                   <Table.Row>
-                    <Table.Cell textAlign="center" py={8} colSpan={6}>
+                    <Table.Cell textAlign="center" py={8} colSpan={7}>
                       <Text color="fg.muted" fontSize="sm">
                         No products added yet
                       </Text>
@@ -652,7 +679,16 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                               onEdit(purchase, isEdit);
                             }}
                           >
-                            {purchase.cost}
+                            <Text
+                              as="span"
+                              color="blue.600"
+                              fontWeight="medium"
+                            >
+                              {purchase.cost}
+                            </Text>
+                          </Table.Cell>
+                          <Table.Cell textAlign="end" color="gray.500">
+                            {purchase.list || item.price?.list || '-'}
                           </Table.Cell>
                           <Table.Cell textAlign="end">
                             {isEdit ? (
@@ -682,7 +718,11 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                               purchase.quantity
                             )}
                           </Table.Cell>
-                          <Table.Cell textAlign="end" fontWeight="semibold">
+                          <Table.Cell
+                            textAlign="end"
+                            fontWeight="semibold"
+                            color="purple.700"
+                          >
                             {purchase.total}
                           </Table.Cell>
                           <Table.Cell>
@@ -720,7 +760,7 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                       borderTopWidth="2px"
                       borderTopColor="gray.300"
                     >
-                      <Table.Cell colSpan={4}>
+                      <Table.Cell colSpan={5}>
                         <Text
                           fontWeight="bold"
                           fontSize="xs"
@@ -731,7 +771,11 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                           Total
                         </Text>
                       </Table.Cell>
-                      <Table.Cell textAlign="end" fontWeight="bold">
+                      <Table.Cell
+                        textAlign="end"
+                        fontWeight="bold"
+                        color="purple.700"
+                      >
                         {newPurchase?.total}
                       </Table.Cell>
                       <Table.Cell></Table.Cell>
@@ -782,7 +826,10 @@ const AddPurchase: NextPage<Props> = function ({ billNumber }) {
                 }}
                 value={
                   newItemDraft.category
-                    ? { label: newItemDraft.category, value: newItemDraft.category }
+                    ? {
+                        label: newItemDraft.category,
+                        value: newItemDraft.category,
+                      }
                     : null
                 }
               />

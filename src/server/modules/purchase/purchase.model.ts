@@ -31,6 +31,10 @@ export class PurchaseItem {
   sale?: number;
 
   @prop()
+  @Field(NumberField, { nullable: true })
+  list?: number;
+
+  @prop()
   @Field(NumberField)
   total: number;
 }

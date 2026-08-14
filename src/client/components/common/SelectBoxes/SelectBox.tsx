@@ -32,6 +32,7 @@ interface Props {
   innerRef?: any;
   placeholder?: string;
   onInputChange?: (value: string) => void;
+  filterOption?: (option: any, inputValue: string) => boolean;
 }
 
 const SelectBox: React.FunctionComponent<Props> = (props) => {
@@ -53,6 +54,7 @@ const SelectBox: React.FunctionComponent<Props> = (props) => {
         options={props.selectData}
         onChange={props.onSelectChange}
         onInputChange={props.onInputChange}
+        filterOption={props.filterOption}
         formatOptionLabel={props.customOption}
         noOptionsMessage={() => props.noOptionsMessage}
         placeholder={props.placeholder}
