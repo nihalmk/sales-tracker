@@ -1,0 +1,68 @@
+src/server/modules/closing/closing.resolver.ts
+  s_5b771625359126::t_d41e7470479af4 55-68
+src/client/components/common/SelectBoxes/CategorySelect.tsx
+  s_5b771625359126::t_8d5fb08ba01db9 1-76
+src/client/components/Closing/NewClosing.tsx
+  s_5b771625359126::t_ed22982fd35138 1,7-12,39-40,44-48,56,63,73,88-89,232,234,237-245,247,253,275-278,312-315,353-357,359,378-382,390-400,443
+src/client/components/common/SelectBoxes/SelectBox.tsx
+  s_5b771625359126::t_81d17400af2232 63-65
+src/client/components/common/RankedBarList.tsx
+  s_5b771625359126::t_8d52fdb26d48fe 1-3,5-11,16-25,27,32-49,68-74,76-85
+  s_5b771625359126::t_d2f1d397ee9816 4,12-15,26,28-31,50-67,75
+src/client/components/Report/ReportView.tsx
+  s_5b771625359126::t_d9f80a8384a602 14
+  s_5b771625359126::t_d8db6f74a4734b 137,170,192,217
+  s_5b771625359126::t_c75a70e84019f9 1-13,15-136,138-169,171-191,193-216,218-263
+src/client/components/Closing/Spent.tsx
+  s_5b771625359126::t_ca8f45e3e9913e 3,7-8
+  s_5b771625359126::t_a5b02604ceacd6 139,141-145,148
+  s_5b771625359126::t_d6025ab7ac73f4 36-40
+src/client/components/Report/aggregate.ts
+  s_5b771625359126::t_732a6aec954fc1 1-14,20-58
+  s_5b771625359126::t_702d26af7bfb19 15-19
+src/client/components/Report/Report.tsx
+  s_5b771625359126::t_773d72e564da04 4
+  s_5b771625359126::t_5acde233e03252 88
+  s_5b771625359126::t_be64f81d419c19 1,5,17-50
+src/client/components/common/SelectBoxes/MultiSelect.tsx
+  s_5b771625359126::t_0a3724912d2276 47-49
+src/client/components/common/TopItemsChart.tsx
+  s_5b771625359126::t_d128a8664037f9 5,20-26,33-35,37-38,61-62,66-85,95,106-108,138,187
+  h_26a6a0ac037242 111,117
+  s_5b771625359126::t_09ca396ebccae9 133-137,139-140,142-152
+  s_5b771625359126::t_da762d46bba881 1-4,6-8,10-19,27-32,36,39-60,63-65,86-94,96-105,109-110,112-116,118-132,141,153-186,188-195
+  s_5b771625359126::t_550b9cf539ca4a 9
+src/client/components/common/SelectBoxes/CreatableSelect.tsx
+  s_5b771625359126::t_3d537df10cc13a 67-69
+src/client/components/common/SelectBoxes/selectStyles.ts
+  s_5b771625359126::t_967724c748f91e 30-34
+src/client/graphql/query/closing.ts
+  s_5b771625359126::t_f5ed41bde3c60d 43-54
+src/client/components/Closing/Received.tsx
+  s_5b771625359126::t_eef7a1d3ea1202 143,145-149,152
+  s_5b771625359126::t_cdff07082b66ae 36-40
+  s_5b771625359126::t_f649c9095e2a1d 3,7-8
+src/server/modules/closing/closing.service.ts
+  s_5b771625359126::t_2abf3747dba256 190-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e10a0e28234efe3b286616f169120f73536883ff",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
