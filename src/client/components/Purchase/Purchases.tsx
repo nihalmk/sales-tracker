@@ -52,8 +52,11 @@ const Purchases: NextPage<Props> = function ({
   // URL — embedded usage (Closing flow) must never read from or write to
   // it.
   const isStandalone = !purchaseFromDate;
-  const { params: urlParams, isReady: urlReady, setParams: setUrlParams } =
-    useUrlFilters();
+  const {
+    params: urlParams,
+    isReady: urlReady,
+    setParams: setUrlParams,
+  } = useUrlFilters();
 
   useEffect(() => {
     if (!isStandalone || !urlReady) {
@@ -90,7 +93,14 @@ const Purchases: NextPage<Props> = function ({
       purchaseFrom: dateFrom.format('YYYY-MM-DD'),
       purchaseTo: dateTo.format('YYYY-MM-DD'),
     });
-  }, [isStandalone, vendorFilter, itemNameFilter, dateFrom, dateTo, setUrlParams]);
+  }, [
+    isStandalone,
+    vendorFilter,
+    itemNameFilter,
+    dateFrom,
+    dateTo,
+    setUrlParams,
+  ]);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);

@@ -200,10 +200,7 @@ export class ItemsService {
       if (!inStockItem || inStockItem.stock === -1) {
         continue;
       }
-      await this.model.updateOne(
-        { _id: itemId },
-        { $inc: { stock: -delta } },
-      );
+      await this.model.updateOne({ _id: itemId }, { $inc: { stock: -delta } });
     }
   }
 

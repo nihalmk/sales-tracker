@@ -49,8 +49,11 @@ const AddStock: NextPage<Props> = function () {
   const [appliedSearch, setAppliedSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  const { params: urlParams, isReady: urlReady, setParams: setUrlParams } =
-    useUrlFilters();
+  const {
+    params: urlParams,
+    isReady: urlReady,
+    setParams: setUrlParams,
+  } = useUrlFilters();
 
   // Resume filters from the URL once the router has hydrated — a reload
   // shouldn't reset the search/category filter back to blank.

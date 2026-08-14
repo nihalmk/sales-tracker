@@ -50,9 +50,7 @@ export class ClosingService {
     closing: CreateClosingInput,
     previousClosing: Closing | null,
   ): Promise<{ inHandTotal: number; spentTotal: number }> {
-    const sales = await this.saleService.getSalesByIds(
-      closing.salesIds || [],
-    );
+    const sales = await this.saleService.getSalesByIds(closing.salesIds || []);
     const purchases = await this.purchaseService.getPurchasesByIds(
       closing.purchaseIds || [],
     );

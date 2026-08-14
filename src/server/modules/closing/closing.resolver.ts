@@ -27,9 +27,7 @@ export default class ClosingResolver {
 
   @Query((_returns) => Closing, { nullable: true })
   @Authorized()
-  async getPreviousClosing(
-    @Ctx() ctx: CTX,
-  ): Promise<Closing | null> {
+  async getPreviousClosing(@Ctx() ctx: CTX): Promise<Closing | null> {
     const closingService = new ClosingService(ctx);
     return await closingService.getPreviousClosing();
   }
@@ -43,8 +41,6 @@ export default class ClosingResolver {
     const closingService = new ClosingService(ctx);
     return await closingService.getDraftClosing();
   }
-
-
 
   @Query((_returns) => [Closing])
   @Authorized()

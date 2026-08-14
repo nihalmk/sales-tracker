@@ -53,8 +53,11 @@ const Sales: NextPage<Props> = function ({
   // embedded usage (Closing flow, AddSale's "Today's Sales" list) must
   // never read from or write to it.
   const isStandalone = !saleDateFrom;
-  const { params: urlParams, isReady: urlReady, setParams: setUrlParams } =
-    useUrlFilters();
+  const {
+    params: urlParams,
+    isReady: urlReady,
+    setParams: setUrlParams,
+  } = useUrlFilters();
 
   useEffect(() => {
     if (!isStandalone || !urlReady) {
@@ -91,7 +94,14 @@ const Sales: NextPage<Props> = function ({
       salesFrom: dateFrom.format('YYYY-MM-DD'),
       salesTo: dateTo.format('YYYY-MM-DD'),
     });
-  }, [isStandalone, customerFilter, itemNameFilter, dateFrom, dateTo, setUrlParams]);
+  }, [
+    isStandalone,
+    customerFilter,
+    itemNameFilter,
+    dateFrom,
+    dateTo,
+    setUrlParams,
+  ]);
 
   const onSearch = () => {
     setDateFrom(pendingDateFrom);

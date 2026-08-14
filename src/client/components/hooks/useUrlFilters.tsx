@@ -23,7 +23,9 @@ export function useUrlFilters() {
 
   const setParams = useCallback(
     (updates: Record<string, string | undefined>) => {
-      const query: Record<string, string> = { ...(router.query as Record<string, string>) };
+      const query: Record<string, string> = {
+        ...(router.query as Record<string, string>),
+      };
       let changed = false;
       for (const [key, value] of Object.entries(updates)) {
         if (value) {
@@ -37,11 +39,9 @@ export function useUrlFilters() {
         }
       }
       if (changed) {
-        router.replace(
-          { pathname: router.pathname, query },
-          undefined,
-          { shallow: true },
-        );
+        router.replace({ pathname: router.pathname, query }, undefined, {
+          shallow: true,
+        });
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -208,7 +208,9 @@ export class SaleService {
       lastActiveClosing[0] &&
       moment(date).isSameOrBefore(lastActiveClosing[0].date, 'day')
     ) {
-      throw new Error(`This sale is part of a closed day and cannot be ${action}.`);
+      throw new Error(
+        `This sale is part of a closed day and cannot be ${action}.`,
+      );
     }
   }
 
