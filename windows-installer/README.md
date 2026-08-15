@@ -75,7 +75,7 @@ npm prune --omit=dev
   (produces `dist/` and `src/client/.next`).
 - `npm prune --omit=dev` — strips devDependencies (TypeScript, ESLint,
   Jest, etc.) out of `node_modules` afterwards, since none of that is
-  needed to *run* the built app — this keeps the installer smaller.
+  needed to _run_ the built app — this keeps the installer smaller.
 
 **Important**: run this on the same OS/architecture you're shipping for
 (Windows x64). A few npm packages compile native binaries specific to the
