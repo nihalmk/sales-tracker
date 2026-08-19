@@ -33,7 +33,8 @@ export const buildItemsExportCsv = (items: Items[]): string =>
     ]),
   ]);
 
-type Column = 'shortId' | 'category' | 'cost' | 'list' | 'sale' | 'stock' | 'imageUrls';
+type Column =
+  'shortId' | 'category' | 'cost' | 'list' | 'sale' | 'stock' | 'imageUrls';
 
 const HEADER_ALIASES: Record<string, Column> = {
   'short id': 'shortId',
@@ -61,13 +62,17 @@ export interface ParsedItemsImport {
 // present in the header but blank on a given row must leave that field
 // untouched, not overwrite it with 0/empty.
 export const parseItemsImportCsv = (text: string): ParsedItemsImport => {
-  const table = parseCsv(text).filter((row) => row.some((cell) => cell.trim() !== ''));
+  const table = parseCsv(text).filter((row) =>
+    row.some((cell) => cell.trim() !== ''),
+  );
   if (table.length === 0) {
     return { rows: [], error: 'The file is empty.' };
   }
 
   const [headerRow, ...dataRows] = table;
-  const columns = headerRow.map((cell) => HEADER_ALIASES[cell.trim().toLowerCase()]);
+  const columns = headerRow.map(
+    (cell) => HEADER_ALIASES[cell.trim().toLowerCase()],
+  );
   if (!columns.includes('shortId')) {
     return { rows: [], error: 'The CSV must have a "Short ID" column.' };
   }
@@ -85,7 +90,10 @@ export const parseItemsImportCsv = (text: string): ParsedItemsImport => {
     // server's existing "Missing Short ID" validation reports it in the
     // summary instead of it silently vanishing.
     const shortId = cells.shortId || '';
-    const hasPrice = cells.cost !== undefined || cells.list !== undefined || cells.sale !== undefined;
+    const hasPrice =
+      cells.cost !== undefined ||
+      cells.list !== undefined ||
+      cells.sale !== undefined;
 
     rows.push({
       shortId,

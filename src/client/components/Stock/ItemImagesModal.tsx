@@ -8,14 +8,7 @@ import OverLay from '../OverLay';
 import ErrorMessage from '../Errors/ErrorMessage';
 import Input from '../common/Inputs/FormInput';
 import Icon from '../common/Icon';
-import {
-  Box,
-  Button,
-  HStack,
-  IconButton,
-  Image,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, HStack, IconButton, Image, Text } from '@chakra-ui/react';
 
 // No dedicated "image" icon exists in the shared PNG icon set (Icon.tsx) —
 // a small inline SVG instead, matching this codebase's own convention for

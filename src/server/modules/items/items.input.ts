@@ -20,19 +20,19 @@ export class CreateItemsInput implements Partial<Items> {
   @Field(StringField)
   name!: string;
 
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   category?: string;
 
   @Field(() => PriceInput, { nullable: true })
   price: PriceInput;
-  
+
   @Field(NumberField)
   stock: number;
 
   @Field((_type) => [String], { nullable: true })
   imageUrls?: string[];
 
-  @Field((_type) => ID, { nullable: true})
+  @Field((_type) => ID, { nullable: true })
   shop?: ObjectId;
 }
 
@@ -44,7 +44,7 @@ export class UpdateItemsInput implements Partial<Items> {
   @Field(StringField)
   name!: string;
 
-  @Field(StringField, { nullable: true})
+  @Field(StringField, { nullable: true })
   category?: string;
 
   @Field(() => PriceInput, { nullable: true })

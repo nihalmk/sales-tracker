@@ -126,7 +126,13 @@ const CATEGORY_RULES: CategoryRule[] = [
   },
   {
     category: 'Smart Wearables',
-    keywords: ['smartwatch', 'smart watch', 'fitness band', 'watch strap', 'band'],
+    keywords: [
+      'smartwatch',
+      'smart watch',
+      'fitness band',
+      'watch strap',
+      'band',
+    ],
   },
   {
     category: 'SIM Accessories',
