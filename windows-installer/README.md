@@ -173,7 +173,7 @@ window.
   by others, set a real `ACCOUNTS_SECRET` (edit `start.bat` and add
   `set "ACCOUNTS_SECRET=<something random>"` above the `node` line).
 - **Password-reset emails**: `start.bat` sets `MAILGUN_API_KEY`/
-  `MAILGUN_DOMAIN` to placeholder values (`not-configured`). These *must*
+  `MAILGUN_DOMAIN` to placeholder values (`not-configured`). These _must_
   be set to something non-empty or the app fails to start entirely — its
   `Emailer` class (`src/server/modules/email/email.service.ts`) throws in
   its constructor if either is missing, and it's constructed eagerly
@@ -195,7 +195,7 @@ window.
   Node process — happy to build that out if you want it.
 - **"DB Backup" says mongoexport isn't installed**: the app's dashboard
   has a `/dbbackup` route that shells out to `mongoexport` - a MongoDB
-  *client tool*, shipped as a **separate download** from the server
+  _client tool_, shipped as a **separate download** from the server
   binaries (`mongodb.com/try/download/database-tools`). Step 4 of the
   one-time setup above bundles this in automatically if you downloaded it
   before compiling - if you're seeing this error, you likely skipped that
