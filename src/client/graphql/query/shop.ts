@@ -8,3 +8,17 @@ export const GET_SHOP_TYPE = gql`
     }
   }
 `;
+
+export const GET_SHOP_SETTINGS = gql`
+  query getShopForUser {
+    getShopForUser {
+      _id
+      name
+      slug
+      whatsappNumber
+      contactEmail
+      tagline
+      isPublished
+    }
+  }
+`;

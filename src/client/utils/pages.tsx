@@ -4,11 +4,13 @@ export const Pages = {
   LOGIN: '/login',
   REGISTER: '/register',
   ACCOUNTS: '/accounts',
+  STORE_SETTINGS: '/store-settings',
 };
 
 export const AuthenticatedPages: { [key: string]: string } = {
   DASHBOARD: '/dashboard',
   INDEX: '/',
+  STORE_SETTINGS: '/store-settings',
 };
 
 export const Titles: { [key: string]: string } = {
@@ -17,4 +19,5 @@ export const Titles: { [key: string]: string } = {
   '/dashboard': 'Sales Dashboard',
   '/login': 'Login',
   register: 'Register',
+  '/store-settings': 'Online Store Settings',
 };

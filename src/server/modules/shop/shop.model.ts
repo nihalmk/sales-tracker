@@ -1,7 +1,7 @@
 import { getModelForClass, prop, Ref } from '@typegoose/typegoose';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { ObjectId } from 'mongodb';
-import { StringField } from '../../common/fields';
+import { StringField, BooleanField } from '../../common/fields';
 
 export enum ShopType {
   Mobile = 'Mobile',
@@ -60,6 +60,32 @@ export class Shop {
   @prop({ type: () => [Branches], required: false })
   @Field(() => [Branches], { nullable: true })
   branches?: Branches[];
+
+  // URL-friendly identifier for the public storefront (/store/<slug>) -
+  // generated once at creation time (see slug.ts) and backfilled for
+  // pre-existing shops by slugBackfill.ts. Never user-editable, so
+  // previously shared links never break.
+  @prop({ index: true })
+  @Field(StringField, { nullable: true })
+  slug?: string;
+
+  @prop()
+  @Field(StringField, { nullable: true })
+  whatsappNumber?: string;
+
+  @prop()
+  @Field(StringField, { nullable: true })
+  contactEmail?: string;
+
+  @prop()
+  @Field(StringField, { nullable: true })
+  tagline?: string;
+
+  // Public storefront is opt-in - defaults to false so a shop is never
+  // exposed at /store/<slug> before the owner deliberately publishes it.
+  @prop({ default: false })
+  @Field(BooleanField)
+  isPublished: boolean;
 }
 
 export const ShopModel = getModelForClass(Shop, {

@@ -38,6 +38,13 @@ export const Header: React.FC<Props> = ({ hide }) => {
   const getItems = (): Record<string, string | boolean | Function>[] => {
     let itemsObject: Record<string, string | boolean | Function>[] = [
       {
+        value: 'Online Store',
+        onClick: () => {
+          router.push(Pages.STORE_SETTINGS);
+        },
+        enabled: !!user?.shop,
+      },
+      {
         value: 'Sign out',
         onClick: async () => {
           await logout();

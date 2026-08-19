@@ -39,9 +39,7 @@ input BulkUpdateItemInput {
   stock: Float
 }
 
-"""
-Result of a CSV bulk update, batched by the client
-"""
+"""Result of a CSV bulk update, batched by the client"""
 type BulkUpdateItemsResult {
   errors: [BulkUpdateError!]!
   notFound: [String!]!
@@ -54,9 +52,7 @@ input BulkUpdatePriceInput {
   sale: Float
 }
 
-"""
-The Closings model
-"""
+"""The Closings model"""
 type Closing {
   _id: ID!
   active: Boolean!
@@ -143,9 +139,7 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
-"""
-The Items model
-"""
+"""The Items model"""
 type Items {
   _id: ID!
   category: String
@@ -165,9 +159,7 @@ type LabelValueObj {
 }
 
 type Mutation {
-  bulkUpdateItemsByShortId(
-    items: [BulkUpdateItemInput!]!
-  ): BulkUpdateItemsResult!
+  bulkUpdateItemsByShortId(items: [BulkUpdateItemInput!]!): BulkUpdateItemsResult!
   createClosing(closing: CreateClosingInput!): Closing
   createItem(item: CreateItemsInput!): Items
   createNewUser(user: CreateUserInput!): ID!
@@ -179,29 +171,30 @@ type Mutation {
   updateItem(item: UpdateItemsInput!): Items
   updatePurchase(purchase: UpdatePurchaseInput!): Purchase
   updateSale(sale: UpdateSaleInput!): Sale
+  updateShopSettings(settings: UpdateShopSettingsInput!): Shop
 }
 
-"""
-A page of Items plus totals for the whole set
-"""
+"""A page of Items plus totals for the whole set"""
 type PaginatedItems {
   items: [Items!]!
   totalCount: Float!
   totalStockAmount: Float!
 }
 
-"""
-A page of Purchases plus totals for the whole range
-"""
+"""A page of public items"""
+type PaginatedPublicItems {
+  items: [PublicItem!]!
+  totalCount: Float!
+}
+
+"""A page of Purchases plus totals for the whole range"""
 type PaginatedPurchases {
   items: [Purchase!]!
   totalAmount: Float!
   totalCount: Float!
 }
 
-"""
-A page of Sales plus totals for the whole range
-"""
+"""A page of Sales plus totals for the whole range"""
 type PaginatedSales {
   items: [Sale!]!
   totalAmount: Float!
@@ -222,9 +215,34 @@ input PriceInput {
   sale: Float!
 }
 
-"""
-The Purchase model
-"""
+"""An item as shown on the public storefront"""
+type PublicItem {
+  _id: ID!
+  category: String
+  imageUrls: [String!]
+  inStock: Boolean!
+  name: String!
+  price: PublicPrice!
+  shortId: String!
+}
+
+"""Pricing shown on the public storefront"""
+type PublicPrice {
+  list: Float!
+  sale: Float!
+}
+
+"""Shop info shown on the public storefront"""
+type PublicShop {
+  _id: ID!
+  contactEmail: String
+  name: String!
+  slug: String!
+  tagline: String
+  whatsappNumber: String
+}
+
+"""The Purchase model"""
 type Purchase {
   _id: ID!
   active: Boolean!
@@ -259,9 +277,7 @@ input PurchaseItemInput {
   total: Float!
 }
 
-"""
-A vendor derived from past purchases history
-"""
+"""A vendor derived from past purchases history"""
 type PurchaseVendor {
   contact: String
   email: String
@@ -274,38 +290,24 @@ type Query {
   getClosingForUser(date: DateRange!): [Closing!]!
   getCustomers(includeUnnamed: Boolean = false): [SaleCustomer!]!
   getDraftClosing: Closing
-  getItemsForUser(
-    category: String
-    limit: Float = 0
-    page: Float = 1
-    search: String
-  ): PaginatedItems!
+  getItemsForUser(category: String, limit: Float = 0, page: Float = 1, search: String): PaginatedItems!
   getLastPurchase: Purchase
   getLastSale: Sale
   getPreviousClosing: Closing
+  getPublicShop(slug: String!): PublicShop
+  getPublicShopCategories(slug: String!): [String!]!
+  getPublicShopItems(category: String, limit: Float = 20, page: Float = 1, search: String, slug: String!): PaginatedPublicItems!
   getPurchaseByBillNumber(billNumber: String!): [Purchase!]!
   getPurchaseByVendorName(vendor: String!): [Purchase!]!
   getPurchaseByVendorPhone(contact: String!): [Purchase!]!
   getPurchaseWithoutClosing: [Purchase!]
-  getPurchasesForUser(
-    date: DateRange!
-    itemName: String
-    limit: Float = 0
-    page: Float = 1
-    vendor: String
-  ): PaginatedPurchases!
+  getPurchasesForUser(date: DateRange!, itemName: String, limit: Float = 0, page: Float = 1, vendor: String): PaginatedPurchases!
   getReceivedCategories: [String!]!
   getSaleByBillNumber(billNumber: String!): [Sale!]!
   getSaleByCustomerName(customer: String!): [Sale!]!
   getSaleByCustomerPhone(contact: String!): [Sale!]!
   getSaleWithoutClosing: [Sale!]
-  getSalesForUser(
-    customer: String
-    date: DateRange!
-    itemName: String
-    limit: Float = 0
-    page: Float = 1
-  ): PaginatedSales!
+  getSalesForUser(customer: String, date: DateRange!, itemName: String, limit: Float = 0, page: Float = 1): PaginatedSales!
   getShopForUser: Shop
   getShopTypes: [LabelValueObj!]
   getSpentCategories: [String!]!
@@ -330,9 +332,7 @@ enum Roles {
   Sales
 }
 
-"""
-The Sales model
-"""
+"""The Sales model"""
 type Sale {
   _id: ID!
   active: Boolean!
@@ -351,9 +351,7 @@ type Sale {
   updatedAt: DateTime!
 }
 
-"""
-A customer derived from past sales history
-"""
+"""A customer derived from past sales history"""
 type SaleCustomer {
   contact: String
   customer: String!
@@ -376,16 +374,19 @@ input SaleItemInput {
   total: Float!
 }
 
-"""
-The Shop model
-"""
+"""The Shop model"""
 type Shop {
   _id: ID!
   address: Address
   branches: [Branches!]
+  contactEmail: String
+  isPublished: Boolean!
   name: String!
+  slug: String
+  tagline: String
   timezone: String
   type: String!
+  whatsappNumber: String
 }
 
 type SpentItems {
@@ -444,9 +445,14 @@ input UpdateSaleInput {
   total: Float!
 }
 
-"""
-The User model
-"""
+input UpdateShopSettingsInput {
+  contactEmail: String
+  isPublished: Boolean
+  tagline: String
+  whatsappNumber: String
+}
+
+"""The User model"""
 type User {
   _id: ID!
   createdAt: DateTime!

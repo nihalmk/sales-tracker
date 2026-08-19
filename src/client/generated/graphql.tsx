@@ -477,6 +477,11 @@ export type Shop = {
   timezone?: Maybe<Scalars['String']>;
   address?: Maybe<Address>;
   branches?: Maybe<Array<Branches>>;
+  slug?: Maybe<Scalars['String']>;
+  whatsappNumber?: Maybe<Scalars['String']>;
+  contactEmail?: Maybe<Scalars['String']>;
+  tagline?: Maybe<Scalars['String']>;
+  isPublished: Scalars['Boolean'];
 };
 
 export type Price = {
@@ -772,4 +777,44 @@ export type CreateShopInput = {
   address: AddressInput;
   timezone?: Maybe<Scalars['String']>;
   branches?: Maybe<Array<BranchesInput>>;
+};
+
+export type UpdateShopSettingsInput = {
+  whatsappNumber?: Maybe<Scalars['String']>;
+  contactEmail?: Maybe<Scalars['String']>;
+  tagline?: Maybe<Scalars['String']>;
+  isPublished?: Maybe<Scalars['Boolean']>;
+};
+
+export type PublicPrice = {
+  __typename?: 'PublicPrice';
+  list: Scalars['Float'];
+  sale: Scalars['Float'];
+};
+
+export type PublicItem = {
+  __typename?: 'PublicItem';
+  _id: Scalars['ID'];
+  shortId: Scalars['String'];
+  name: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+  price: PublicPrice;
+  imageUrls?: Maybe<Array<Scalars['String']>>;
+  inStock: Scalars['Boolean'];
+};
+
+export type PaginatedPublicItems = {
+  __typename?: 'PaginatedPublicItems';
+  items: Array<PublicItem>;
+  totalCount: Scalars['Float'];
+};
+
+export type PublicShop = {
+  __typename?: 'PublicShop';
+  _id: Scalars['ID'];
+  name: Scalars['String'];
+  slug: Scalars['String'];
+  tagline?: Maybe<Scalars['String']>;
+  whatsappNumber?: Maybe<Scalars['String']>;
+  contactEmail?: Maybe<Scalars['String']>;
 };

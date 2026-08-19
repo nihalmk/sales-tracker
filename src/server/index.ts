@@ -16,6 +16,7 @@ import { addRoutes } from './routes';
 import compression from 'compression';
 import { authChecker } from './common/authChecker';
 import { runItemStartupCleanup } from './modules/items/autoCategorize';
+import { runShopSlugBackfill } from './modules/shop/slugBackfill';
 // import { graphqlPubsub as pubSub } from './modules/graphqlPubsub/pubsub.service';
 
 const koaConnect = require('koa-connect');
@@ -138,6 +139,12 @@ const startUp = async () => {
     // just does one cheap query and returns.
     runItemStartupCleanup().catch((error) => {
       logger.error({ error }, 'Background item startup cleanup failed');
+    });
+
+    // Assigns a public-storefront slug to any shop that predates that
+    // feature. Same fire-and-forget contract as the item cleanup above.
+    runShopSlugBackfill().catch((error) => {
+      logger.error({ error }, 'Background shop slug backfill failed');
     });
 
     // K_SERVICE is set automatically on Cloud Run; skip the local dev-convenience

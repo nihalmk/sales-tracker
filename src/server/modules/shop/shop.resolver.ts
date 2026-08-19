@@ -11,7 +11,7 @@ import { CTX } from '../../interfaces/common';
 import { ShopService } from './shop.service';
 import { Shop, ShopType } from './shop.model';
 import { ObjectId } from 'mongodb';
-import { CreateShopInput } from './shop.input';
+import { CreateShopInput, UpdateShopSettingsInput } from './shop.input';
 import { LabelValueObj } from '../common/Types/InputTypes';
 
 registerEnumType(ShopType, {
@@ -55,5 +55,16 @@ export default class ShopResolver {
   ): Promise<Shop> {
     const shopService = new ShopService(ctx);
     return await shopService.createShop(shop);
+  }
+
+  @Mutation((_returns) => Shop, { nullable: true })
+  @Authorized()
+  async updateShopSettings(
+    @Ctx() ctx: CTX,
+    @Arg('settings', (_returns) => UpdateShopSettingsInput)
+    settings: UpdateShopSettingsInput,
+  ): Promise<Shop> {
+    const shopService = new ShopService(ctx);
+    return await shopService.updateShopSettings(settings);
   }
 }
