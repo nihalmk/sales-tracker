@@ -4,11 +4,14 @@
 ;   - the built app (Next.js + Koa server)
 ;   - a portable Node.js runtime (so the target machine needs nothing installed)
 ;   - a portable MongoDB server (same reason)
+;   - MongoDB Database Tools (mongoexport, etc.), optional - powers the
+;     in-app "DB Backup" feature
 ;   - start.bat / stop.bat launchers, plus Start Menu / Desktop shortcuts
 ;
-; See README.md in this folder for how to assemble the "node-runtime" and
-; "mongodb-runtime" folders and run the build (npm ci / npm run build /
-; npm prune) before compiling this script with Inno Setup.
+; See README.md in this folder for how to assemble the "node-runtime",
+; "mongodb-runtime", and "mongodb-tools-runtime" folders and run the build
+; (npm ci / npm run build / npm prune) before compiling this script with
+; Inno Setup.
 
 #define MyAppName "Sales Tracker"
 #define MyAppVersion "1.0.0"
@@ -57,6 +60,13 @@ Source: "..\package.json"; DestDir: "{app}\app"; Flags: ignoreversion
 ; README.md for exact download links and expected folder layout.
 Source: "node-runtime\*"; DestDir: "{app}\node"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "mongodb-runtime\*"; DestDir: "{app}\mongodb"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+; Optional: MongoDB Database Tools (mongoexport, mongodump, etc.) - only
+; needed for the dashboard's "DB Backup" feature; everything else works
+; fine without it. Merges into the same mongodb\bin folder mongod.exe
+; lives in, which start.bat already puts on PATH. Silently skipped if you
+; haven't downloaded it - see README.md.
+Source: "mongodb-tools-runtime\bin\*"; DestDir: "{app}\mongodb\bin"; Flags: ignoreversion recursesubdirs createallsubdirs skipifsourcedoesntexist
 
 ; Launchers
 Source: "start.bat"; DestDir: "{app}"; Flags: ignoreversion

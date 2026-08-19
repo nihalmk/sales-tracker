@@ -62,7 +62,10 @@ if !TRIES! LSS 30 goto WAIT_MONGO
 
 echo.
 echo ERROR: MongoDB did not start within 30 seconds.
-echo Check the log for details: %LOG_DIR%\mongod.log
+echo Check these for details:
+echo   %LOG_DIR%\mongod.log
+echo   %LOG_DIR%\mongod-launch.log
+echo   %LOG_DIR%\mongod-launch.err.log
 pause
 exit /b 1
 
@@ -80,6 +83,22 @@ echo.
 set "MONGO_URI=mongodb://127.0.0.1:%MONGO_PORT%/sales-tracker"
 set "PORT=3000"
 set "NODE_ENV=production"
+
+rem Placeholders only - the app's Emailer class throws on startup (not just
+rem when actually sending mail) if these are unset at all, since it's
+rem constructed eagerly during server boot (src/accounts/setup.ts). Real
+rem password-reset emails still won't send with fake values - see the
+rem README's "Known simplifications" note - but the app itself will start.
+rem To enable real email sending, replace these with real Mailgun
+rem credentials instead.
+set "MAILGUN_API_KEY=not-configured"
+set "MAILGUN_DOMAIN=not-configured"
+
+rem So the "DB Backup" feature can find mongoexport.exe if you've dropped
+rem the separate MongoDB Database Tools into mongodb\bin alongside
+rem mongod.exe - see the README's DB backup troubleshooting note. Harmless
+rem if you haven't - the app just doesn't need this for anything else.
+set "PATH=%ROOT%mongodb\bin;%PATH%"
 
 cd /d "%APP_DIR%"
 "%NODE_EXE%" dist\src\server\index.js

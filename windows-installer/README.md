@@ -47,6 +47,16 @@ The app itself already auto-opens your default browser once it's up
      `windows-installer\mongodb-runtime\bin\mongod.exe`.
    - Note: MongoDB 5.0+ requires a CPU with AVX support. Virtually all
      PCs from the last ~10 years have this, but very old hardware may not.
+4. **Download MongoDB Database Tools** (optional - only powers the
+   dashboard's "DB Backup" feature; skip this if you don't need it):
+   - Go to <https://www.mongodb.com/try/download/database-tools>, choose
+     **Windows**, and pick the **.zip** package.
+   - Extract it, and arrange it so you have:
+     `windows-installer\mongodb-tools-runtime\bin\mongoexport.exe`.
+   - If you skip this step entirely (don't create the
+     `mongodb-tools-runtime` folder at all), the installer still compiles
+     fine - `mongoexport` just won't be available, and "DB Backup" will
+     show its "not installed" error. Everything else works regardless.
 
 Your `windows-installer` folder should now look like:
 
@@ -54,6 +64,7 @@ Your `windows-installer` folder should now look like:
 windows-installer\
 ├── node-runtime\node.exe, ...
 ├── mongodb-runtime\bin\mongod.exe, ...
+├── mongodb-tools-runtime\bin\mongoexport.exe, ...   (optional)
 ├── start.bat
 ├── stop.bat
 ├── SalesTracker.iss
@@ -117,6 +128,42 @@ Run the installer yourself on a clean-ish Windows machine (or VM) first:
    folders are intentionally left behind (see note in `SalesTracker.iss`)
    — the shop's data isn't wiped just because the program was removed.
 
+## Troubleshooting: "MongoDB did not start within 30 seconds"
+
+`start.bat` waits up to 30 seconds for MongoDB to accept connections, then
+gives up with this message. That means `mongod.exe` launched but exited
+(or never bound its port) shortly after - check, in order:
+
+1. **`logs\mongod-launch.log` and `logs\mongod-launch.err.log`** - these
+   capture mongod's console output from the moment it launches, which is
+   normally invisible since it runs hidden. If `mongod.log` itself (the
+   file MongoDB writes once it's actually up) is empty or missing, mongod
+   failed before reaching that point - these two files are where the real
+   reason shows up instead.
+2. **Missing Visual C++ Redistributable (x64)** - the most common cause
+   of an early, silent failure like this. Install the [Microsoft Visual
+   C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)
+   if it's not already on the machine.
+3. **CPU without AVX support** - MongoDB 5.0+ requires it. Mostly affects
+   older hardware or VMs without AVX passthrough enabled; the launch log
+   will say so explicitly if this is it.
+4. **Wrong MongoDB build** - e.g. a 32-bit or ARM zip on an x64 machine.
+   `start.bat` would normally catch a missing/misplaced `mongod.exe` with
+   a different, earlier error ("MongoDB was not found at..."), so this is
+   less likely if you got this far.
+
+To see the raw, unfiltered result directly (bypassing `start.bat`
+entirely), open a Command Prompt and run:
+
+```
+cd "<install folder>\mongodb\bin"
+mongod.exe --dbpath "<install folder>\data\db"
+```
+
+Either a Windows dialog will complain it can't start the program (points
+to #2 or #4 above), or mongod will print its own error directly in that
+window.
+
 ## Known simplifications (fine for a fully local, single-PC install)
 
 - **Auth secret**: the app falls back to a built-in default
@@ -125,10 +172,17 @@ Run the installer yourself on a clean-ish Windows machine (or VM) first:
   a network. If you ever port-forward this or run it somewhere reachable
   by others, set a real `ACCOUNTS_SECRET` (edit `start.bat` and add
   `set "ACCOUNTS_SECRET=<something random>"` above the `node` line).
-- **Password-reset emails**: `MAILGUN_API_KEY`/`MAILGUN_DOMAIN` aren't
-  set, so password-reset emails won't actually send. Not an issue for a
-  single local user who won't forget their own password reset flow needs
-  email — just something to be aware of.
+- **Password-reset emails**: `start.bat` sets `MAILGUN_API_KEY`/
+  `MAILGUN_DOMAIN` to placeholder values (`not-configured`). These *must*
+  be set to something non-empty or the app fails to start entirely — its
+  `Emailer` class (`src/server/modules/email/email.service.ts`) throws in
+  its constructor if either is missing, and it's constructed eagerly
+  during server boot (`src/accounts/setup.ts`), not lazily when an email
+  is actually sent. With the placeholders, the app starts fine, but an
+  actual password-reset attempt will fail with a Mailgun auth error - not
+  an issue for a single local user who won't be using that flow. To
+  enable real email sending, replace the placeholders in `start.bat` with
+  real Mailgun credentials.
 - **Port 3000 / 27017 already in use**: if something else on the machine
   is already using either port, `start.bat` will either reuse an existing
   MongoDB on 27017 (intentional — see the script) or fail to bind port
@@ -139,3 +193,13 @@ Run the installer yourself on a clean-ish Windows machine (or VM) first:
   that's wanted later, `mongod.exe --install` can register MongoDB as a
   proper Windows service, and something like NSSM can do the same for the
   Node process — happy to build that out if you want it.
+- **"DB Backup" says mongoexport isn't installed**: the app's dashboard
+  has a `/dbbackup` route that shells out to `mongoexport` - a MongoDB
+  *client tool*, shipped as a **separate download** from the server
+  binaries (`mongodb.com/try/download/database-tools`). Step 4 of the
+  one-time setup above bundles this in automatically if you downloaded it
+  before compiling - if you're seeing this error, you likely skipped that
+  step. Either go back and add `mongodb-tools-runtime\bin\mongoexport.exe`
+  and recompile, or just skip "DB Backup" entirely and copy the whole
+  `data\db` folder somewhere safe while the app is stopped instead (a
+  complete backup on its own, no tooling needed).
