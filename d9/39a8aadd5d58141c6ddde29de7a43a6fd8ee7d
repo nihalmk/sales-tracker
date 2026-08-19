@@ -1,0 +1,41 @@
+windows-installer/start-mongo.ps1
+  s_5b771625359126::t_135f41e47c6fd0 14-21,37-38,42-55
+  s_5b771625359126::t_dde6aed0dc8e5c 23-30,35
+  s_5b771625359126::t_d66caac2e6e6f1 22
+windows-installer/README.md
+  s_5b771625359126::t_689e2b98382383 199-205
+  s_5b771625359126::t_3eaed115acbe15 50-59,67
+  s_5b771625359126::t_085a0c03a762c7 196-198
+  s_5b771625359126::t_7fc3e381b9d926 131-166
+  s_5b771625359126::t_e3267d60e559cc 175-185
+windows-installer/start.bat
+  s_5b771625359126::t_6a6b961dcd4917 97-102
+  s_5b771625359126::t_ac2072110063a9 87-96
+  s_5b771625359126::t_f8733d2d68c042 65-68
+windows-installer/SalesTracker.iss
+  s_5b771625359126::t_f337b9593fdcb0 64-70
+  s_5b771625359126::t_ec8581511a4fbb 7-8,11-14
+package.json
+  s_5b771625359126::t_d077000ffa5420 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d939a8aadd5d58141c6ddde29de7a43a6fd8ee7d",
+  "prompts": {},
+  "humans": {
+    "h_26a6a0ac037242": {
+      "author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  },
+  "sessions": {
+    "s_5b771625359126": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96e4f81a-5891-4af9-9251-913ec2b2a54c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Nihal <mohamad.nihal@deliveryhero.in>"
+    }
+  }
+}
