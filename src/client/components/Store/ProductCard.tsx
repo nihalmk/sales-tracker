@@ -18,7 +18,8 @@ export const discountPercent = (list: number, sale: number): number =>
 const ProductCard: React.FC<Props> = ({ item, onClick }) => {
   const { list, sale } = item.price;
   const discount = discountPercent(list, sale);
-  const mainImage = item.imageUrls?.[0] || getCategoryPlaceholderImage(item.category);
+  const mainImage =
+    item.imageUrls?.[0] || getCategoryPlaceholderImage(item.category);
 
   return (
     <Card.Root

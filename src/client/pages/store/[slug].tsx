@@ -25,7 +25,12 @@ const StorePage: NextPage<Props> = () => {
 
   if (!router.isReady || loading) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <Loader />
       </Box>
     );
@@ -35,7 +40,13 @@ const StorePage: NextPage<Props> = () => {
 
   if (!shop) {
     return (
-      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" px={4}>
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        px={4}
+      >
         <Head>
           <title>Store not found</title>
         </Head>

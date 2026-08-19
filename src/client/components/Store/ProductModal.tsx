@@ -20,7 +20,9 @@ interface Props {
   onClose: () => void;
 }
 
-const ChevronIcon: React.FC<{ direction: 'left' | 'right' }> = ({ direction }) => (
+const ChevronIcon: React.FC<{ direction: 'left' | 'right' }> = ({
+  direction,
+}) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
     <path
       d={direction === 'left' ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'}
@@ -82,7 +84,11 @@ const ProductModal: React.FC<Props> = ({ item, onClose }) => {
             <Dialog.Body p={0}>
               <Box position="relative">
                 <AspectRatio ratio={1}>
-                  <Image src={images[index]} alt={item.name} objectFit="cover" />
+                  <Image
+                    src={images[index]}
+                    alt={item.name}
+                    objectFit="cover"
+                  />
                 </AspectRatio>
                 {images.length > 1 && (
                   <React.Fragment>
@@ -147,7 +153,12 @@ const ProductModal: React.FC<Props> = ({ item, onClose }) => {
               </Box>
               <VStack align="stretch" gap={2} p={5}>
                 {item.category && (
-                  <Text fontSize="xs" color="fg.muted" textTransform="uppercase" letterSpacing="wide">
+                  <Text
+                    fontSize="xs"
+                    color="fg.muted"
+                    textTransform="uppercase"
+                    letterSpacing="wide"
+                  >
                     {item.category}
                   </Text>
                 )}
@@ -160,7 +171,11 @@ const ProductModal: React.FC<Props> = ({ item, onClose }) => {
                     ₹{sale}
                   </Text>
                   {discount > 0 && (
-                    <Text fontSize="md" color="fg.muted" textDecoration="line-through">
+                    <Text
+                      fontSize="md"
+                      color="fg.muted"
+                      textDecoration="line-through"
+                    >
                       ₹{list}
                     </Text>
                   )}

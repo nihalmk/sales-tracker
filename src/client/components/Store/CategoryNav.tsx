@@ -10,7 +10,8 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-const label = (option: string): string => (option === ALL_CATEGORIES ? 'All' : option);
+const label = (option: string): string =>
+  option === ALL_CATEGORIES ? 'All' : option;
 
 const HamburgerIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -25,7 +26,13 @@ const HamburgerIcon: React.FC = () => (
 
 const ChevronDownIcon: React.FC = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M6 9l6 6 6-6"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -82,7 +89,11 @@ const CategoryNav: React.FC<Props> = ({ categories, value, onChange }) => {
         </Menu.Root>
       </Box>
 
-      <Box display={{ base: 'none', md: 'block' }} position="relative" overflow="hidden">
+      <Box
+        display={{ base: 'none', md: 'block' }}
+        position="relative"
+        overflow="hidden"
+      >
         <HStack ref={containerRef} gap={2} wrap="nowrap" overflow="hidden">
           {visible.map((option) => (
             <Button

@@ -16,15 +16,33 @@ const WhatsAppIcon: React.FC = () => (
 
 const EmailIcon: React.FC = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <rect x="2" y="4" width="20" height="16" rx="2" stroke="white" strokeWidth="2" />
-    <path d="M3 6l9 7 9-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <rect
+      x="2"
+      y="4"
+      width="20"
+      height="16"
+      rx="2"
+      stroke="white"
+      strokeWidth="2"
+    />
+    <path
+      d="M3 6l9 7 9-7"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 // Fixed bottom-right contact shortcuts. Only rendered when the shop owner
 // has actually filled in the corresponding field in Store Settings - never
 // shown as a dead/non-functional button.
-const ContactBubbles: React.FC<Props> = ({ whatsappNumber, contactEmail, shopName }) => {
+const ContactBubbles: React.FC<Props> = ({
+  whatsappNumber,
+  contactEmail,
+  shopName,
+}) => {
   if (!whatsappNumber && !contactEmail) {
     return null;
   }

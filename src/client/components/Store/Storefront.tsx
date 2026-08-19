@@ -27,7 +27,12 @@ const SEARCH_DEBOUNCE_MS = 600;
 const SearchIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
     <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-    <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <path
+      d="M21 21l-4.35-4.35"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
@@ -54,25 +59,18 @@ const Storefront: React.FC<Props> = ({ shop }) => {
   });
   const categories: string[] = categoriesData?.getPublicShopCategories || [];
 
-  const {
-    items,
-    loading,
-    loadingMore,
-    error,
-    hasMore,
-    retry,
-    sentinelRef,
-  } = useInfiniteScroll({
-    query: GET_PUBLIC_SHOP_ITEMS,
-    variables: {
-      slug: shop.slug,
-      search: appliedSearch || undefined,
-      category: category === ALL_CATEGORIES ? undefined : category,
-    },
-    pageSize: PAGE_SIZE,
-    getItems: (data): PublicItem[] => data?.getPublicShopItems?.items || [],
-    getTotalCount: (data) => data?.getPublicShopItems?.totalCount || 0,
-  });
+  const { items, loading, loadingMore, error, hasMore, retry, sentinelRef } =
+    useInfiniteScroll({
+      query: GET_PUBLIC_SHOP_ITEMS,
+      variables: {
+        slug: shop.slug,
+        search: appliedSearch || undefined,
+        category: category === ALL_CATEGORIES ? undefined : category,
+      },
+      pageSize: PAGE_SIZE,
+      getItems: (data): PublicItem[] => data?.getPublicShopItems?.items || [],
+      getTotalCount: (data) => data?.getPublicShopItems?.totalCount || 0,
+    });
 
   return (
     <Box minH="100vh" bg="gray.50">
@@ -89,19 +87,38 @@ const Storefront: React.FC<Props> = ({ shop }) => {
           {shop.name}
         </Heading>
         {shop.tagline && (
-          <Text mt={2} fontSize={{ base: 'sm', md: 'md' }} opacity={0.9} maxW="2xl">
+          <Text
+            mt={2}
+            fontSize={{ base: 'sm', md: 'md' }}
+            opacity={0.9}
+            maxW="2xl"
+          >
             {shop.tagline}
           </Text>
         )}
       </Box>
 
-      <Box maxW="7xl" mx="auto" px={{ base: 4, md: 8 }} mt={{ base: -10, md: -12 }} pb={20}>
-        <Box bg="white" borderRadius="l3" shadow="lg" p={{ base: 3, md: 4 }} mb={6}>
+      <Box
+        maxW="7xl"
+        mx="auto"
+        px={{ base: 4, md: 8 }}
+        mt={{ base: -10, md: -12 }}
+        pb={20}
+      >
+        <Box
+          bg="white"
+          borderRadius="l3"
+          shadow="lg"
+          p={{ base: 3, md: 4 }}
+          mb={6}
+        >
           <InputGroup startElement={<SearchIcon />}>
             <Input
               placeholder="Search products..."
               value={searchTerm}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
               bg="white"
               size="lg"
             />
@@ -109,13 +126,20 @@ const Storefront: React.FC<Props> = ({ shop }) => {
 
           {categories.length > 0 && (
             <Box mt={4}>
-              <CategoryNav categories={categories} value={category} onChange={setCategory} />
+              <CategoryNav
+                categories={categories}
+                value={category}
+                onChange={setCategory}
+              />
             </Box>
           )}
         </Box>
 
         {loading ? (
-          <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={{ base: 3, md: 5 }}>
+          <SimpleGrid
+            columns={{ base: 2, sm: 3, md: 4, lg: 5 }}
+            gap={{ base: 3, md: 5 }}
+          >
             {Array.from({ length: 10 }).map((_unused, i) => (
               <Skeleton key={i} h="260px" borderRadius="l3" />
             ))}
@@ -139,7 +163,10 @@ const Storefront: React.FC<Props> = ({ shop }) => {
           </VStack>
         ) : (
           <React.Fragment>
-            <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={{ base: 3, md: 5 }}>
+            <SimpleGrid
+              columns={{ base: 2, sm: 3, md: 4, lg: 5 }}
+              gap={{ base: 3, md: 5 }}
+            >
               {items.map((item) => (
                 <ProductCard
                   key={item._id}
@@ -148,11 +175,13 @@ const Storefront: React.FC<Props> = ({ shop }) => {
                 />
               ))}
             </SimpleGrid>
-            {hasMore && (
-              <Box ref={sentinelRef} h="1px" />
-            )}
+            {hasMore && <Box ref={sentinelRef} h="1px" />}
             {loadingMore && (
-              <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={{ base: 3, md: 5 }} mt={5}>
+              <SimpleGrid
+                columns={{ base: 2, sm: 3, md: 4, lg: 5 }}
+                gap={{ base: 3, md: 5 }}
+                mt={5}
+              >
                 {Array.from({ length: 5 }).map((_unused, i) => (
                   <Skeleton key={i} h="260px" borderRadius="l3" />
                 ))}
@@ -163,7 +192,10 @@ const Storefront: React.FC<Props> = ({ shop }) => {
       </Box>
 
       {selectedItem && (
-        <ProductModal item={selectedItem} onClose={() => setSelectedItem(undefined)} />
+        <ProductModal
+          item={selectedItem}
+          onClose={() => setSelectedItem(undefined)}
+        />
       )}
 
       <ContactBubbles

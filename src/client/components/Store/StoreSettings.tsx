@@ -90,7 +90,10 @@ const StoreSettings: React.FC<Props> = () => {
             </Text>
 
             {publicUrl && (
-              <Alert.Root status={form?.isPublished ? 'success' : 'info'} borderRadius="l2">
+              <Alert.Root
+                status={form?.isPublished ? 'success' : 'info'}
+                borderRadius="l2"
+              >
                 <Alert.Indicator />
                 <Alert.Content>
                   <Alert.Description>
@@ -186,7 +189,9 @@ const StoreSettings: React.FC<Props> = () => {
                 <Switch.Thumb />
               </Switch.Control>
               {/* @ts-expect-error Chakra v3's Ark UI-derived SwitchLabelProps doesn't model `children` in its polymorphic types, though it renders them fine. */}
-              <Switch.Label>Publish store (make it publicly visible)</Switch.Label>
+              <Switch.Label>
+                Publish store (make it publicly visible)
+              </Switch.Label>
             </Switch.Root>
           </Stack>
           <button type="submit" hidden></button>

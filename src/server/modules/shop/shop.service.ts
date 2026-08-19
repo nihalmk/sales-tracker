@@ -33,7 +33,7 @@ export class ShopService {
     const slug = await generateUniqueSlug(shop.name);
     const createdShop = await this.model.create({ ...shop, slug });
     await this.userService.updateUserShop(
-      (this.ctx.userId as unknown) as ObjectId,
+      this.ctx.userId as unknown as ObjectId,
       createdShop._id,
     );
     return createdShop;

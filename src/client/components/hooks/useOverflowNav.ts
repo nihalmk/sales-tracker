@@ -21,7 +21,11 @@ interface Result {
 // from a parallel set of DOM nodes (rendered off-screen, one per item, via
 // measureRef) rather than the visible ones, so the answer doesn't depend
 // on how many are currently shown.
-export function useOverflowNav({ count, gap = 8, moreWidth = 90 }: Options): Result {
+export function useOverflowNav({
+  count,
+  gap = 8,
+  moreWidth = 90,
+}: Options): Result {
   const containerElRef = useRef<HTMLDivElement | null>(null);
   const measureElsRef = useRef<(HTMLElement | null)[]>([]);
   const [visibleCount, setVisibleCount] = useState(count);

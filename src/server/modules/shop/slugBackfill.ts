@@ -21,5 +21,7 @@ export const runShopSlugBackfill = async (): Promise<void> => {
     await ShopModel.updateOne({ _id: shop._id }, { $set: { slug } });
   }
 
-  logger.info(`Startup shop cleanup: assigned a slug to ${shops.length} shop(s).`);
+  logger.info(
+    `Startup shop cleanup: assigned a slug to ${shops.length} shop(s).`,
+  );
 };
