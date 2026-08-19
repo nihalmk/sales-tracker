@@ -495,6 +495,7 @@ export type Items = {
   category?: Maybe<Scalars['String']>;
   price?: Maybe<Price>;
   stock: Scalars['Float'];
+  imageUrls?: Maybe<Array<Scalars['String']>>;
   shop?: Maybe<Shop>;
   createdAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
@@ -650,6 +651,7 @@ export type CreateItemsInput = {
   category?: Maybe<Scalars['String']>;
   price?: Maybe<PriceInput>;
   stock: Scalars['Float'];
+  imageUrls?: Maybe<Array<Scalars['String']>>;
   shop?: Maybe<Scalars['ID']>;
 };
 
@@ -659,6 +661,34 @@ export type UpdateItemsInput = {
   category?: Maybe<Scalars['String']>;
   price?: Maybe<PriceInput>;
   stock: Scalars['Float'];
+  imageUrls?: Maybe<Array<Scalars['String']>>;
+};
+
+export type BulkUpdatePriceInput = {
+  sale?: Maybe<Scalars['Float']>;
+  cost?: Maybe<Scalars['Float']>;
+  list?: Maybe<Scalars['Float']>;
+};
+
+export type BulkUpdateItemInput = {
+  shortId: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
+  price?: Maybe<BulkUpdatePriceInput>;
+  stock?: Maybe<Scalars['Float']>;
+  imageUrls?: Maybe<Array<Scalars['String']>>;
+};
+
+export type BulkUpdateError = {
+  __typename?: 'BulkUpdateError';
+  shortId: Scalars['String'];
+  message: Scalars['String'];
+};
+
+export type BulkUpdateItemsResult = {
+  __typename?: 'BulkUpdateItemsResult';
+  updated: Array<Items>;
+  notFound: Array<Scalars['String']>;
+  errors: Array<BulkUpdateError>;
 };
 
 export type PurchaseItemInput = {

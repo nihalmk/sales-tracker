@@ -11,6 +11,7 @@ export const itemsResponse = `{
     list
   }
   stock
+  imageUrls
   shop {
     _id
     name

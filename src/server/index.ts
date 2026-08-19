@@ -15,6 +15,7 @@ import { buildTypeDefsAndResolvers } from 'type-graphql';
 import { addRoutes } from './routes';
 import compression from 'compression';
 import { authChecker } from './common/authChecker';
+import { runItemStartupCleanup } from './modules/items/autoCategorize';
 // import { graphqlPubsub as pubSub } from './modules/graphqlPubsub/pubsub.service';
 
 const koaConnect = require('koa-connect');
@@ -128,6 +129,16 @@ const startUp = async () => {
     await addRoutes(app);
     logger.info(`🚀 Server listening on ${PORT}`);
     app.listen(PORT);
+
+    // Deliberately not awaited — must never delay startup or the first
+    // request. Assigns a best-guess category to any item still missing
+    // one, and backfills MRP from Sale Price where MRP is missing/0 (both
+    // from historical data, or any edge case createItem's own auto-guess
+    // didn't cover). Safe to run every boot: a shop with nothing to fix
+    // just does one cheap query and returns.
+    runItemStartupCleanup().catch((error) => {
+      logger.error({ error }, 'Background item startup cleanup failed');
+    });
 
     // K_SERVICE is set automatically on Cloud Run; skip the local dev-convenience
     // browser auto-open there since no `xdg-open`/browser exists in the container,

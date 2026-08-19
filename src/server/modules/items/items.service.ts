@@ -1,11 +1,21 @@
-import { ItemsModel, Items, PaginatedItems } from './items.model';
-import { CreateItemsInput, UpdateItemsInput } from './items.input';
+import {
+  ItemsModel,
+  Items,
+  PaginatedItems,
+  BulkUpdateItemsResult,
+} from './items.model';
+import {
+  CreateItemsInput,
+  UpdateItemsInput,
+  BulkUpdateItemInput,
+} from './items.input';
 import { CTX } from '../../interfaces/common';
 import { UserService } from '../user/user.service';
 import _ from 'lodash';
 import { SaleItemInput } from '../sale/sale.input';
 import { PurchaseItemInput } from '../purchase/purchase.input';
 import { ObjectId } from 'mongodb';
+import { guessCategory } from './autoCategorize';
 
 // Queries on models to to get/create/update items data
 
@@ -115,6 +125,9 @@ export class ItemsService {
   async createItem(item: CreateItemsInput): Promise<Items> {
     const createdItem = await this.model.create({
       ...item,
+      // Only guessed when the user didn't pick one themselves — never
+      // overrides an explicit choice.
+      category: item.category || guessCategory(item.name),
       shop: item.shop || this.ctx.user.shop,
     });
     return createdItem;
@@ -137,6 +150,84 @@ export class ItemsService {
       },
     );
     return updateItems;
+  }
+
+  // CSV bulk update, matched by shortId — only ever touches
+  // category/price/stock/imageUrls (BulkUpdateItemInput has no `name`
+  // field at all, so there's nothing else it could touch). The client
+  // sends this in small batches for a real, incremental progress bar; each
+  // row here is independent, so one bad row never blocks the rest of the
+  // batch.
+  async bulkUpdateByShortId(
+    rows: BulkUpdateItemInput[],
+  ): Promise<BulkUpdateItemsResult> {
+    const updated: Items[] = [];
+    const notFound: string[] = [];
+    const errors: { shortId: string; message: string }[] = [];
+
+    for (const row of rows) {
+      const shortId = row.shortId?.trim();
+      if (!shortId) {
+        errors.push({
+          shortId: row.shortId || '(blank)',
+          message: 'Missing Short ID',
+        });
+        continue;
+      }
+      if (row.stock !== undefined && row.stock < -1) {
+        errors.push({ shortId, message: 'Stock must be -1 or greater' });
+        continue;
+      }
+      if (
+        row.price &&
+        ((row.price.cost !== undefined && row.price.cost < 0) ||
+          (row.price.list !== undefined && row.price.list < 0) ||
+          (row.price.sale !== undefined && row.price.sale < 0))
+      ) {
+        errors.push({ shortId, message: 'Prices cannot be negative' });
+        continue;
+      }
+
+      const existing = await this.model.findOne({
+        shop: this.ctx.user.shop,
+        shortId,
+      });
+      if (!existing) {
+        notFound.push(shortId);
+        continue;
+      }
+
+      const update: Record<string, unknown> = {};
+      if (row.category !== undefined) {
+        update.category = row.category;
+      }
+      // Price is a single embedded sub-document in Mongo, but a CSV row
+      // may only carry one price column (e.g. a supplier's cost-only price
+      // list) - merge onto the existing price rather than replacing the
+      // whole sub-document, so untouched fields survive.
+      if (row.price !== undefined) {
+        update.price = {
+          cost: row.price.cost ?? existing.price?.cost ?? 0,
+          list: row.price.list ?? existing.price?.list ?? 0,
+          sale: row.price.sale ?? existing.price?.sale ?? 0,
+        };
+      }
+      if (row.stock !== undefined) {
+        update.stock = row.stock;
+      }
+      if (row.imageUrls !== undefined) {
+        update.imageUrls = row.imageUrls;
+      }
+
+      const updatedItem = await this.model.findOneAndUpdate(
+        { _id: existing._id },
+        { $set: update },
+        { new: true },
+      );
+      updated.push(updatedItem);
+    }
+
+    return { updated, notFound, errors };
   }
 
   async updateStock(items: SaleItemInput[]): Promise<void> {

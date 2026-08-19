@@ -1,12 +1,12 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { NextPage } from 'next';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useLazyQuery } from '@apollo/client';
 import { CREATE_ITEM, UPDATE_ITEM } from '../../graphql/mutation/items';
 import { GET_ITEMS, GET_CATEGORIES } from '../../graphql/query/items';
 import Input from '../common/Inputs/FormInput';
 import SuccessMessage from '../Alerts/SuccessMessage';
 import ErrorMessage from '../Errors/ErrorMessage';
-import { Items } from '../../generated/graphql';
+import { Items, BulkUpdateItemInput } from '../../generated/graphql';
 import Loader from '../Loaders/Loader';
 import { removeUnderscoreKeys } from '../../utils/helpers';
 import SelectBox, { LabelValueObj } from '../common/SelectBoxes/SelectBox';
@@ -22,12 +22,18 @@ import {
   VStack,
   Flex,
   Box,
+  IconButton,
 } from '@chakra-ui/react';
 import Icon from '../common/Icon';
+import Tooltip from '../common/Tooltip';
 import { useInfiniteScroll } from '../hooks/useInfiniteScroll';
 import InfiniteScrollStatus from '../common/InfiniteScrollStatus';
 import { useLinkedPriceField } from '../hooks/useLinkedPriceField';
 import { useUrlFilters } from '../hooks/useUrlFilters';
+import ItemImagesModal, { ImageIcon } from './ItemImagesModal';
+import ImportItemsModal from './ImportItemsModal';
+import { downloadTextFile } from '../../utils/csv';
+import { buildItemsExportCsv, parseItemsImportCsv } from '../../utils/itemsCsv';
 
 const PAGE_SIZE = 20;
 const SEARCH_DEBOUNCE_MS = 1000;
@@ -123,6 +129,14 @@ const AddStock: NextPage<Props> = function () {
   const [updateSubmitted, setUpdateSubmitted] = useState(false);
 
   const [newItem, setNewItem] = useState<Items>();
+  const [newImageUrlDraft, setNewImageUrlDraft] = useState('');
+  const [viewingImagesItem, setViewingImagesItem] = useState<Items>();
+  const [importRows, setImportRows] = useState<BulkUpdateItemInput[]>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fetchAllItemsForExport, { loading: exportLoading }] = useLazyQuery(
+    GET_ITEMS,
+    { fetchPolicy: 'no-cache' },
+  );
   const {
     onDependentChange: onSalePriceChange,
     nextDependentValue: nextSalePrice,
@@ -147,7 +161,7 @@ const AddStock: NextPage<Props> = function () {
 
   const onNewItemCreate = async (e?: React.SyntheticEvent) => {
     e && e.preventDefault();
-    const { name, category, price, stock } = newItem || {};
+    const { name, category, price, stock, imageUrls } = newItem || {};
     setSubmitted(true);
     if (
       !name ||
@@ -169,11 +183,13 @@ const AddStock: NextPage<Props> = function () {
           category,
           price,
           stock,
+          imageUrls,
         },
       });
       await refetchItems();
       setMessage('New item added successfully');
       setNewItem(undefined);
+      setNewImageUrlDraft('');
       resetSaleLink();
       setSubmitted(false);
       setTimeout(() => {
@@ -228,23 +244,80 @@ const AddStock: NextPage<Props> = function () {
     }
   };
 
+  const onExportCsv = async () => {
+    try {
+      const { data } = await fetchAllItemsForExport();
+      const allItems: Items[] = data?.getItemsForUser?.items || [];
+      const csv = buildItemsExportCsv(allItems);
+      const timestamp = new Date().toISOString().slice(0, 10);
+      downloadTextFile(csv, `stock-export-${timestamp}.csv`);
+    } catch (e) {
+      setError(`Error exporting items. ${e.message}`);
+      setTimeout(() => {
+        setError('');
+      }, 5000);
+    }
+  };
+
+  const onImportFileSelected = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) {
+      return;
+    }
+    const text = await file.text();
+    const { rows, error: parseError } = parseItemsImportCsv(text);
+    if (parseError) {
+      setError(parseError);
+      setTimeout(() => {
+        setError('');
+      }, 5000);
+      return;
+    }
+    setImportRows(rows);
+  };
+
   return (
     <React.Fragment>
       <Card.Root variant="elevated" borderRadius="l3" mb={5}>
         <Card.Header>
-          <HStack justify="space-between">
+          <HStack justify="space-between" wrap="wrap" gap={3}>
             <HStack gap={2}>
               <Icon name="stock" boxSize={5} />
               <Heading size="md">Stock</Heading>
             </HStack>
-            <Text textAlign="right">
-              <Text as="span" fontWeight="semibold" mr={2}>
-                Total
+            <HStack gap={3} wrap="wrap">
+              <Text textAlign="right">
+                <Text as="span" fontWeight="semibold" mr={2}>
+                  Total
+                </Text>
+                <Text as="span" color="green.600" fontWeight="medium">
+                  {totalStockAmount}₹
+                </Text>
               </Text>
-              <Text as="span" color="green.600" fontWeight="medium">
-                {totalStockAmount}₹
-              </Text>
-            </Text>
+              <Button
+                size="sm"
+                variant="outline"
+                loading={exportLoading}
+                onClick={onExportCsv}
+              >
+                Export CSV
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Import CSV
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,text/csv"
+                hidden
+                onChange={onImportFileSelected}
+              />
+            </HStack>
           </HStack>
         </Card.Header>
         <form onSubmit={onNewItemCreate}>
@@ -378,6 +451,85 @@ const AddStock: NextPage<Props> = function () {
                 value={newItem?.stock || ''}
               />
             </SimpleGrid>
+            <Box mb={4}>
+              <Text fontSize="sm" fontWeight="medium" mb={2}>
+                Images (optional)
+              </Text>
+              <HStack mb={2} align="flex-end">
+                <Box flex="1">
+                  <Input
+                    tabIndex={7}
+                    inputName="imageUrl"
+                    inputType="text"
+                    max={500}
+                    placeholderValue="Image URL"
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setNewImageUrlDraft(e.target.value)
+                    }
+                    disabled={createLoading}
+                    value={newImageUrlDraft}
+                  />
+                </Box>
+                <Button
+                  tabIndex={8}
+                  variant="outline"
+                  colorPalette="brand"
+                  disabled={createLoading || !newImageUrlDraft.trim()}
+                  onClick={() => {
+                    const url = newImageUrlDraft.trim();
+                    if (!url) {
+                      return;
+                    }
+                    setNewItem((currentState) => ({
+                      ...currentState,
+                      imageUrls: [...(currentState?.imageUrls || []), url],
+                    }));
+                    setNewImageUrlDraft('');
+                  }}
+                >
+                  <Icon name="add" />
+                  Add Image
+                </Button>
+              </HStack>
+              {!!newItem?.imageUrls?.length && (
+                <VStack align="stretch" gap={1}>
+                  {newItem.imageUrls.map((url, i) => (
+                    <HStack
+                      key={i}
+                      justify="space-between"
+                      borderWidth="1px"
+                      borderColor="border"
+                      borderRadius="l1"
+                      px={2}
+                      py={1}
+                    >
+                      <Text fontSize="xs" color="fg.muted" truncate>
+                        {url}
+                      </Text>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorPalette="red"
+                        onClick={() => {
+                          setNewItem((currentState) => {
+                            const nextImageUrls = [
+                              ...(currentState?.imageUrls || []),
+                            ];
+                            nextImageUrls.splice(i, 1);
+                            return {
+                              ...currentState,
+                              imageUrls: nextImageUrls,
+                            };
+                          });
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </HStack>
+                  ))}
+                </VStack>
+              )}
+            </Box>
             <Flex justify="flex-end">
               <Button
                 id="item-submit"
@@ -442,6 +594,9 @@ const AddStock: NextPage<Props> = function () {
               <Table.Row>
                 <Table.ColumnHeader>#ID</Table.ColumnHeader>
                 <Table.ColumnHeader>Product</Table.ColumnHeader>
+                <Table.ColumnHeader textAlign="center">
+                  Images
+                </Table.ColumnHeader>
                 <Table.ColumnHeader>Category</Table.ColumnHeader>
                 <Table.ColumnHeader textAlign="end">
                   Cost Price
@@ -459,13 +614,13 @@ const AddStock: NextPage<Props> = function () {
             <Table.Body>
               {itemsLoading ? (
                 <Table.Row>
-                  <Table.Cell textAlign="center" py={8} colSpan={8}>
+                  <Table.Cell textAlign="center" py={8} colSpan={9}>
                     <Loader />
                   </Table.Cell>
                 </Table.Row>
               ) : itemsError && items?.length === 0 ? (
                 <Table.Row>
-                  <Table.Cell textAlign="center" py={8} colSpan={8}>
+                  <Table.Cell textAlign="center" py={8} colSpan={9}>
                     <VStack gap={2}>
                       <Text color="red.600" fontSize="sm">
                         Failed to load items.
@@ -484,7 +639,7 @@ const AddStock: NextPage<Props> = function () {
               ) : (
                 items?.length === 0 && (
                   <Table.Row>
-                    <Table.Cell textAlign="center" py={8} colSpan={8}>
+                    <Table.Cell textAlign="center" py={8} colSpan={9}>
                       <Text color="fg.muted" fontSize="sm">
                         No items added yet
                       </Text>
@@ -523,6 +678,18 @@ const AddStock: NextPage<Props> = function () {
                         ) : (
                           item.name
                         )}
+                      </Table.Cell>
+                      <Table.Cell textAlign="center">
+                        <Tooltip content="View images">
+                          <IconButton
+                            aria-label="View images"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setViewingImagesItem(item)}
+                          >
+                            <ImageIcon />
+                          </IconButton>
+                        </Tooltip>
                       </Table.Cell>
                       <Table.Cell color="fg.muted">
                         {isEdit ? (
@@ -726,6 +893,20 @@ const AddStock: NextPage<Props> = function () {
           />
         </Card.Body>
       </Card.Root>
+      {viewingImagesItem && (
+        <ItemImagesModal
+          item={viewingImagesItem}
+          onClose={() => setViewingImagesItem(undefined)}
+          onSaved={refetchItems}
+        />
+      )}
+      {importRows && (
+        <ImportItemsModal
+          rows={importRows}
+          onClose={() => setImportRows(undefined)}
+          onCompleted={refetchItems}
+        />
+      )}
     </React.Fragment>
   );
 };

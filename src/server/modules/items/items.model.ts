@@ -51,6 +51,10 @@ export class Items {
   @Field(NumberField)
   stock: number;
 
+  @prop({ type: () => [String] })
+  @Field((_type) => [String], { nullable: true })
+  imageUrls?: string[];
+
   @prop({ ref: 'Shop', required: false, index: true })
   @Field((_type) => Shop, { nullable: true })
   shop: Ref<Shop>;
@@ -79,4 +83,30 @@ export class PaginatedItems {
 
   @Field(NumberField)
   totalStockAmount: number;
+}
+
+// One rejected/failed row from a CSV bulk update - kept alongside its
+// shortId so the client can show the user exactly which row to fix.
+@ObjectType()
+export class BulkUpdateError {
+  @Field(StringField)
+  shortId: string;
+
+  @Field(StringField)
+  message: string;
+}
+
+@ObjectType({
+  description: 'Result of a CSV bulk update, batched by the client',
+})
+export class BulkUpdateItemsResult {
+  @Field((_type) => [Items])
+  updated: Items[];
+
+  // Short IDs from the batch that didn't match any item in this shop.
+  @Field((_type) => [String])
+  notFound: string[];
+
+  @Field((_type) => [BulkUpdateError])
+  errors: BulkUpdateError[];
 }

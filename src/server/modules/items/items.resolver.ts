@@ -1,8 +1,12 @@
 import { Resolver, Query, Authorized, Ctx, Arg, Mutation } from 'type-graphql';
 import { CTX } from '../../interfaces/common';
 import { ItemsService } from './items.service';
-import { Items, PaginatedItems } from './items.model';
-import { CreateItemsInput, UpdateItemsInput } from './items.input';
+import { Items, PaginatedItems, BulkUpdateItemsResult } from './items.model';
+import {
+  CreateItemsInput,
+  UpdateItemsInput,
+  BulkUpdateItemInput,
+} from './items.input';
 
 /**
  * Mutations and Queries for getting items / updating items data
@@ -60,5 +64,20 @@ export default class ItemsResolver {
   ): Promise<Items> {
     const itemsService = new ItemsService(ctx);
     return await itemsService.updateItems(item);
+  }
+
+  // CSV import — the client sends this in small batches (see
+  // ImportItemsModal.tsx) rather than one giant call, both so it can show
+  // real incremental progress and so one bad batch doesn't risk the whole
+  // import.
+  @Mutation((_returns) => BulkUpdateItemsResult)
+  @Authorized()
+  async bulkUpdateItemsByShortId(
+    @Ctx() ctx: CTX,
+    @Arg('items', (_returns) => [BulkUpdateItemInput])
+    items: BulkUpdateItemInput[],
+  ): Promise<BulkUpdateItemsResult> {
+    const itemsService = new ItemsService(ctx);
+    return await itemsService.bulkUpdateByShortId(items);
   }
 }
